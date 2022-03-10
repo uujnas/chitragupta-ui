@@ -1,31 +1,61 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { verify_token } from "../components/routeGuard/RouteGuard";
 
 const Login = () => {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const token_verified = async () => {
+    const token_verified = await verify_token();
+    if (token_verified) {
+      router.push("/home");
+    }
+  };
+
+  useEffect(token_verified, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("")
 
-    // make request to remote api login endpoint
-    const response = await axios.post(
-      "http://localhost:4000/users/sign_in.json",
-      {
-        user: { email, password },
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    try {
+      // make request to remote api login endpoint
+      const response = await axios.post(
+        "http://localhost:4000/users/sign_in.json",
+        {
+          user: { email, password },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    localStorage.setItem("token", response.headers.authorization)
+      localStorage.setItem("token", response.headers.authorization);
+      router.push("/home")
+    } catch (error) {
+      localStorage.removeItem("token");
+      setError("Invalid user or password.")
+    }
   };
 
   return (
     <section className="my-8 pt-14">
       <div className="container px-2 py-2 mx-auto md:w-full md:max-w-md">
         <div className="w-full px-3 bg-white divide-y divide-gray-200 rounded-lg shadow">
+          <div>
+            {
+              error.length >= 1 ? (
+              <div className="text-red-500 text">
+                {error}  
+              </div>): ""
+            }
+          </div>
+          
           <div className="px-5 py-7">
             <label className="block pb-1 text-sm font-semibold text-gray-600">
               E-mail

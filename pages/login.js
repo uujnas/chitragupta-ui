@@ -11,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const token_verified = async () => {
+    console.log(process.env.NEXT_PUBLIC_REMOTE_URL);
     const token_verified = await verify_token();
     if (token_verified) {
       router.push(getRedirect());
@@ -23,16 +24,39 @@ const Login = () => {
       : "/home";
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}`;
+    script.id = "recaptcha";
+    document.head.append(script);
+  });
+
   useEffect(token_verified, []);
 
   const handleSubmit = async (e) => {
+    console.log("handling submit");
     e.preventDefault();
+
+    // first we will check captcha score
+    grecaptcha.ready(function async () {
+      grecaptcha
+        .execute(process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY, { action: "submit" })
+        .then(function (token) {
+          console.log(token)
+          // We must make request to backend from here
+          // if we try to force our way google simply won't let us
+          console.log(token)
+        })
+    });
+
+    return;
+
     setError("");
 
     try {
       // make request to remote api login endpoint
       const response = await axios.post(
-        "http://localhost:4000/users/sign_in.json",
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
         {
           user: { email, password },
           headers: {
@@ -85,7 +109,9 @@ const Login = () => {
               className="inline-block w-full py-3 text-sm font-semibold text-center text-white transition bg-blue-500 rounded-lg shadow-sm hover:bg-blue-600 "
               onClick={handleSubmit}
             >
-              <span className="inline-block mr-2 uppercase">Login</span>
+              <span className="inline-block mr-2 uppercase g-recaptcha">
+                Login
+              </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

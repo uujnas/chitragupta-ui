@@ -1,38 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, useSortBy, useFilters, usePagination } from 'react-table';
 import { COLUMNS } from './column';
+import Jsona from 'jsona';
+import axios from 'axios';
 
 const DataTable = () => {
+  const [leaveRequests, setLeaveRequests] = useState([])
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(
-    () => [
-      {
-        username: 'Sagar Shah',
-        start_date: '2016-02-15',
-        end_date: '2016-02-18',
-        duration: '3',
-        reason: 'a mild fever',
-        status: 'approved'
-      },
-      {
-        username: 'Sujan BAsnet',
-        start_date: '2022-03-08',
-        end_date: '2016-02-15',
-        duration: '1',
-        reason: 'feeling lazy',
-        status: 'rejected'
-      },
-      {
-        username: 'Nihal Dhakal',
-        start_date: '2022-02-14',
-        end_date: '2022-02-15',
-        duration: '1',
-        reason: 'need to go to hospital',
-        status: 'approved'
-      }
-    ],
-    []
-  );
+
+  useEffect(async ()=> {
+    const leave_requests = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`, {headers: {"Authorization": localStorage.token}})
+    const dataFormatter = new Jsona();
+    setLeaveRequests(dataFormatter.deserialize(leave_requests.data))
+    console.log(dataFormatter.deserialize(leave_requests.data))
+  }, [])
 
   const {
     getTableProps,
@@ -49,7 +30,7 @@ const DataTable = () => {
   } = useTable(
     {
       columns,
-      data
+      data: leaveRequests
     },
     useFilters,
     useSortBy,

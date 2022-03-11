@@ -32,7 +32,7 @@ const RouteGuard = ({ children }) => {
     // why are we splitting with ?
     const path = url.split("?")[0];
 
-    const token_verified = await verify_token()
+    const token_verified = await verify_token();
     if (!token_verified && !publicPaths.includes(path)) {
       setAuthorized(false);
       router.push({
@@ -60,7 +60,16 @@ const verify_token = async () => {
 
     return response.statusText == "OK";
   } catch (error) {
-    return false
+    return false;
+  }
+};
+
+RouteGuard.getInitialProps = async (ctx) => {
+  const token_verified = await verify_token();
+  // check that we are in SSR and not in Client side
+  if (typeof window === "undefined" && ctx.ctx.res.writeHead && !token_verified) {
+    ctx.ctx.res.writeHead(302, { Location: "account/login" });
+    ctx.ctx.res.end();
   }
 };
 

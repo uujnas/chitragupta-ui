@@ -1,5 +1,3 @@
-import ColumnFilter from './ColumnFilter';
-
 export const COLUMNS = [
   { Header: 'Username', accessor: 'username' },
   {
@@ -18,5 +16,5 @@ export const COLUMNS = [
   },
   { Header: 'duration', accessor: 'duration' },
   { Header: 'reason', accessor: 'reason' },
-  { Header: 'status', accessor: 'status', Filter: ColumnFilter }
+  { Header: 'status', accessor: 'status' }
 ];

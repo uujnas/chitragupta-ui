@@ -9,25 +9,25 @@ const Navbar = ({ subPages, page }) => {
         <div className="user">user</div>
       </div>
       <nav
-        class="flex py-8 px-5 text-white-700   dark:bg-white-800 dark:border-white-700"
+        className="flex px-5 py-8 text-white-700 dark:bg-white-800 dark:border-white-700"
         aria-label="Breadcrumb"
       >
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-          <li class="inline-flex items-center">
+        <ol className="inline-flex items-center space-x-1 md:space-x-3">
+          <li className="inline-flex items-center">
             <a
               href="#"
-              class="inline-flex items-center font-lg mr-6 font-medium text-white-700  dark:text-white-400 dark:hover:text-white"
+              className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white"
             >
               Dashboard
             </a>
           </li>
-          <li class="inline-flex items-center">
+          <li className="inline-flex items-center">
             <a
               href="#"
-              class="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
+              className="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
             >
               <svg
-                class="mr-2 w-4 h-4"
+                className="w-4 h-4 mr-2"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -38,9 +38,9 @@ const Navbar = ({ subPages, page }) => {
             </a>
           </li>
           <li>
-            <div class="flex items-center">
+            <div className="flex items-center">
               <svg
-                class="w-5 h-5 text-white-400"
+                className="w-5 h-5 text-white-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +53,7 @@ const Navbar = ({ subPages, page }) => {
               </svg>
               <a
                 href="#"
-                class="ml-1 text-sm font-medium text-white-700 hover:text-white-900 md:ml-2 dark:text-white-400 dark:hover:text-white"
+                className="ml-1 text-sm font-medium text-white-700 hover:text-white-900 md:ml-2 dark:text-white-400 dark:hover:text-white"
               >
                 {page}
               </a>
@@ -62,9 +62,9 @@ const Navbar = ({ subPages, page }) => {
 
           {subPages.map((subPage, index) => (
             <li aria-current="page" key={index}>
-              <div class="flex items-center">
+              <div className="flex items-center">
                 <svg
-                  class="w-5 h-5 text-white-400"
+                  className="w-5 h-5 text-white-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ const Navbar = ({ subPages, page }) => {
                     clip-rule="evenodd"
                   ></path>
                 </svg>
-                <span class="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
+                <span className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
                   {subPage}
                 </span>
               </div>

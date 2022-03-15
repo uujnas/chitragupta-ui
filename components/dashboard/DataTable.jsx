@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import { useTable, useSortBy, useFilters, usePagination } from 'react-table';
+import { useTable, useSortBy, usePagination } from 'react-table';
 import { COLUMNS } from './column';
+import { CSVLink } from 'react-csv';
 
 const DataTable = ({ showModal, setShowModal }) => {
   const columns = useMemo(() => COLUMNS, []);
@@ -51,15 +52,26 @@ const DataTable = ({ showModal, setShowModal }) => {
       columns,
       data
     },
-    useFilters,
     useSortBy,
     usePagination
   );
 
   const { pageIndex } = state;
 
+  const exportData = data.map((d) => Object.values(d));
+
   return (
     <div className="relative">
+      <div className="flex justify-end my-4">
+        <button className="px-4 py-2 text-white bg-teal-600 rounded inlline-block">
+          <CSVLink
+            data={exportData}
+            filename={`${new Date().toISOString().slice(0, 18)}_report.csv`}
+          >
+            Export Data
+          </CSVLink>
+        </button>
+      </div>
       <table
         {...getTableProps()}
         className="min-w-full divide-y divide-gray-200"

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import DataTable from '../components/dashboard/DataTable';
 import Navbar from '../components/layout/Navbar';
-import Modal from '../components/dashboard/modal';
+import Modal from '../components/modal';
+import { Btn, Input, Label } from '../components/formComponents';
 
 const home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -17,7 +18,18 @@ const home = () => {
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <DataTable showModal={showModal} setShowModal={setShowModal} />
         {showModal && (
-          <Modal setShowModal={setShowModal} showModal={showModal} />
+          <Modal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            user={'Sujan Shah'}
+          >
+            <Label>Reason</Label>
+            <Input type="text" />
+            <Label>Reason</Label>
+            <Input type="text" />
+
+            <Btn className="bg-red-500 hover:bg-red-600">Rejected</Btn>
+          </Modal>
         )}
       </div>
     </>

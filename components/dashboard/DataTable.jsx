@@ -1,40 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTable, useSortBy, usePagination } from 'react-table';
-import { COLUMNS } from './column';
 import { CSVLink } from 'react-csv';
+import { columns, data } from '../../data/tableData';
+import { Btn } from '../formComponents';
 
 const DataTable = ({ showModal, setShowModal }) => {
-  const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(
-    () => [
-      {
-        username: 'Sagar Shah',
-        start_date: '2016-02-15',
-        end_date: '2016-02-18',
-        duration: '3',
-        reason: 'a mild fever',
-        status: 'approved'
-      },
-      {
-        username: 'Sujan BAsnet',
-        start_date: '2022-03-08',
-        end_date: '2016-02-15',
-        duration: '1',
-        reason: 'feeling lazy',
-        status: 'rejected'
-      },
-      {
-        username: 'Nihal Dhakal',
-        start_date: '2022-02-14',
-        end_date: '2022-02-15',
-        duration: '1',
-        reason: 'need to go to hospital',
-        status: 'approved'
-      }
-    ],
-    []
-  );
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -63,14 +33,14 @@ const DataTable = ({ showModal, setShowModal }) => {
   return (
     <div className="relative">
       <div className="flex justify-end my-4">
-        <button className="px-4 py-2 text-white bg-teal-600 rounded inlline-block">
+        <Btn className="bg-teal-500 hover:bg-teal-600">
           <CSVLink
             data={exportData}
             filename={`${new Date().toISOString().slice(0, 18)}_report.csv`}
           >
             Export Data
           </CSVLink>
-        </button>
+        </Btn>
       </div>
       <table
         {...getTableProps()}
@@ -86,7 +56,6 @@ const DataTable = ({ showModal, setShowModal }) => {
                 >
                   <div className="flex justify-between">
                     {column.render('Header')}
-                    {/* <div>{column.canFilter ? column.render('Filter') : null}</div> */}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (

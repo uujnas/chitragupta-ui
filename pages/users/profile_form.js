@@ -1,8 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 
 const ProfileForm = () => {
   const [user, setUser] = useState({});
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   if (typeof window !== "undefined") {
     const userId = localStorage.getItem("user_id");
@@ -11,25 +14,32 @@ const ProfileForm = () => {
   const formSubmit = async (e) => {
     e.preventDefault();
 
-    // patch request to user resource remote url
-    const response = await axios.put(
-      `http://localhost:4000/users/${userId}.json`,
-      {
-        user,
-      },
-      { headers: { Authorization: localStorage.token } }
-    );
+    try {
+      // patch request to user resource remote url
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${userId}.json`,
+        {
+          user,
+        },
+        { headers: { Authorization: localStorage.token } }
+      );
 
-    if (response.statusText == "OK") {
-      console.log("successfully updated user...");
-    } else {
-      console.log("Failed to update user");
+      if (response.statusText == "OK") {
+        router.push("/home");
+      } 
+    } catch (error) {
+      setError(error.response.data.message || error.response.data.error || error.message);
     }
   };
 
   return (
     <section className="my-8 pt-14">
       <div className="container px-2 py-2 mx-auto md:w-full md:max-w-2xl">
+        {error.length > 0 && (
+          <div id="error-message">
+            <span className="text-red-500">{error}</span>
+          </div>
+        )}
         <div class="flex flex-wrap -mx-3 mb-6">
           <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
             <label

@@ -39,7 +39,7 @@ const Login = () => {
     try {
       // make request to remote api login endpoint
       const response = await axios.post(
-        'http://localhost:4000/users/sign_in.json',
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
         {
           user: { email, password },
           headers: {

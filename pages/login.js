@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FormContainer,
   Input,
@@ -7,26 +7,53 @@ import {
   FormControl,
   Btn
 } from '../components/formComponents';
+import { useRouter } from "next/router";
+import { verify_token } from "../components/routeGuard/RouteGuard";
 
 const Login = () => {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState("");
+
+  const token_verified = async () => {
+    const token_verified = await verify_token();
+    if (token_verified) {
+      router.push(getRedirect());
+    }
+  };
+
+  const getRedirect = () => {
+    return router.query && router.query.returnUrl
+      ? router.query.returnUrl
+      : "/home";
+  };
+
+  useEffect(token_verified, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    // make request to remote api login endpoint
-    const response = await axios.post(
-      'http://localhost:4000/users/sign_in.json',
-      {
-        user: { email, password },
-        headers: {
-          'Content-Type': 'application/json'
+    try {
+      // make request to remote api login endpoint
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
+        {
+          user: { email, password },
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      }
-    );
+      );
 
-    localStorage.setItem('token', response.headers.authorization);
+      localStorage.setItem("token", response.headers.authorization);
+      router.push(getRedirect());
+    } catch (error) {
+      localStorage.removeItem("token");
+      setError("Invalid user or password.");
+    }
   };
 
   return (

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import DataTable from '../components/dashboard/DataTable';
 import Navbar from '../components/layout/Navbar';
+import Modal from '../components/modal';
+import { Btn, Input, Label } from '../components/formComponents';
 
 const home = () => {
+  const [showModal, setShowModal] = useState(false);
   return (
     <>
       <Head>
@@ -13,7 +16,21 @@ const home = () => {
       </Head>
       <Navbar page={'Dashboard'} subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
-        <DataTable />
+        <DataTable showModal={showModal} setShowModal={setShowModal} />
+        {showModal && (
+          <Modal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            user={'Sujan Shah'}
+          >
+            <Label>Reason</Label>
+            <Input type="text" />
+            <Label>Reason</Label>
+            <Input type="text" />
+
+            <Btn className="bg-red-500 hover:bg-red-600">Rejected</Btn>
+          </Modal>
+        )}
       </div>
     </>
   );

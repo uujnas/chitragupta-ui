@@ -51,7 +51,7 @@ const RouteGuard = ({ children }) => {
 // validate auth token by hitting remote endpoint
 const verify_token = async () => {
   try {
-    const response = await axios.get("http://localhost:4000/api/v1/user.json", {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: localStorage.token,

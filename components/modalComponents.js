@@ -1,7 +1,7 @@
 import tw from 'tailwind-styled-components';
 
 export const ModalContainer = tw.div`
-fixed inset-0 z-100 flex justify-center items-center h-full
+fixed inset-0 z-50 flex justify-center items-center h-full
 `;
 
 export const ModalOverlay = tw.div`

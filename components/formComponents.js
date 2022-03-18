@@ -1,4 +1,4 @@
-import tw from 'tailwind-styled-components';
+import tw from "tailwind-styled-components";
 
 export const Input = tw.input`
 w-full px-3 py-3 mb-4 text-sm border rounded-lg
@@ -22,4 +22,12 @@ inline-block py-3 px-5 mt-4 text-sm font-semibold text-center text-white transit
 
 export const BtnPrimary = tw.button`
 inline-block py-2 px-4 text-sm font-semibold text-center text-white transition bg-blue-500 rounded shadow-sm hover:bg-blue-600
+`;
+
+export const Select = tw.select`
+block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500
+`;
+
+export const Option = tw.option`
+w-full px-2 py-2 text-sm
 `;

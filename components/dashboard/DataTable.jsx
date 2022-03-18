@@ -1,20 +1,28 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { useTable, useSortBy, usePagination } from 'react-table';
-import Jsona from 'jsona';
-import axios from 'axios';
-import { CSVLink } from 'react-csv';
-import { columns, data } from '../../data/tableData';
-import { Btn } from '../formComponents';
+import React, { useMemo, useState, useEffect } from "react";
+import { useTable, useSortBy, usePagination } from "react-table";
+import Jsona from "jsona";
+import axios from "axios";
+import { CSVLink } from "react-csv";
+import { columns, data } from "../../data/tableData";
+import { Btn } from "../formComponents";
 
 const DataTable = ({ showModal, setShowModal }) => {
-  const [leaveRequests, setLeaveRequests] = useState([])
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [leaveRequest, setLeaveRequest] = useState({});
 
-  useEffect(async ()=> {
-    const leave_requests = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`, {headers: {"Authorization": localStorage.token}})
+  useEffect(async () => {
+    const leave_requests = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+      { headers: { Authorization: localStorage.token } }
+    );
     const dataFormatter = new Jsona();
-    setLeaveRequests(dataFormatter.deserialize(leave_requests.data))
-    console.log(dataFormatter.deserialize(leave_requests.data))
-  }, [])
+    setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
+    console.log(dataFormatter.deserialize(leave_requests.data));
+  }, []);
+
+  const rowClick = () => {
+    setShowModal(!showModal);
+  };
 
   const {
     getTableProps,
@@ -27,11 +35,11 @@ const DataTable = ({ showModal, setShowModal }) => {
     canPreviousPage,
     pageOptions,
     state,
-    prepareRow
+    prepareRow,
   } = useTable(
     {
       columns,
-      data: leaveRequests
+      data: leaveRequests,
     },
     useSortBy,
     usePagination
@@ -66,7 +74,7 @@ const DataTable = ({ showModal, setShowModal }) => {
                   className="p-2 text-sm font-bold tracking-wider text-left text-gray-900 uppercase "
                 >
                   <div className="flex justify-between">
-                    {column.render('Header')}
+                    {column.render("Header")}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (
@@ -121,9 +129,9 @@ const DataTable = ({ showModal, setShowModal }) => {
                     <td
                       {...cell.getCellProps()}
                       className="p-2 py-4"
-                      onClick={() => setShowModal(!showModal)}
+                      onClick={rowClick}
                     >
-                      {cell.render('Cell')}
+                      {cell.render("Cell")}
                     </td>
                   );
                 })}

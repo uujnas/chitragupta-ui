@@ -6,12 +6,21 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 import axios from "axios";
 import Jsona from "jsona";
+import Modal from "../components/modal";
+import {
+  Input,
+  Label,
+  Select,
+  Option,
+  Btn,
+} from "../components/formComponents";
 
 const Calendar = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
-  const [createLeaveRequest, setCreateLeaveRequest] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [leaveRequest, setLeaveRequest] = useState({});
+  const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false);
+  const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(async () => {
     const leave_requests = await axios.get(
@@ -24,7 +33,7 @@ const Calendar = () => {
     //  we need to make some tweaks like set start_date to start and end_date to end as fullCalendar requires
     events.forEach((event) => {
       event.start = event.start_date;
-      event.end = event.end_date;
+      event.end = fullCalendarEndDate(event.end_date);
       event.color = colorMap(event.status);
     });
 
@@ -32,6 +41,10 @@ const Calendar = () => {
 
     console.log(events);
   }, []);
+
+  useEffect(() => {
+    console.log(leaveRequest);
+  }, [leaveRequest]);
 
   const colorMap = (status) => {
     switch (status) {
@@ -50,6 +63,73 @@ const Calendar = () => {
     }
   };
 
+  const fullCalendarEndDate = (date) => {
+    let end_date = new Date(date);
+    end_date.setDate(end_date.getDate() + 1);
+    end_date.toLocaleString();
+    // we need to make sure we have date in YY-MM-DD format
+    // '2022-1-1' is not valid date
+    // '2022-01-01' is valid date
+    return `${end_date.getFullYear()}-${`0${end_date.getMonth() + 1}`.slice(
+      -2
+    )}-${`0${end_date.getDate()}`.slice(-2)}`;
+  };
+
+  const createLeaveRequest = (info) => {
+    // end date should be the last day of the leave, better not include the present day
+    const endDate = new Date(info.endStr);
+    endDate.setDate(endDate.getDate() - 1);
+    endDate.toLocaleString();
+
+    setCreatingLeaveRequest(true);
+
+    setLeaveRequest({
+      ...leaveRequest,
+      leave_type: "sick_leave",
+      start_date: info.startStr,
+      end_date: endDate,
+      status: "pending",
+    });
+  };
+
+  const addEvent = async () => {
+    console.log("Adding leave request....");
+    // create leave request
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests`,
+        {
+          leave_request: leaveRequest,
+        },
+        { headers: { Authorization: localStorage.token } }
+      );
+
+      console.log(response);
+
+      if (response.statusText === "OK") {
+        setCreatingLeaveRequest(false);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError(
+        error.response.data.message ||
+          error.response.data.error ||
+          error.message
+      );
+    }
+  };
+
+  const updateLeaveRequest = ({event}) => {
+    console.log("Updating leave request", event);
+
+    setUpdatingLeaveRequest(true);
+
+    setLeaveRequest({
+      
+    })
+  };
+
   return (
     <>
       <Head>
@@ -64,22 +144,41 @@ const Calendar = () => {
           events={leaveRequests}
           selectable={true}
           editable={true}
-          select={(info) => {
-            // end date should be the last day of the leave, better not include the present day
-            const endDate = new Date(info.endStr);
-            endDate.setDate(endDate.getDate() - 1);
-            endDate.toLocaleString();
-
-            setCreateLeaveRequest(true)
-            setStartDate(info.startStr)
-            setEndDate(endDate)
-            
-
-            console.log("Select inseide", info);
-          }}
+          select={createLeaveRequest}
+          eventClick={updateLeaveRequest}
         />
         ;
       </div>
+      {creatingLeaveRequest && (
+        <Modal
+          setShowModal={setCreatingLeaveRequest}
+          showModal={creatingLeaveRequest}
+        >
+          <div>
+            <Label>Leave Type</Label>
+            <Select
+              onChange={(e) =>
+                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
+              }
+            >
+              <Option value="sick_leave">Sick Leave</Option>
+              <Option value="personal">Personal</Option>
+              <Option value="others">Others</Option>
+            </Select>
+
+            <Label>Reason</Label>
+            <Input
+              onChange={(e) =>
+                setLeaveRequest({ ...leaveRequest, title: e.target.value })
+              }
+            />
+
+            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

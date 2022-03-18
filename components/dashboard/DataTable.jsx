@@ -1,15 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useTable, useSortBy, useFilters, usePagination } from 'react-table';
+import { useTable, useSortBy, usePagination } from 'react-table';
 import Jsona from 'jsona';
 import axios from 'axios';
-import { useTable, useSortBy, usePagination } from 'react-table';
 import { CSVLink } from 'react-csv';
 import { columns, data } from '../../data/tableData';
 import { Btn } from '../formComponents';
 
 const DataTable = ({ showModal, setShowModal }) => {
   const [leaveRequests, setLeaveRequests] = useState([])
-  const columns = useMemo(() => COLUMNS, []);
 
   useEffect(async ()=> {
     const leave_requests = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`, {headers: {"Authorization": localStorage.token}})

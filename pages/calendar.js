@@ -120,14 +120,22 @@ const Calendar = () => {
     }
   };
 
-  const updateLeaveRequest = ({event}) => {
+  const updateLeaveRequest = async ({ event }) => {
     console.log("Updating leave request", event);
 
-    setUpdatingLeaveRequest(true);
+    //  first get id of leave request with
+    const id = event.id;
 
-    setLeaveRequest({
-      
-    })
+    // make request to remote API to get leave request detail
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}`,
+      { headers: { Authorization: localStorage.token } }
+    );
+
+    const dataFormatter = new Jsona();
+    setLeaveRequest(dataFormatter.deserialize(response.data));
+
+    setUpdatingLeaveRequest(true);
   };
 
   return (
@@ -153,6 +161,37 @@ const Calendar = () => {
         <Modal
           setShowModal={setCreatingLeaveRequest}
           showModal={creatingLeaveRequest}
+        >
+          <div>
+            <Label>Leave Type</Label>
+            <Select
+              onChange={(e) =>
+                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
+              }
+            >
+              <Option value="sick_leave">Sick Leave</Option>
+              <Option value="personal">Personal</Option>
+              <Option value="others">Others</Option>
+            </Select>
+
+            <Label>Reason</Label>
+            <Input
+              onChange={(e) =>
+                setLeaveRequest({ ...leaveRequest, title: e.target.value })
+              }
+            />
+
+            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
+
+      {updatingLeaveRequest && (
+        <Modal
+          setShowModal={setUpdatingLeaveRequest}
+          showModal={updatingLeaveRequest}
         >
           <div>
             <Label>Leave Type</Label>

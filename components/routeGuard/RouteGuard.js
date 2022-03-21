@@ -1,13 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { User } from "../../user-context";
+import Jsona from "jsona";
 
 const RouteGuard = ({ children }) => {
   const router = useRouter();
 
   const [authorized, setAuthorized] = useState(false);
 
+  const { user, setUser } = useContext(User);
+
   useEffect(async () => {
+    const token_verified = await verify_token();
+
+    if (token_verified) {
+      const response = await current_user();
+      const dataFormatter = new Jsona();
+      setUser(dataFormatter.deserialize(response.data));
+    }
+
     // on initial load run auth check
     await authCheck(router.asPath);
 
@@ -50,24 +62,39 @@ const RouteGuard = ({ children }) => {
 
 // validate auth token by hitting remote endpoint
 const verify_token = async () => {
-  try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.token,
-      },
-    });
+  const response = await current_user();
 
-    return response.statusText == "OK";
+  return response.statusText == "OK";
+};
+
+// get current user
+const current_user = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.token,
+        },
+      }
+    );
+
+    return response;
   } catch (error) {
-    return false;
+    console.log(error);
+    return error;
   }
 };
 
 RouteGuard.getInitialProps = async (ctx) => {
   const token_verified = await verify_token();
   // check that we are in SSR and not in Client side
-  if (typeof window === "undefined" && ctx.ctx.res.writeHead && !token_verified) {
+  if (
+    typeof window === "undefined" &&
+    ctx.ctx.res.writeHead &&
+    !token_verified
+  ) {
     ctx.ctx.res.writeHead(302, { Location: "account/login" });
     ctx.ctx.res.end();
   }

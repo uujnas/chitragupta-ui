@@ -14,7 +14,7 @@ const Modal = ({ children, showModal, setShowModal, user }) => {
         <ModalBox>
           <ModalHeader>
             <h4 className="text-lg font-semibold text-gray-900 lg:text-xl ">
-              {user}
+              {`${user.first_name} ${user.last_name}`}
             </h4>
             <button
               type="button"
@@ -38,7 +38,7 @@ const Modal = ({ children, showModal, setShowModal, user }) => {
             </button>
           </ModalHeader>
           <div class="mx-auto flex items-center text-sm w-fit px-6 py-2 mt-4 rounded bg-green-100">
-            <div className="text-green-600">Sick Leave Balance : 5</div>
+            <div className="text-green-600">Sick Leave Balance : {user.sick_leave_balance}</div>
           </div>
           <ModalBody>{children}</ModalBody>
         </ModalBox>

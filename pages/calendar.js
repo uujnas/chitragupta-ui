@@ -105,8 +105,8 @@ const Calendar = () => {
         setCreatingLeaveRequest(false);
         // add newly created leave request to the calendar
         const leave_request = dataFormatter.deserialize(response.data);
-        leave_request.start = leave_request.start_date
-        leave_request.end = leave_request.end_date
+        leave_request.start = leave_request.start_date;
+        leave_request.end = leave_request.end_date;
         setLeaveRequests([...leaveRequests, leave_request]);
       } else {
         setError(response.data.message);
@@ -132,8 +132,8 @@ const Calendar = () => {
       { headers: { Authorization: localStorage.token } }
     );
 
-    const dataFormatter = new Jsona();
-    setLeaveRequest(dataFormatter.deserialize(response.data));
+    const leave_request = dataFormatter.deserialize(response.data);
+    setLeaveRequest(leave_request);
 
     setUpdatingLeaveRequest(true);
   };
@@ -191,6 +191,7 @@ const Calendar = () => {
         <Modal
           setShowModal={setUpdatingLeaveRequest}
           showModal={updatingLeaveRequest}
+          user={leaveRequest.user}
         >
           <div>
             <Label>Leave Type</Label>

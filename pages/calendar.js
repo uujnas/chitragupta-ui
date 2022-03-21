@@ -22,12 +22,13 @@ const Calendar = () => {
   const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false);
   const [error, setError] = useState("");
 
+  const dataFormatter = new Jsona();
+
   useEffect(async () => {
     const leave_requests = await axios.get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
       { headers: { Authorization: localStorage.token } }
     );
-    const dataFormatter = new Jsona();
     let events = dataFormatter.deserialize(leave_requests.data);
 
     //  we need to make some tweaks like set start_date to start and end_date to end as fullCalendar requires
@@ -41,10 +42,6 @@ const Calendar = () => {
 
     console.log(events);
   }, []);
-
-  useEffect(() => {
-    console.log(leaveRequest);
-  }, [leaveRequest]);
 
   const colorMap = (status) => {
     switch (status) {
@@ -104,17 +101,20 @@ const Calendar = () => {
         { headers: { Authorization: localStorage.token } }
       );
 
-      console.log(response);
-
       if (response.statusText === "OK") {
         setCreatingLeaveRequest(false);
+        // add newly created leave request to the calendar
+        const leave_request = dataFormatter.deserialize(response.data);
+        leave_request.start = leave_request.start_date
+        leave_request.end = leave_request.end_date
+        setLeaveRequests([...leaveRequests, leave_request]);
       } else {
         setError(response.data.message);
       }
     } catch (error) {
       setError(
-        error.response.data.message ||
-          error.response.data.error ||
+        (error.response &&
+          (error.response.data.message || error.response.data.error)) ||
           error.message
       );
     }
@@ -155,7 +155,6 @@ const Calendar = () => {
           select={createLeaveRequest}
           eventClick={updateLeaveRequest}
         />
-        ;
       </div>
       {creatingLeaveRequest && (
         <Modal

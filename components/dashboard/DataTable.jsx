@@ -1,26 +1,12 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import Jsona from "jsona";
-import axios from "axios";
 import { CSVLink } from "react-csv";
 import { columns, data } from "../../data/tableData";
 import { Btn } from "../formComponents";
 
-const DataTable = ({ showModal, setShowModal }) => {
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [leaveRequest, setLeaveRequest] = useState({});
-
-  useEffect(async () => {
-    const leave_requests = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-    const dataFormatter = new Jsona();
-    setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-    console.log(dataFormatter.deserialize(leave_requests.data));
-  }, []);
-
-  const rowClick = () => {
+const DataTable = ({ leaveRequests, showModal, setShowModal, setLeaveRequest }) => {
+  const rowClick = (row) => {
+    setLeaveRequest(row.original);
     setShowModal(!showModal);
   };
 
@@ -123,14 +109,14 @@ const DataTable = ({ showModal, setShowModal }) => {
           {page.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} className="pl-2 dashboard-data">
+              <tr
+                {...row.getRowProps()}
+                className="pl-2 dashboard-data"
+                onClick={() => rowClick(row)}
+              >
                 {row.cells.map((cell) => {
                   return (
-                    <td
-                      {...cell.getCellProps()}
-                      className="p-2 py-4"
-                      onClick={rowClick}
-                    >
+                    <td {...cell.getCellProps()} className="p-2 py-4">
                       {cell.render("Cell")}
                     </td>
                   );

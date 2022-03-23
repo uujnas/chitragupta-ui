@@ -1,10 +1,16 @@
-import React from 'react';
-import Head from 'next/head';
-import Navbar from '../components/layout/Navbar';
-import FullCalendar from '@fullcalendar/react'; // must go before plugins
-import dayGridPlugin from '@fullcalendar/daygrid';
+import React from "react";
+import Head from "next/head";
+import Navbar from "../components/layout/Navbar";
+import FullCalendar from "@fullcalendar/react"; // must go before plugins
+import dayGridPlugin from "@fullcalendar/daygrid";
 
 const Calendar = () => {
+  const pageProps = { label: "Dashboard", link: "/home" };
+  const subPageProps = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
+
   return (
     <>
       <Head>
@@ -12,13 +18,13 @@ const Calendar = () => {
         <meta name="description" content="chitragupta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar page={'Dashboard'} subPages={['Calendar', 'Admin']} />
+      <Navbar page={pageProps} subPages={subPageProps} />
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin]}
           events={[
-            { title: 'head hurts', date: '2022-03-05' },
-            { title: 'pain on hand joints', date: '2022-03-20' }
+            { title: "head hurts", date: "2022-03-05" },
+            { title: "pain on hand joints", date: "2022-03-20" },
           ]}
         />
         ;

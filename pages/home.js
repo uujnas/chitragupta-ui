@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
-import Head from 'next/head';
-import DataTable from '../components/dashboard/DataTable';
-import Navbar from '../components/layout/Navbar';
-import Modal from '../components/modal';
-import { Btn, Input, Label } from '../components/formComponents';
+import React, { useState } from "react";
+import Head from "next/head";
+import DataTable from "../components/dashboard/DataTable";
+import Navbar from "../components/layout/Navbar";
+import Modal from "../components/modal";
+import { Btn, Input, Label } from "../components/formComponents";
 
 const home = () => {
   const [showModal, setShowModal] = useState(false);
+  const pageProps = { label: "Dashboard", link: "/home" };
+  const subPageProps = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
   return (
     <>
       <Head>
@@ -14,14 +19,14 @@ const home = () => {
         <meta name="description" content="chitragupta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar page={'Dashboard'} subPages={['Calendar', 'Admin']} />
+      <Navbar page={pageProps} subPages={subPageProps} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <DataTable showModal={showModal} setShowModal={setShowModal} />
         {showModal && (
           <Modal
             showModal={showModal}
             setShowModal={setShowModal}
-            user={'Sujan Shah'}
+            user={"Sujan Shah"}
           >
             <Label>Reason</Label>
             <Input type="text" />

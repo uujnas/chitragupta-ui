@@ -1,7 +1,9 @@
-import React from 'react';
-import { Link } from 'next/link';
+import React from "react";
+import { Link } from "next/link";
 
 const Navbar = ({ subPages, page }) => {
+  console.log(page)
+  console.log(subPages)
   return (
     <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
@@ -15,7 +17,7 @@ const Navbar = ({ subPages, page }) => {
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
             <a
-              href="#"
+              href="/home"
               className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white"
             >
               Dashboard
@@ -23,7 +25,7 @@ const Navbar = ({ subPages, page }) => {
           </li>
           <li className="inline-flex items-center">
             <a
-              href="#"
+              href="/home"
               className="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
             >
               <svg
@@ -52,10 +54,10 @@ const Navbar = ({ subPages, page }) => {
                 ></path>
               </svg>
               <a
-                href="#"
+                href={page.link}
                 className="ml-1 text-sm font-medium text-white-700 hover:text-white-900 md:ml-2 dark:text-white-400 dark:hover:text-white"
               >
-                {page}
+                {page.label}
               </a>
             </div>
           </li>
@@ -75,9 +77,11 @@ const Navbar = ({ subPages, page }) => {
                     clip-rule="evenodd"
                   ></path>
                 </svg>
-                <span className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
-                  {subPage}
-                </span>
+                <Link to={subPage.link}>
+                  <span className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
+                    {subPage.label}
+                  </span>
+                </Link>
               </div>
             </li>
           ))}

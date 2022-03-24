@@ -47,12 +47,13 @@ const DataTable = ({ showModal, setShowModal }) => {
         className="min-w-full divide-y divide-gray-200"
       >
         <thead className="border-x-0 border-gray-50">
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+          {headerGroups.map((headerGroup, index) => (
+            <tr {...headerGroup.getHeaderGroupProps()} key={index}>
               {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   className="p-2 text-sm font-bold tracking-wider text-left text-gray-900 uppercase "
+                  key={column["Header"]}
                 >
                   <div className="flex justify-between">
                     {column.render('Header')}
@@ -104,13 +105,14 @@ const DataTable = ({ showModal, setShowModal }) => {
           {page.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} className="pl-2 dashboard-data">
+              <tr {...row.getRowProps()} className="pl-2 dashboard-data" key={row.id}>
                 {row.cells.map((cell) => {
                   return (
                     <td
                       {...cell.getCellProps()}
                       className="p-2 py-4"
                       onClick={() => setShowModal(!showModal)}
+                      key={`${row.id} ${cell.value}`}
                     >
                       {cell.render('Cell')}
                     </td>

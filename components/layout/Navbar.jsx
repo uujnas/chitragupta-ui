@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const Navbar = ({ subPages, page }) => {
   return (
@@ -13,16 +14,15 @@ const Navbar = ({ subPages, page }) => {
       >
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
-            <a
-              href="/home"
-              className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white"
-            >
-              Dashboard
-            </a>
+            <Link href="/home">
+              <a className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white">
+                Dashboard
+              </a>
+            </Link>
           </li>
           <li className="inline-flex items-center">
+            <Link href="/home">
             <a
-              href="/home"
               className="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
             >
               <svg
@@ -35,6 +35,7 @@ const Navbar = ({ subPages, page }) => {
               </svg>
               Home
             </a>
+            </Link>
           </li>
           <li>
             <div className="flex items-center">
@@ -74,8 +75,11 @@ const Navbar = ({ subPages, page }) => {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                <a href={subPage.link} className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
-                    {subPage.label}
+                <a
+                  href={subPage.link}
+                  className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500"
+                >
+                  {subPage.label}
                 </a>
               </div>
             </li>

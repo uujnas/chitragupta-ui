@@ -5,7 +5,7 @@ import Navbar from "../components/layout/Navbar";
 import Modal from "../components/modal";
 import { Btn, Input, Label } from "../components/formComponents";
 
-const home = () => {
+const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const pageProps = { label: "Dashboard", link: "/home" };
   const subPageProps = [
@@ -41,4 +41,4 @@ const home = () => {
   );
 };
 
-export default home;
+export default Home;

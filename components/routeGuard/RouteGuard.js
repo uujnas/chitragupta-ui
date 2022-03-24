@@ -7,21 +7,23 @@ const RouteGuard = ({ children }) => {
 
   const [authorized, setAuthorized] = useState(false);
 
-  useEffect(async () => {
-    // on initial load run auth check
-    await authCheck(router.asPath);
+  useEffect(() => {
+    async () => {
+      // on initial load run auth check
+      await authCheck(router.asPath);
 
-    // on route change start - hide page content by setting authorized to false
-    const hideContent = () => setAuthorized(false);
-    router.events.on("routerChangeStart", hideContent);
+      // on route change start - hide page content by setting authorized to false
+      const hideContent = () => setAuthorized(false);
+      router.events.on("routerChangeStart", hideContent);
 
-    // on route change complete - run auth check
-    router.events.on("routeChangeComplete", authCheck);
+      // on route change complete - run auth check
+      router.events.on("routeChangeComplete", authCheck);
 
-    // unsubscribe from events in useEffect return function
-    return () => {
-      router.events.off("routeChangeStart", hideContent);
-      router.events.off("routeChangeComplete", authCheck);
+      // unsubscribe from events in useEffect return function
+      return () => {
+        router.events.off("routeChangeStart", hideContent);
+        router.events.off("routeChangeComplete", authCheck);
+      };
     };
   }, []);
 
@@ -51,12 +53,15 @@ const RouteGuard = ({ children }) => {
 // validate auth token by hitting remote endpoint
 const verify_token = async () => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.token,
-      },
-    });
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.token,
+        },
+      }
+    );
 
     return response.statusText == "OK";
   } catch (error) {
@@ -67,7 +72,11 @@ const verify_token = async () => {
 RouteGuard.getInitialProps = async (ctx) => {
   const token_verified = await verify_token();
   // check that we are in SSR and not in Client side
-  if (typeof window === "undefined" && ctx.ctx.res.writeHead && !token_verified) {
+  if (
+    typeof window === "undefined" &&
+    ctx.ctx.res.writeHead &&
+    !token_verified
+  ) {
     ctx.ctx.res.writeHead(302, { Location: "account/login" });
     ctx.ctx.res.end();
   }

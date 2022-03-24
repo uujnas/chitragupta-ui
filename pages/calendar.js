@@ -17,6 +17,12 @@ import {
 import { User } from "../user-context";
 
 const Calendar = () => {
+  const pageProps = { label: "Dashboard", link: "/home" };
+  const subPageProps = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
+
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState({});
   const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false);
@@ -194,7 +200,7 @@ const Calendar = () => {
         <meta name="description" content="chitragupta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
+      <Navbar page={pageProps} subPages={subPageProps} />
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}

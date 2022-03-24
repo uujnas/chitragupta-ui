@@ -10,6 +10,11 @@ import Jsona from "jsona";
 
 const home = () => {
   const [showModal, setShowModal] = useState(false);
+  const pageProps = { label: "Dashboard", link: "/home" };
+  const subPageProps = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
   const [leaveRequest, setLeaveRequest] = useState({});
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [error, setError] = useState("");
@@ -77,7 +82,7 @@ const home = () => {
         <meta name="description" content="chitragupta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
+      <Navbar page={pageProps} subPages={subPageProps} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <DataTable
           leaveRequests={leaveRequests}

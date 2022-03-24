@@ -200,7 +200,7 @@ const Calendar = () => {
         <meta name="description" content="chitragupta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar page={pageProps} subPages={subPageProps} />
+      <Navbar />
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}

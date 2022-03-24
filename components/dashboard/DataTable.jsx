@@ -52,12 +52,13 @@ const DataTable = ({ leaveRequests, showModal, setShowModal, setLeaveRequest }) 
         className="min-w-full divide-y divide-gray-200"
       >
         <thead className="border-x-0 border-gray-50">
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+          {headerGroups.map((headerGroup, index) => (
+            <tr {...headerGroup.getHeaderGroupProps()} key={index}>
               {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   className="p-2 text-sm font-bold tracking-wider text-left text-gray-900 uppercase "
+                  key={column["Header"]}
                 >
                   <div className="flex justify-between">
                     {column.render("Header")}

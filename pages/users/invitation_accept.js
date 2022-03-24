@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { addGreptcha, getCaptchaScore } from "../../lib/utils";
 
 const InvitationAccept = () => {
   const [password, setPassword] = useState("");
@@ -10,7 +11,11 @@ const InvitationAccept = () => {
   const router = useRouter();
   const { invitation_token } = router.query;
 
-  const handleSubmit = async () => {
+  useEffect(() => addGreptcha(), []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
     if (password.length < 8) {
       setError("Password length must be greater than 8.");
       return;
@@ -20,27 +25,34 @@ const InvitationAccept = () => {
     }
 
     try {
-      const response = await axios.put(
-        "http://localhost:4000/users/invitation.json",
-        {
-          user: {
-            invitation_token,
-            password,
-            password_confirmation: passwordConfirmation,
-          },
-        }
-      );
+      const score = await getCaptchaScore();
 
-      if (response.statusText == "OK") {
-        // set localstorage token
-        localStorage.setItem("token", `Bearer ${response.headers.authorization}`)
-        // set user id
-        localStorage.setItem("user_id", response.data.user.id)
-        // redirect to page where user will fill rest of the info
-        router.push("/users/profile_form")
-      } else {
-        // show error message
-        setError("Failed to set password")
+      if (score > 0.6) {
+        const response = await axios.put(
+          "http://localhost:4000/users/invitation.json",
+          {
+            user: {
+              invitation_token,
+              password,
+              password_confirmation: passwordConfirmation,
+            },
+          }
+        );
+
+        if (response.statusText == "OK") {
+          // set localstorage token
+          localStorage.setItem(
+            "token",
+            `Bearer ${response.headers.authorization}`
+          );
+          // set user id
+          localStorage.setItem("user_id", response.data.user.id);
+          // redirect to page where user will fill rest of the info
+          router.push("/users/profile_form");
+        } else {
+          // show error message
+          setError("Failed to set password");
+        }
       }
     } catch (error) {
       setError(error.message);

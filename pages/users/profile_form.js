@@ -25,7 +25,7 @@ const ProfileForm = () => {
       );
 
       if (response.statusText == "OK") {
-        router.push("/home");
+        router.push("/");
       } 
     } catch (error) {
       setError(error.response.data.message || error.response.data.error || error.message);

@@ -1,32 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { addGreptcha, getCaptchaScore } from "../../lib/utils";
 
 const InviteForm = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => addGreptcha(), []);
+
   const formSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/invite.json`,
-        {
-          email,
-        },
-        { headers: { Authorization: localStorage.token } }
-      );
+      const score = await getCaptchaScore();
 
-      if (response.statusText == "OK") {
-        setSuccess("Successfully invited user...");
-        setError("");
+      if (score > 0.6) {
+        try {
+          const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/invite.json`,
+            {
+              email,
+            },
+            { headers: { Authorization: localStorage.token } }
+          );
+
+          if (response.statusText == "OK") {
+            setSuccess("Successfully invited user...");
+            setError("");
+          } else {
+            setError("Failed to invite user...");
+          }
+        } catch (error) {
+          setError(error.response.data.message || error.response.data.error);
+          setSuccess("");
+        }
       } else {
-        setError("Failed to invite user...");
+        setError("Are you a robot?");
       }
     } catch (error) {
-      setError(error.response.data.message || error.response.data.error);
-      setSuccess("");
+      setError(error.message);
+      console.log(error);
     }
   };
 
@@ -56,7 +70,10 @@ const InviteForm = () => {
               class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               id="pan-number"
               type="email"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setSuccess("");
+                setEmail(e.target.value);
+              }}
             />
           </div>
         </div>

@@ -29,10 +29,12 @@ const RouteGuard = ({ children }) => {
     guard();
   }, []);
 
-  // we need to pass url as there can be paths available to all
-  // and paths only available to authenticated users
   const authCheck = async (url) => {
-    const publicPaths = ["/login"];
+    // we need to pass url as there can be paths available to all
+    // and paths only available to authenticated users
+    const publicPaths = ["/login", "/users/invitation_accept"];
+
+    // TODO: apart from publicPaths we will also need adminPaths, accessible only to user with role 'admin'
     // why are we splitting with ?
     const path = url.split("?")[0];
 

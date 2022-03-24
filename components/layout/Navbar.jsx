@@ -1,9 +1,6 @@
 import React from "react";
-import { Link } from "next/link";
 
 const Navbar = ({ subPages, page }) => {
-  console.log(page)
-  console.log(subPages)
   return (
     <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
@@ -77,11 +74,9 @@ const Navbar = ({ subPages, page }) => {
                     clip-rule="evenodd"
                   ></path>
                 </svg>
-                <Link to={subPage.link}>
-                  <span className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
+                <a href={subPage.link} className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
                     {subPage.label}
-                  </span>
-                </Link>
+                </a>
               </div>
             </li>
           ))}

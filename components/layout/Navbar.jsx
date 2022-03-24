@@ -1,7 +1,13 @@
 import React from "react";
 import Link from "next/link";
 
-const Navbar = ({ subPages, page }) => {
+const Navbar = () => {
+  const page = { label: "Dashboard", link: "/" };
+  const subPages = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
+
   return (
     <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
@@ -14,14 +20,14 @@ const Navbar = ({ subPages, page }) => {
       >
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
-            <Link href="/home">
+            <Link href="/">
               <a className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white">
                 Dashboard
               </a>
             </Link>
           </li>
           <li className="inline-flex items-center">
-            <Link href="/home">
+            <Link href="/">
             <a
               className="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
             >

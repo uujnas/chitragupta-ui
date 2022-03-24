@@ -8,7 +8,7 @@ const RouteGuard = ({ children }) => {
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    async () => {
+    const guard = async () => {
       // on initial load run auth check
       await authCheck(router.asPath);
 
@@ -25,6 +25,8 @@ const RouteGuard = ({ children }) => {
         router.events.off("routeChangeComplete", authCheck);
       };
     };
+
+    guard();
   }, []);
 
   // we need to pass url as there can be paths available to all

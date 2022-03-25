@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Jsona from "jsona";
-import { useGlobalContext } from "../../context";
+import { useGlobalContext } from "../../context/context";
 
 const RouteGuard = ({ children }) => {
   const router = useRouter();

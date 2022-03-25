@@ -1,5 +1,5 @@
 import { RouteGuard } from "../components/routeGuard/RouteGuard";
-import AppProvider from "../context";
+import AppProvider from "../context/context";
 
 import "../styles/globals.css";
 import "@fullcalendar/common/main.css";

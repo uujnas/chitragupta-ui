@@ -8,13 +8,13 @@ import {
   Btn,
 } from "../components/formComponents";
 import { useRouter } from "next/router";
-import { useGlobalContext } from "../context";
+import { useGlobalContext } from "../context/context";
 import Jsona from "jsona";
 import { verify_token } from "../components/routeGuard/RouteGuard";
 
 const Login = () => {
   const router = useRouter();
-  const { user, setUser } = useGlobalContext();
+  const { setUser } = useGlobalContext();
   const dataFormatter = new Jsona();
 
   const [email, setEmail] = useState("");
@@ -52,10 +52,7 @@ const Login = () => {
         }
       );
 
-      console.log(response);
-
       localStorage.setItem("token", response.headers.authorization);
-
       setUser(dataFormatter.deserialize(response.data));
 
       router.push(getRedirect());

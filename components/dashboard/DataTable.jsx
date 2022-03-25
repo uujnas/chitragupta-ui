@@ -3,7 +3,7 @@ import { useTable, useSortBy, usePagination } from "react-table";
 import { CSVLink } from "react-csv";
 import { columns, data } from "../../data/tableData";
 import { Btn } from "../formComponents";
-import { useGlobalContext } from "../../context";
+import { useGlobalContext } from "../../context/context";
 
 const DataTable = ({ showModal, setShowModal, setLeaveRequest }) => {
   const { leaveRequests } = useGlobalContext();

@@ -14,7 +14,7 @@ import {
   Option,
   Btn,
 } from "../components/formComponents";
-import { useGlobalContext } from "../context";
+import { useGlobalContext } from "../context/context";
 
 const Calendar = () => {
   const pageProps = { label: "Dashboard", link: "/home" };

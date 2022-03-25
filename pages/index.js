@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import Head from "next/head";
 import DataTable from "../components/dashboard/DataTable";
 import Navbar from "../components/layout/Navbar";
 import Modal from "../components/modal";
 import { Btn, Input, Label } from "../components/formComponents";
-import { useGlobalContext } from "../context";
+import { useGlobalContext } from "../context/context";
 import axios from "axios";
 import Jsona from "jsona";
+import { reducer } from "../context/reducer";
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -14,6 +15,7 @@ const Home = () => {
   const [error, setError] = useState("");
 
   const { user, leaveRequests, setLeaveRequests } = useGlobalContext();
+  const [leave_requests, dispatch] = useReducer(reducer, leaveRequests);
 
   const isAdmin = () => user.role === "admin";
 
@@ -54,7 +56,11 @@ const Home = () => {
         const leave_requests = [...leaveRequests];
         leave_requests[index] = updatedLeaveRequest;
 
-        setLeaveRequests(leave_requests);
+        if (status === "approved") {
+          dispatch({ type: "APPROVE_LEAVE_REQUEST", id: updatedLeaveRequest.id });
+        } else {
+          setLeaveRequests(leave_requests);
+        }
       }
     } catch (error) {
       setError((error.response && error.response.data) || error.message);

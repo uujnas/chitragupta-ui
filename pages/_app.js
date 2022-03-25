@@ -1,5 +1,5 @@
 import { RouteGuard } from "../components/routeGuard/RouteGuard";
-import  UserContext from "../user-context";
+import AppProvider from "../context";
 
 import "../styles/globals.css";
 import "@fullcalendar/common/main.css";
@@ -8,11 +8,11 @@ import "@fullcalendar/daygrid/main.css";
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <UserContext>
+      <AppProvider>
         <RouteGuard>
           <Component {...pageProps} />
         </RouteGuard>
-      </UserContext>
+      </AppProvider>
     </>
   );
 }

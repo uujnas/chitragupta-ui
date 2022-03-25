@@ -14,9 +14,10 @@ import {
   Option,
   Btn,
 } from "../components/formComponents";
+import { useGlobalContext } from "../context";
 
 const Calendar = () => {
-  const [leaveRequests, setLeaveRequests] = useState([]);
+  // const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState({});
   const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false);
   const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false);
@@ -24,12 +25,10 @@ const Calendar = () => {
 
   const dataFormatter = new Jsona();
 
+  const { leaveRequests, setLeaveRequests } = useGlobalContext()
+
   useEffect(async () => {
-    const leave_requests = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-    let events = dataFormatter.deserialize(leave_requests.data);
+    let events = [...leaveRequests]
 
     //  we need to make some tweaks like set start_date to start and end_date to end as fullCalendar requires
     events.forEach((event) => {

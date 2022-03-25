@@ -1,25 +1,24 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { User } from "../../user-context";
 import Jsona from "jsona";
+import { useGlobalContext } from "../../context";
 
 const RouteGuard = ({ children }) => {
   const router = useRouter();
 
   const [authorized, setAuthorized] = useState(false);
-
-  const { user, setUser } = useContext(User);
+  const { user, setUser } = useGlobalContext();
 
   useEffect(() => {
     const guard = async () => {
-    const token_verified = await verify_token();
+      const token_verified = await verify_token();
 
-    if (token_verified) {
-      const response = await current_user();
-      const dataFormatter = new Jsona();
-      setUser(dataFormatter.deserialize(response.data));
-    }
+      if (token_verified) {
+        const response = await current_user();
+        const dataFormatter = new Jsona();
+        setUser(dataFormatter.deserialize(response.data));
+      }
 
       // on initial load run auth check
       await authCheck(router.asPath);

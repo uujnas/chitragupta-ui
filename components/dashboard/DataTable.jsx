@@ -5,20 +5,11 @@ import axios from "axios";
 import { CSVLink } from "react-csv";
 import { columns, data } from "../../data/tableData";
 import { Btn } from "../formComponents";
+import { useGlobalContext } from "../../context";
 
 const DataTable = ({ showModal, setShowModal }) => {
-  const [leaveRequests, setLeaveRequests] = useState([]);
+  const { leaveRequests } = useGlobalContext()
   const [leaveRequest, setLeaveRequest] = useState({});
-
-  useEffect(async () => {
-    const leave_requests = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-    const dataFormatter = new Jsona();
-    setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-    console.log(dataFormatter.deserialize(leave_requests.data));
-  }, []);
 
   const rowClick = () => {
     setShowModal(!showModal);

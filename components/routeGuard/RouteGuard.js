@@ -11,7 +11,8 @@ const RouteGuard = ({ children }) => {
 
   const { user, setUser } = useContext(User);
 
-  useEffect(async () => {
+  useEffect(() => {
+    const guard = async () => {
     const token_verified = await verify_token();
 
     if (token_verified) {
@@ -20,21 +21,24 @@ const RouteGuard = ({ children }) => {
       setUser(dataFormatter.deserialize(response.data));
     }
 
-    // on initial load run auth check
-    await authCheck(router.asPath);
+      // on initial load run auth check
+      await authCheck(router.asPath);
 
-    // on route change start - hide page content by setting authorized to false
-    const hideContent = () => setAuthorized(false);
-    router.events.on("routerChangeStart", hideContent);
+      // on route change start - hide page content by setting authorized to false
+      const hideContent = () => setAuthorized(false);
+      router.events.on("routerChangeStart", hideContent);
 
-    // on route change complete - run auth check
-    router.events.on("routeChangeComplete", authCheck);
+      // on route change complete - run auth check
+      router.events.on("routeChangeComplete", authCheck);
 
-    // unsubscribe from events in useEffect return function
-    return () => {
-      router.events.off("routeChangeStart", hideContent);
-      router.events.off("routeChangeComplete", authCheck);
+      // unsubscribe from events in useEffect return function
+      return () => {
+        router.events.off("routeChangeStart", hideContent);
+        router.events.off("routeChangeComplete", authCheck);
+      };
     };
+
+    guard();
   }, []);
 
   // we need to pass url as there can be paths available to all

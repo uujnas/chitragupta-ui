@@ -1,7 +1,13 @@
-import React from 'react';
-import { Link } from 'next/link';
+import React from "react";
+import Link from "next/link";
 
-const Navbar = ({ subPages, page }) => {
+const Navbar = () => {
+  const page = { label: "Dashboard", link: "/" };
+  const subPages = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
+
   return (
     <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
@@ -14,16 +20,15 @@ const Navbar = ({ subPages, page }) => {
       >
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
-            <a
-              href="#"
-              className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white"
-            >
-              Dashboard
-            </a>
+            <Link href="/">
+              <a className="inline-flex items-center mr-6 font-medium font-lg text-white-700 dark:text-white-400 dark:hover:text-white">
+                Dashboard
+              </a>
+            </Link>
           </li>
           <li className="inline-flex items-center">
+            <Link href="/">
             <a
-              href="#"
               className="inline-flex items-center text-sm font-medium text-white-700 hover:text-white-900 dark:text-white-400 dark:hover:text-white"
             >
               <svg
@@ -36,6 +41,7 @@ const Navbar = ({ subPages, page }) => {
               </svg>
               Home
             </a>
+            </Link>
           </li>
           <li>
             <div className="flex items-center">
@@ -46,16 +52,16 @@ const Navbar = ({ subPages, page }) => {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
               <a
-                href="#"
+                href={page.link}
                 className="ml-1 text-sm font-medium text-white-700 hover:text-white-900 md:ml-2 dark:text-white-400 dark:hover:text-white"
               >
-                {page}
+                {page.label}
               </a>
             </div>
           </li>
@@ -70,14 +76,17 @@ const Navbar = ({ subPages, page }) => {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   ></path>
                 </svg>
-                <span className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500">
-                  {subPage}
-                </span>
+                <a
+                  href={subPage.link}
+                  className="ml-1 text-sm font-medium text-white-400 md:ml-2 dark:text-white-500"
+                >
+                  {subPage.label}
+                </a>
               </div>
             </li>
           ))}

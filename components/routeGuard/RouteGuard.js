@@ -8,7 +8,7 @@ const RouteGuard = ({ children }) => {
   const router = useRouter();
 
   const [authorized, setAuthorized] = useState(false);
-  const { user, setUser } = useGlobalContext();
+  const { setUser } = useGlobalContext();
 
   useEffect(() => {
     const guard = async () => {
@@ -48,6 +48,7 @@ const RouteGuard = ({ children }) => {
     const path = url.split("?")[0];
 
     const token_verified = await verify_token();
+
     if (!token_verified && !publicPaths.includes(path)) {
       setAuthorized(false);
       router.push({

@@ -1,17 +1,15 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import Jsona from "jsona";
-import axios from "axios";
 import { CSVLink } from "react-csv";
 import { columns, data } from "../../data/tableData";
 import { Btn } from "../formComponents";
 import { useGlobalContext } from "../../context";
 
-const DataTable = ({ showModal, setShowModal }) => {
-  const { leaveRequests } = useGlobalContext()
-  const [leaveRequest, setLeaveRequest] = useState({});
+const DataTable = ({ showModal, setShowModal, setLeaveRequest }) => {
+  const { leaveRequests } = useGlobalContext();
 
-  const rowClick = () => {
+  const rowClick = (row) => {
+    setLeaveRequest(row.original);
     setShowModal(!showModal);
   };
 
@@ -115,13 +113,17 @@ const DataTable = ({ showModal, setShowModal }) => {
           {page.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} className="pl-2 dashboard-data" key={row.id}>
+              <tr
+                {...row.getRowProps()}
+                className="pl-2 dashboard-data"
+                onClick={() => rowClick(row)}
+                key={row.id}
+              >
                 {row.cells.map((cell) => {
                   return (
                     <td
                       {...cell.getCellProps()}
                       className="p-2 py-4"
-                      onClick={rowClick}
                       key={`${row.id} ${cell.value}`}
                     >
                       {cell.render("Cell")}

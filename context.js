@@ -1,4 +1,10 @@
-import { createContext, useState, useCallback, useEffect, useContext } from "react";
+import {
+  createContext,
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+} from "react";
 import axios from "axios";
 import Jsona from "jsona";
 
@@ -8,22 +14,35 @@ export default function AppProvider({ children }) {
   const [user, setUser] = useState({ user: {} });
   const [leaveRequests, setLeaveRequests] = useState([]);
 
+  const dataFormatter = new Jsona();
+
   const fetchLeaveRequests = useCallback(async () => {
-    const leave_requests = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-    const dataFormatter = new Jsona();
+    try {
+      const leave_requests = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+        { headers: { Authorization: localStorage.token } }
+      );
 
-    // sets global state for leave requests
-    setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-  }, [leaveRequests]);
+      // sets global state for leave requests
+      setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
+    } catch (error) {
+      console.log(error);
+    }
+  }, [leaveRequests, user]);
 
-  useEffect(() => fetchLeaveRequests(), []);
+  useEffect(() => {
+    fetchLeaveRequests();
+  }, [user]);
 
-  return <AppContext.Provider value={{ user, setUser, leaveRequests, setLeaveRequests }}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider
+      value={{ user, setUser, leaveRequests, setLeaveRequests }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
 }
 
 export const useGlobalContext = () => {
-  return useContext(AppContext)
-}
+  return useContext(AppContext);
+};

@@ -1,20 +1,24 @@
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import {
   FormContainer,
   Input,
   Label,
   FormControl,
-  Btn
-} from '../components/formComponents';
+  Btn,
+} from "../components/formComponents";
 import { useRouter } from "next/router";
+import { useGlobalContext } from "../context";
+import Jsona from "jsona";
 import { verify_token } from "../components/routeGuard/RouteGuard";
 
 const Login = () => {
   const router = useRouter();
+  const { user, setUser } = useGlobalContext();
+  const dataFormatter = new Jsona();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const token_verified = async () => {
@@ -27,7 +31,7 @@ const Login = () => {
   const getRedirect = () => {
     return router.query && router.query.returnUrl
       ? router.query.returnUrl
-      : "/home";
+      : "/";
   };
 
   useEffect(() => token_verified(), []);
@@ -43,12 +47,17 @@ const Login = () => {
         {
           user: { email, password },
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
+      console.log(response);
+
       localStorage.setItem("token", response.headers.authorization);
+
+      setUser(dataFormatter.deserialize(response.data));
+
       router.push(getRedirect());
     } catch (error) {
       localStorage.removeItem("token");

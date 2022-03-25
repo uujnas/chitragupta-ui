@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Head from "next/head";
 import Navbar from "../components/layout/Navbar";
 import FullCalendar from "@fullcalendar/react"; // must go before plugins
@@ -17,6 +17,12 @@ import {
 import { useGlobalContext } from "../context";
 
 const Calendar = () => {
+  const pageProps = { label: "Dashboard", link: "/home" };
+  const subPageProps = [
+    { label: "Calendar", link: "/calendar" },
+    { label: "Admin", link: "/admin" },
+  ];
+
   // const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState({});
   const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false);
@@ -25,7 +31,7 @@ const Calendar = () => {
 
   const dataFormatter = new Jsona();
 
-  const { leaveRequests, setLeaveRequests } = useGlobalContext()
+  const { user, leaveRequests, setLeaveRequests } = useGlobalContext()
 
   useEffect(async () => {
     let events = [...leaveRequests]
@@ -41,6 +47,8 @@ const Calendar = () => {
 
     console.log(events);
   }, []);
+
+  const isAdmin = () => user.role === "admin";
 
   const colorMap = (status) => {
     switch (status) {
@@ -72,6 +80,8 @@ const Calendar = () => {
   };
 
   const createLeaveRequest = (info) => {
+    setError("");
+
     // end date should be the last day of the leave, better not include the present day
     const endDate = new Date(info.endStr);
     endDate.setDate(endDate.getDate() - 1);
@@ -119,8 +129,50 @@ const Calendar = () => {
     }
   };
 
+  const updateEvent = async (status) => {
+    const leave_request = {
+      ...leaveRequest,
+      status: status,
+      approver_id: (isAdmin() || null) && user.id,
+    };
+
+    // update leave request
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}`,
+        {
+          leave_request: leave_request,
+        },
+        { headers: { Authorization: localStorage.token } }
+      );
+
+      if (response.statusText === "OK") {
+        setUpdatingLeaveRequest(false);
+        // add updated leave request to the calendar
+        const leave_request = dataFormatter.deserialize(response.data);
+        leave_request.start = leave_request.start_date;
+        leave_request.end = leave_request.end_date;
+
+        // find index of the updated leave_request
+        const index = leaveRequests.findIndex(
+          (leave) => leave.id === leave_request.id
+        );
+
+        // update leave_request at the index
+        const leave_requests = [...leaveRequests];
+        leave_requests[index] = leave_request;
+
+        setLeaveRequests(leave_requests);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError((error.response && JSON.stringify(error.response.data)) || error.message);
+    }
+  };
+
   const updateLeaveRequest = async ({ event }) => {
-    console.log("Updating leave request", event);
+    setError("");
 
     //  first get id of leave request with
     const id = event.id;
@@ -148,7 +200,29 @@ const Calendar = () => {
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
-          events={leaveRequests}
+          events={async (info) => {
+            const start = info.start.toISOString().substring(0, 10);
+            const end = info.end.toISOString().substring(0, 10);
+
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+              {
+                params: { start, end },
+                headers: { Authorization: localStorage.token },
+              }
+            );
+
+            let leave_requests = dataFormatter.deserialize(response.data);
+
+            return leave_requests.map((leave) => {
+              return {
+                ...leave,
+                start: leave.start_date,
+                end: leave.end_date,
+                color: colorMap(leave.status),
+              };
+            });
+          }}
           selectable={true}
           editable={true}
           select={createLeaveRequest}
@@ -159,17 +233,35 @@ const Calendar = () => {
         <Modal
           setShowModal={setCreatingLeaveRequest}
           showModal={creatingLeaveRequest}
+          user={user}
+          leaveRequest={leaveRequest}
         >
           <div>
+            {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
               onChange={(e) =>
                 setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
               }
             >
-              <Option value="sick_leave">Sick Leave</Option>
-              <Option value="personal">Personal</Option>
-              <Option value="others">Others</Option>
+              <Option
+                value="sick_leave"
+                selected={leaveRequest.leave_type == "sick_leave"}
+              >
+                Sick Leave
+              </Option>
+              <Option
+                value="personal"
+                selected={leaveRequest.leave_type == "personal"}
+              >
+                Personal
+              </Option>
+              <Option
+                value="others"
+                selected={leaveRequest.leave_type == "others"}
+              >
+                Others
+              </Option>
             </Select>
 
             <Label>Reason</Label>
@@ -177,6 +269,7 @@ const Calendar = () => {
               onChange={(e) =>
                 setLeaveRequest({ ...leaveRequest, title: e.target.value })
               }
+              value={leaveRequest.title}
             />
 
             <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
@@ -193,15 +286,32 @@ const Calendar = () => {
           user={leaveRequest.user}
         >
           <div>
+            {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
               onChange={(e) =>
                 setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
               }
+              disabled={isAdmin()}
             >
-              <Option value="sick_leave">Sick Leave</Option>
-              <Option value="personal">Personal</Option>
-              <Option value="others">Others</Option>
+              <Option
+                value="sick_leave"
+                selected={leaveRequest.leave_type == "sick_leave"}
+              >
+                Sick Leave
+              </Option>
+              <Option
+                value="personal"
+                selected={leaveRequest.leave_type == "personal"}
+              >
+                Personal
+              </Option>
+              <Option
+                value="others"
+                selected={leaveRequest.leave_type == "others"}
+              >
+                Others
+              </Option>
             </Select>
 
             <Label>Reason</Label>
@@ -209,11 +319,45 @@ const Calendar = () => {
               onChange={(e) =>
                 setLeaveRequest({ ...leaveRequest, title: e.target.value })
               }
+              value={leaveRequest.title}
+              disabled={isAdmin()}
             />
 
-            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
-              Submit
-            </Btn>
+            {isAdmin() && (
+              <>
+                <Label>Reply</Label>
+                <Input
+                  onChange={(e) =>
+                    setLeaveRequest({
+                      ...leaveRequest,
+                      reply_attributes: { reason: e.target.value },
+                    })
+                  }
+                  value={leaveRequest.reply && leaveRequest.reply.reason}
+                />
+                <Btn
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={() => updateEvent("rejected")}
+                >
+                  Reject
+                </Btn>
+                <Btn
+                  className="ml-2 bg-green-500 hover:bg-green-600"
+                  onClick={() => updateEvent("approved")}
+                >
+                  Approve
+                </Btn>
+              </>
+            )}
+
+            {!isAdmin() && (
+              <Btn
+                className="bg-blue-500 hover:bg-blue-600"
+                onClick={() => updateEvent(leaveRequest.status)}
+              >
+                Update
+              </Btn>
+            )}
           </div>
         </Modal>
       )}

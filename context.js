@@ -11,7 +11,7 @@ import Jsona from "jsona";
 export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
-  const [user, setUser] = useState({ user: {} });
+  const [user, setUser] = useState({  });
   const [leaveRequests, setLeaveRequests] = useState([]);
 
   const dataFormatter = new Jsona();

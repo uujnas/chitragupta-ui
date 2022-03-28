@@ -15,7 +15,7 @@ const Home = () => {
 
   const { user, leaveRequests, setLeaveRequests } = useGlobalContext();
 
-  const isAdmin = () => user.role === "admin";
+  const isAdmin = () => user && user.role === "admin";
 
   const updateLeaveRequest = async (status) => {
     const leave_request = {

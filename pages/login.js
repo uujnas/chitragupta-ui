@@ -54,9 +54,12 @@ const Login = () => {
 
       console.log(response);
 
-      localStorage.setItem("token", response.headers.authorization);
 
-      setUser(dataFormatter.deserialize(response.data));
+      localStorage.setItem("token", response.headers.authorization);
+      // we are not deserializing data because it is not serialized in first place
+      // we send every data as serialized, 
+      // but this one is returned by sessions_controller#new so we have no control over it
+      setUser(response.data);
 
       router.push(getRedirect());
     } catch (error) {

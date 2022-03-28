@@ -1,8 +1,7 @@
 import React from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import { columns } from "../../data/tableData";
 
-const DataTable = ({ children, data, rowClick }) => {
+const DataTable = ({ children, data, rowClick, columns }) => {
 
   const {
     getTableProps,

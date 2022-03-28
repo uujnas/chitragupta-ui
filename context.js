@@ -11,8 +11,9 @@ import Jsona from "jsona";
 export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
-  const [user, setUser] = useState({  });
+  const [user, setUser] = useState({});
   const [leaveRequests, setLeaveRequests] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const dataFormatter = new Jsona();
 
@@ -30,13 +31,24 @@ export default function AppProvider({ children }) {
     }
   }, [leaveRequests, user]);
 
+  const fetchUsers = useCallback(async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
+      { headers: { Authorization: localStorage.token } }
+    );
+
+    setUsers(dataFormatter.deserialize(response.data));
+  }, [user]);
+
   useEffect(() => {
     fetchLeaveRequests();
+
+    fetchUsers();
   }, [user]);
 
   return (
     <AppContext.Provider
-      value={{ user, setUser, leaveRequests, setLeaveRequests }}
+      value={{ user, setUser, leaveRequests, setLeaveRequests, users }}
     >
       {children}
     </AppContext.Provider>

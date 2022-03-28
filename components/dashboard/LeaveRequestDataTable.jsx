@@ -1,10 +1,8 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { useTable, useSortBy, usePagination } from "react-table";
 import { CSVLink } from "react-csv";
-import { columns, data } from "../../data/tableData";
-import { Btn } from "../formComponents";
 import { useGlobalContext } from "../../context";
 import DataTable from "./DataTable";
+import { columns } from "../../data/leaveTableData.js"
 
 const LeaveRequestDataTable = ({
   showModal,
@@ -21,7 +19,7 @@ const LeaveRequestDataTable = ({
   const exportData = leaveRequests.map((d) => Object.values(d));
 
   return (
-    <DataTable data={leaveRequests} rowClick={rowClick}>
+    <DataTable data={leaveRequests} rowClick={rowClick} columns={columns}>
       <div className="flex justify-end my-4">
         <Btn className="bg-teal-500 hover:bg-teal-600">
           <CSVLink

@@ -14,11 +14,13 @@ const Navbar = () => {
   const { user } = useGlobalContext();
   const [showDropdown, setShowDropDown] = useState(false);
 
+  const isAdmin = () => user && user.role === "admin";
+
   const page = { label: "Dashboard", link: "/" };
-  const subPages = [
-    { label: "Calendar", link: "/calendar" },
-    { label: "Admin", link: "/admin" },
-  ];
+  const subPages = [{ label: "Calendar", link: "/calendar" }];
+
+  if (isAdmin()) subPages.push({ label: "Admin", link: "/admin" });
+
   const router = useRouter();
 
   useEffect(() => {

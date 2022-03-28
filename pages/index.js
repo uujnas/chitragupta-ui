@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import DataTable from "../components/dashboard/DataTable";
+import LeaveRequestDataTable from "../components/dashboard/LeaveRequestDataTable";
 import Navbar from "../components/layout/Navbar";
 import Modal from "../components/modal";
 import { Btn, Input, Label } from "../components/formComponents";
@@ -64,7 +64,7 @@ const Home = () => {
     <>
       <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
-        <DataTable
+        <LeaveRequestDataTable
           showModal={showModal}
           setShowModal={setShowModal}
           setLeaveRequest={setLeaveRequest}

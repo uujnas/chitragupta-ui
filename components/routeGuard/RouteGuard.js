@@ -66,9 +66,13 @@ const RouteGuard = ({ children }) => {
 
 // validate auth token by hitting remote endpoint
 const verify_token = async () => {
-  const response = await current_user();
+  try {
+    const response = await current_user();
 
-  return response.statusText == "OK";
+    return response.statusText == "OK";
+  } catch (error) {
+    return false;
+  }
 };
 
 // get current user

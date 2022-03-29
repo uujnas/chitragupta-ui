@@ -32,12 +32,16 @@ export default function AppProvider({ children }) {
   }, [leaveRequests, user]);
 
   const fetchUsers = useCallback(async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
+        { headers: { Authorization: localStorage.token } }
+      );
 
-    setUsers(dataFormatter.deserialize(response.data));
+      setUsers(dataFormatter.deserialize(response.data));
+    } catch (error) {
+      console.log(error);
+    }
   }, [user]);
 
   useEffect(() => {

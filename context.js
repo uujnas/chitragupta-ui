@@ -69,7 +69,7 @@ export default function AppProvider({ children }) {
 
   return (
     <AppContext.Provider
-      value={{ user, setUser, leaveRequests, setLeaveRequests, users, loading }}
+      value={{ user, setUser, leaveRequests, setLeaveRequests, users, loading, setLoading }}
     >
       {children}
     </AppContext.Provider>

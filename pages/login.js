@@ -13,7 +13,7 @@ import { verify_token } from "../components/routeGuard/RouteGuard";
 
 const Login = () => {
   const router = useRouter();
-  const { setUser } = useGlobalContext();
+  const { setUser, setLoading } = useGlobalContext();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,6 +58,7 @@ const Login = () => {
       // we send every data as serialized, 
       // but this one is returned by sessions_controller#new so we have no control over it
       setUser(response.data);
+      setLoading(false)
 
       router.push(getRedirect());
     } catch (error) {

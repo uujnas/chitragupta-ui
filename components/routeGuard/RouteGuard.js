@@ -53,20 +53,20 @@ const RouteGuard = ({ children }) => {
 
     const token_verified = await verify_token();
 
-    if (loading) {
-      setAuthorized(false);
-    } else if (!isAdmin() && adminPaths.includes(path)) {
-      setAuthorized(false);
-      router.push("/");
-    } else if (!token_verified && !publicPaths.includes(path)) {
+    if (!token_verified && !publicPaths.includes(path)) { // first check if valid token is present
       setAuthorized(false);
       router.push({
         pathname: "/login",
         // after login redirect to intended page
         query: { returnUrl: router.asPath },
       });
+    } else if (loading && !publicPaths.includes(path)) { // while loading user don't authorize except for public paths
+      setAuthorized(false);
+    } else if (!isAdmin() && adminPaths.includes(path)) { // guard for admin paths
+      setAuthorized(false);
+      router.push("/");
     } else {
-      setAuthorized(true);
+      setAuthorized(true)
     }
   };
 

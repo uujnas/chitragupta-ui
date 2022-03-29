@@ -8,7 +8,9 @@ const RouteGuard = ({ children }) => {
   const router = useRouter();
 
   const [authorized, setAuthorized] = useState(false);
-  const { setUser } = useGlobalContext();
+  const { user, setUser, loading } = useGlobalContext();
+
+  const isAdmin = () => user && user.role == "admin";
 
   useEffect(() => {
     const guard = async () => {
@@ -38,18 +40,25 @@ const RouteGuard = ({ children }) => {
     };
 
     guard();
-  }, []);
+  }, [loading]);
 
   // we need to pass url as there can be paths available to all
   // and paths only available to authenticated users
   const authCheck = async (url) => {
     const publicPaths = ["/login"];
+    const adminPaths = ["/admin"];
+
     // why are we splitting with ?
     const path = url.split("?")[0];
 
     const token_verified = await verify_token();
 
-    if (!token_verified && !publicPaths.includes(path)) {
+    if (loading) {
+      setAuthorized(false);
+    } else if (!isAdmin() && adminPaths.includes(path)) {
+      setAuthorized(false);
+      router.push("/");
+    } else if (!token_verified && !publicPaths.includes(path)) {
       setAuthorized(false);
       router.push({
         pathname: "/login",

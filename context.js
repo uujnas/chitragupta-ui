@@ -12,6 +12,8 @@ export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
   const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(true); // this is only to check if user is loading
+
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [users, setUsers] = useState([]);
 
@@ -44,15 +46,30 @@ export default function AppProvider({ children }) {
     }
   }, [user]);
 
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user.json`,
+        { headers: { Authorization: localStorage.token } }
+      );
+
+      setUser(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  useEffect(() => fetchUser(), []);
+
   useEffect(() => {
     fetchLeaveRequests();
-
     fetchUsers();
   }, [user]);
 
   return (
     <AppContext.Provider
-      value={{ user, setUser, leaveRequests, setLeaveRequests, users }}
+      value={{ user, setUser, leaveRequests, setLeaveRequests, users, loading }}
     >
       {children}
     </AppContext.Provider>

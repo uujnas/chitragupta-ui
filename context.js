@@ -53,7 +53,7 @@ export default function AppProvider({ children }) {
         { headers: { Authorization: localStorage.token } }
       );
 
-      setUser(response.data);
+      setUser(dataFormatter.deserialize(response.data));
       setLoading(false);
     } catch (error) {
       console.log(error);

@@ -46,7 +46,7 @@ const RouteGuard = ({ children }) => {
   // and paths only available to authenticated users
   const authCheck = async (url) => {
     const publicPaths = ["/login"];
-    const adminPaths = ["/admin"];
+    const adminPaths = ["/admin", "/admin/users"];
 
     // why are we splitting with ?
     const path = url.split("?")[0];

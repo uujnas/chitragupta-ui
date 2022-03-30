@@ -53,20 +53,23 @@ const RouteGuard = ({ children }) => {
 
     const token_verified = await verify_token();
 
-    if (!token_verified && !publicPaths.includes(path)) { // first check if valid token is present
+    if (!token_verified && !publicPaths.includes(path)) {
+      // first check if valid token is present
       setAuthorized(false);
       router.push({
         pathname: "/login",
         // after login redirect to intended page
         query: { returnUrl: window.location.pathname }, // we are using window.location cuz router doesn't have access to query like id from here
       });
-    } else if (loading && !publicPaths.includes(path)) { // while loading user don't authorize except for public paths
+    } else if (loading && !publicPaths.includes(path)) {
+      // while loading user don't authorize except for public paths
       setAuthorized(false);
-    } else if (!isAdmin() && adminPaths.includes(path)) { // guard for admin paths
+    } else if (!isAdmin() && adminPaths.includes(path)) {
+      // guard for admin paths
       setAuthorized(false);
       router.push("/");
     } else {
-      setAuthorized(true)
+      setAuthorized(true);
     }
   };
 

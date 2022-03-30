@@ -13,9 +13,12 @@ const User = () => {
   const MAX_PAID_LEAVE_BALANCE = 18;
   const MAX_UNPAID_LEAVE_BALANCE = 25;
 
-  const leave_percentage = (leave_balance, total) => user ? Math.round((leave_balance/total) * 100) : 0
+  const leave_percentage = (leave_balance, total) =>
+    user ? Math.round((leave_balance / total) * 100) : 0;
 
   useEffect(() => {
+    let controller = new AbortController();
+
     const fetch_user = async (id) => {
       try {
         // fetch user from remote api
@@ -23,16 +26,20 @@ const User = () => {
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${id}.json`,
           {
             headers: { Authorization: localStorage.token },
+            signal: controller.signal,
           }
         );
 
         setUser(dataFormatter.deserialize(response.data));
+        controller = null;
       } catch (error) {
         console.log(error);
       }
     };
 
     fetch_user(router.query.id);
+
+    return () => controller?.abort();
   }, []);
 
   useEffect(() => console.log(user), [user]);
@@ -52,7 +59,9 @@ const User = () => {
               />
               <div>
                 <div class="text-xs font-medium lg:text-sm my-5">
-                  <h2 className="text-2xl">{user && (`${user.first_name} ${user.last_name}`)}</h2>
+                  <h2 className="text-2xl">
+                    {user && `${user.first_name} ${user.last_name}`}
+                  </h2>
                 </div>
                 <div className="w-full my-4 border-b-2"></div>
               </div>
@@ -119,12 +128,19 @@ const User = () => {
                   <span class="text-sm text-blue-700 dark:text-white">
                     Sick Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">{user && user.sick_leave_balance}</span>
+                  <span class="text-sm text-blue-700 dark:text-white">
+                    {user && user.sick_leave_balance}
+                  </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
                     class="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${leave_percentage(user ? user.sick_leave_balance : 0, MAX_SICK_LEAVE_BALANCE)}%` }}
+                    style={{
+                      width: `${leave_percentage(
+                        user ? user.sick_leave_balance : 0,
+                        MAX_SICK_LEAVE_BALANCE
+                      )}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -134,12 +150,19 @@ const User = () => {
                   <span class="text-sm text-blue-700 dark:text-white">
                     Paid Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">{user && user.paid_leave_balance}</span>
+                  <span class="text-sm text-blue-700 dark:text-white">
+                    {user && user.paid_leave_balance}
+                  </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
                     class="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${leave_percentage(user ? user.paid_leave_balance : 0, MAX_PAID_LEAVE_BALANCE)}%` }}
+                    style={{
+                      width: `${leave_percentage(
+                        user ? user.paid_leave_balance : 0,
+                        MAX_PAID_LEAVE_BALANCE
+                      )}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -149,12 +172,19 @@ const User = () => {
                   <span class="text-sm text-blue-700 dark:text-white">
                     Paid Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">{user && user.unpaid_leave_balance}</span>
+                  <span class="text-sm text-blue-700 dark:text-white">
+                    {user && user.unpaid_leave_balance}
+                  </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
                     class="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${leave_percentage(user ? user.unpaid_leave_balance : 0, MAX_UNPAID_LEAVE_BALANCE)}%` }}
+                    style={{
+                      width: `${leave_percentage(
+                        user ? user.unpaid_leave_balance : 0,
+                        MAX_UNPAID_LEAVE_BALANCE
+                      )}%`,
+                    }}
                   ></div>
                 </div>
               </div>

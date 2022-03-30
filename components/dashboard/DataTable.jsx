@@ -98,12 +98,12 @@ const DataTable = ({ children, data, rowClick, columns }) => {
                 onClick={() => rowClick(row)}
                 key={row.id}
               >
-                {row.cells.map((cell) => {
+                {row.cells.map((cell, index) => {
                   return (
                     <td
                       {...cell.getCellProps()}
                       className="p-2 py-4"
-                      key={`${row.id} ${cell.value}`}
+                      key={`${index} ${row.id} ${cell.value}`}
                     >
                       {cell.render("Cell")}
                     </td>

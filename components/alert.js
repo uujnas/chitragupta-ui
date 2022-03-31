@@ -5,7 +5,6 @@ const Alert = ({ success, message, show, setError, setSuccess }) => {
     <>
       {show && (
         <div
-          className="relative px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded"
           className={`${
             success
               ? "bg-green-100 border-green-400 text-green-700"

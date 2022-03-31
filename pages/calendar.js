@@ -207,7 +207,7 @@ const Calendar = () => {
             const response = await axios.get(
               `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
               {
-                params: { start, end },
+                params: { start, end, all_leaves: true },
                 headers: { Authorization: localStorage.token },
               }
             );

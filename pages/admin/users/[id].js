@@ -7,7 +7,6 @@ import Jsona from "jsona";
 const User = () => {
   const [user, setUser] = useState(null);
   const router = useRouter();
-  const dataFormatter = new Jsona();
 
   const MAX_SICK_LEAVE_BALANCE = 5;
   const MAX_PAID_LEAVE_BALANCE = 18;
@@ -18,6 +17,7 @@ const User = () => {
 
   useEffect(() => {
     let controller = new AbortController();
+    const dataFormatter = new Jsona();
 
     const fetch_user = async (id) => {
       try {
@@ -78,9 +78,9 @@ const User = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="feather feather-mail"
                     >
                       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -101,9 +101,9 @@ const User = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="feather feather-calendar"
                     >
                       <rect

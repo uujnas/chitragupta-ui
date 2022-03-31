@@ -2,6 +2,7 @@ import React from "react";
 import Card from "../../components/card";
 import Navbar from "../../components/layout/Navbar";
 import { Btn } from "../../components/formComponents";
+import Link from "next/link";
 
 const Admin = () => {
   return (
@@ -9,9 +10,9 @@ const Admin = () => {
       <Navbar />
       <div className="m-5">
         <Card topic="user" description="View and manage users">
-          <a href="/admin/users">
+          <Link href="/admin/users">
             <Btn className="bg-gray-500">Visit</Btn>
-          </a>
+          </Link>
         </Card>
       </div>
     </>

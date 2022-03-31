@@ -48,17 +48,17 @@ const User = () => {
     <>
       <Navbar />
 
-      <div class="bg-white w-[300px] mx-auto">
-        <div class="text-center pt-10">
+      <div className="bg-white w-[300px] mx-auto">
+        <div className="pt-10 text-center">
           <div>
             <div>
               <img
-                class="mx-auto h-20 w-20 rounded-full lg:w-24 lg:h-24"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24"
                 src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
                 alt=""
               />
               <div>
-                <div class="text-xs font-medium lg:text-sm my-5">
+                <div className="my-5 text-xs font-medium lg:text-sm">
                   <h2 className="text-2xl">
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
@@ -81,7 +81,7 @@ const User = () => {
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="feather feather-mail"
+                      className="feather feather-mail"
                     >
                       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                       <polyline points="22,6 12,13 2,6"></polyline>
@@ -104,7 +104,7 @@ const User = () => {
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="feather feather-calendar"
+                      className="feather feather-calendar"
                     >
                       <rect
                         x="3"
@@ -124,17 +124,17 @@ const User = () => {
               </div>
 
               <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm text-blue-700 dark:text-white">
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     Sick Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     {user && user.sick_leave_balance}
                   </span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
-                    class="bg-blue-600 h-2 rounded-full"
+                    className="h-2 bg-blue-600 rounded-full"
                     style={{
                       width: `${leave_percentage(
                         user ? user.sick_leave_balance : 0,
@@ -146,17 +146,17 @@ const User = () => {
               </div>
 
               <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm text-blue-700 dark:text-white">
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     Paid Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     {user && user.paid_leave_balance}
                   </span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
-                    class="bg-blue-600 h-2 rounded-full"
+                    className="h-2 bg-blue-600 rounded-full"
                     style={{
                       width: `${leave_percentage(
                         user ? user.paid_leave_balance : 0,
@@ -168,17 +168,17 @@ const User = () => {
               </div>
 
               <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm text-blue-700 dark:text-white">
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     Paid Leave Balance
                   </span>
-                  <span class="text-sm text-blue-700 dark:text-white">
+                  <span className="text-sm text-blue-700 dark:text-white">
                     {user && user.unpaid_leave_balance}
                   </span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                   <div
-                    class="bg-blue-600 h-2 rounded-full"
+                    className="h-2 bg-blue-600 rounded-full"
                     style={{
                       width: `${leave_percentage(
                         user ? user.unpaid_leave_balance : 0,

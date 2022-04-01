@@ -5,15 +5,32 @@ import { Btn } from "../../components/formComponents";
 import Link from "next/link";
 
 const Admin = () => {
+  const adminPages = [
+    {
+      topic: "User",
+      description: "View and manage users",
+      link: "/admin/users"
+    },
+    {
+      topic: "Salary",
+      description: "View and manage salaries",
+      link: "/admin/salaries"
+    }
+  ]
+
   return (
     <>
       <Navbar />
-      <div className="m-5">
-        <Card topic="user" description="View and manage users">
-          <Link href="/admin/users">
-            <Btn className="bg-gray-500">Visit</Btn>
-          </Link>
-        </Card>
+      <div className="flex flex-wrap m-5">
+        {
+          adminPages.map((page) => (
+            <Card topic={page.topic} description={page.description}>
+              <Link href={page.link}>
+                <Btn className="bg-gray-500">Visit</Btn>
+              </Link>
+            </Card>
+          ))
+        }
       </div>
     </>
   );

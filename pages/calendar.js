@@ -236,7 +236,7 @@ const Calendar = () => {
         <Modal
           setShowModal={setCreatingLeaveRequest}
           showModal={creatingLeaveRequest}
-          user={user}
+          title={"New Leave Request"}
           leaveRequest={leaveRequest}
         >
           <div>
@@ -301,7 +301,7 @@ const Calendar = () => {
         <Modal
           setShowModal={setUpdatingLeaveRequest}
           showModal={updatingLeaveRequest}
-          user={leaveRequest.user}
+          title={`${leaveRequest.user.first_name} ${leaveRequest.user.last_name}`}
         >
           <div className="flex justify-between">
             <LeaveBalanceBadge

@@ -13,10 +13,7 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
 
   const dataFormatter = new Jsona();
 
-  const creatingNewSalary = () => {
-    console.log("creating new salary");
-    setCreateNewSalary(true);
-  };
+  const creatingNewSalary = () => setCreateNewSalary(true);
 
   const updateSalary = (e) => {
     setSalary({ ...salary, [e.target.name]: e.target.value });
@@ -24,15 +21,17 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
 
   const createSalary = async () => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`, 
-      {
-        salary
-      },
-      {
-        headers: {
-          Authorization: localStorage.token,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
+        {
+          salary,
         },
-      });
+        {
+          headers: {
+            Authorization: localStorage.token,
+          },
+        }
+      );
 
       setSalaries([dataFormatter.deserialize(response.data), ...salaries]);
     } catch (error) {

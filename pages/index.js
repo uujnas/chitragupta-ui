@@ -6,6 +6,7 @@ import { Btn, Input, Label } from "../components/formComponents";
 import { useGlobalContext } from "../context";
 import axios from "axios";
 import Jsona from "jsona";
+import LeaveBalanceBadge from "../components/leaveBalanceBadge";
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -61,28 +62,31 @@ const Home = () => {
     }
   };
 
-  const fetchLeaveRequests = useCallback(async (allLeaves = false) => {
-    const leaveController = new AbortController();
+  const fetchLeaveRequests = useCallback(
+    async (allLeaves = false) => {
+      const leaveController = new AbortController();
 
-    try {
-      const leave_requests = await axios.get(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-        {
-          headers: { Authorization: localStorage.token },
-          signal: leaveController.signal,
-          params: { all_leaves: allLeaves }
-        }
-      );
+      try {
+        const leave_requests = await axios.get(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+          {
+            headers: { Authorization: localStorage.token },
+            signal: leaveController.signal,
+            params: { all_leaves: allLeaves },
+          }
+        );
 
-      // sets global state for leave requests
-      setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-      leaveController = null;
-    } catch (error) {
-      console.log(error);
-    }
+        // sets global state for leave requests
+        setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
+        leaveController = null;
+      } catch (error) {
+        console.log(error);
+      }
 
-    return () => leaveController?.abort();
-  }, [leaveRequests]);
+      return () => leaveController?.abort();
+    },
+    [leaveRequests]
+  );
 
   useEffect(() => fetchLeaveRequests(), []);
 
@@ -100,8 +104,8 @@ const Home = () => {
             role="switch"
             aria-checked="false"
             onClick={() => {
-              setAllLeaves(!allLeaves)
-              fetchLeaveRequests(!allLeaves)
+              setAllLeaves(!allLeaves);
+              fetchLeaveRequests(!allLeaves);
             }}
           >
             <span className="sr-only">Use setting</span>
@@ -123,12 +127,21 @@ const Home = () => {
           <Modal
             showModal={showModal}
             setShowModal={setShowModal}
-            user={leaveRequest.user}
+            title={`${leaveRequest.user.first_name} ${leaveRequest.user.last_name}`}
           >
-            <div className="flex items-center px-6 py-2 mx-auto mt-4 text-sm bg-green-100 rounded w-fit">
-              <div className="text-green-600">
-                Sick Leave Balance : {user.sick_leave_balance}
-              </div>
+            <div className="flex justify-between">
+              <LeaveBalanceBadge
+                label={"Sick Leave Balance"}
+                balance={leaveRequest.user.sick_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label={"Paid Leave Balance"}
+                balance={leaveRequest.user.paid_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label={"Unpaid Leave Balance"}
+                balance={leaveRequest.user.unpaid_leave_balance || 0}
+              />
             </div>
             {error !== "" && (
               <span className="text-red-500">{JSON.stringify(error)}</span>

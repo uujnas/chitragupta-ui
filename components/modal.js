@@ -1,20 +1,20 @@
-import React from 'react';
+import React from "react";
 import {
   ModalBody,
   ModalBox,
   ModalContainer,
   ModalHeader,
-  ModalOverlay
-} from './modalComponents';
+  ModalOverlay,
+} from "./modalComponents";
 
-const Modal = ({ children, showModal, setShowModal, user }) => {
+const Modal = ({ children, showModal, setShowModal, title }) => {
   return (
     <ModalContainer>
       <ModalOverlay aria-hidden="true">
         <ModalBox>
           <ModalHeader>
             <h4 className="text-lg font-semibold text-gray-900 lg:text-xl ">
-              {`${user.first_name} ${user.last_name}`}
+              {title}
             </h4>
             <button
               type="button"
@@ -37,10 +37,10 @@ const Modal = ({ children, showModal, setShowModal, user }) => {
               </svg>
             </button>
           </ModalHeader>
-          <div className="flex items-center px-6 py-2 mx-auto mt-4 text-sm bg-green-100 rounded w-fit">
-            <div className="text-green-600">Sick Leave Balance : {user.sick_leave_balance}</div>
-          </div>
-          <ModalBody>{children}</ModalBody>
+
+          <ModalBody>
+            {children}
+          </ModalBody>
         </ModalBox>
       </ModalOverlay>
     </ModalContainer>

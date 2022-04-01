@@ -125,6 +125,11 @@ const Home = () => {
             setShowModal={setShowModal}
             user={leaveRequest.user}
           >
+            <div className="flex items-center px-6 py-2 mx-auto mt-4 text-sm bg-green-100 rounded w-fit">
+              <div className="text-green-600">
+                Sick Leave Balance : {user.sick_leave_balance}
+              </div>
+            </div>
             {error !== "" && (
               <span className="text-red-500">{JSON.stringify(error)}</span>
             )}

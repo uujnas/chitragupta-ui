@@ -15,6 +15,7 @@ import {
   Btn,
 } from "../components/formComponents";
 import { useGlobalContext } from "../context";
+import LeaveBalanceBadge from "../components/leaveBalanceBadge";
 
 const Calendar = () => {
   const pageProps = { label: "Dashboard", link: "/home" };
@@ -31,10 +32,10 @@ const Calendar = () => {
 
   const dataFormatter = new Jsona();
 
-  const { user, leaveRequests, setLeaveRequests } = useGlobalContext()
+  const { user, leaveRequests, setLeaveRequests } = useGlobalContext();
 
   useEffect(async () => {
-    let events = [...leaveRequests]
+    let events = [...leaveRequests];
 
     //  we need to make some tweaks like set start_date to start and end_date to end as fullCalendar requires
     events.forEach((event) => {
@@ -167,7 +168,9 @@ const Calendar = () => {
         setError(response.data.message);
       }
     } catch (error) {
-      setError((error.response && JSON.stringify(error.response.data)) || error.message);
+      setError(
+        (error.response && JSON.stringify(error.response.data)) || error.message
+      );
     }
   };
 
@@ -237,6 +240,21 @@ const Calendar = () => {
           leaveRequest={leaveRequest}
         >
           <div>
+            <div className="flex justify-between">
+              <LeaveBalanceBadge
+                label={"Sick Leave Balance"}
+                balance={user.sick_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label={"Paid Leave Balance"}
+                balance={user.paid_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label={"Unpaid Leave Balance"}
+                balance={user.unpaid_leave_balance || 0}
+              />
+            </div>
+
             {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
@@ -285,6 +303,20 @@ const Calendar = () => {
           showModal={updatingLeaveRequest}
           user={leaveRequest.user}
         >
+          <div className="flex justify-between">
+            <LeaveBalanceBadge
+              label={"Sick Leave Balance"}
+              balance={leaveRequest.user.sick_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label={"Paid Leave Balance"}
+              balance={leaveRequest.user.paid_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label={"Unpaid Leave Balance"}
+              balance={leaveRequest.user.unpaid_leave_balance}
+            />
+          </div>
           <div>
             {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>

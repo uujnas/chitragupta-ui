@@ -1,7 +1,7 @@
 import tw from "tailwind-styled-components";
 
 export const Input = tw.input`
-w-full px-3 py-3 mb-4 text-sm border rounded-lg
+w-full px-3 py-3 text-sm border rounded-lg
 `;
 
 export const Label = tw.label`

@@ -5,7 +5,7 @@ w-full px-3 py-3 text-sm border rounded-lg
 `;
 
 export const Label = tw.label`
-block pb-3 text-sm font-semibold text-gray-600
+block pb-3 text-sm font-semibold
 `;
 
 export const FormControl = tw.div`

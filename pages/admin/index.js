@@ -15,6 +15,11 @@ const Admin = () => {
       topic: "Salary",
       description: "View and manage salaries",
       link: "/admin/salaries"
+    },
+    {
+      topic: "Salary Settings",
+      description: "View and manage salary settings",
+      link: "/admin/salarySettings"
     }
   ]
 

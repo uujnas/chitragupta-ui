@@ -7,6 +7,7 @@ import Modal from "../modal";
 import axios from "axios";
 import Jsona from "jsona";
 import InputWithLabelAndError from "../InputWithLabelAndError";
+import { useRouter } from "next/router";
 
 const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
   const [salarySetting, setSalarySetting] = useState({});
@@ -16,6 +17,7 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
   const dataFormatter = new Jsona();
   const creatingNew = () => setCreateNew(true);
   const numberRegEx = /^\d+.?\d*$/;
+  const router = useRouter();
 
   useEffect(() => console.log(salarySetting), [salarySetting]);
 
@@ -109,7 +111,9 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
 
         <DataTable
           data={salarySettings}
-          rowClick={() => console.log()}
+          rowClick={(row) =>
+            router.push(`/admin/salarySettings/${row.original.id}`)
+          }
           columns={columns}
         />
       </TableContainer>

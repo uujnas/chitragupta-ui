@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/layout/Navbar";
-import SalarySettingsDataTable from "../../components/dashboard/SalarySettingsDataTable";
+import Navbar from "../../../components/layout/Navbar";
+import SalarySettingsDataTable from "../../../components/dashboard/SalarySettingsDataTable";
 import axios from "axios";
 import Jsona from "jsona";
 

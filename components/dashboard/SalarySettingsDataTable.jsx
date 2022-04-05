@@ -15,6 +15,7 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
   const [createNew, setCreateNew] = useState(false);
   const [errors, setErrors] = useState({});
   const [taxRules, setTaxRules] = useState([]);
+  const [updatingSalarySetting, setUpdatingSalarySetting] = useState(false);
 
   const dataFormatter = new Jsona();
   const creatingNew = () => setCreateNew(true);
@@ -107,6 +108,29 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
     }
   };
 
+  const remoteUpdateSalarySetting = async () => {
+    if (checkIfFormIsValid() === 0) {
+      try {
+        const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings/${salarySetting.id}.json`,
+          {
+            salary_setting: {
+              ...salarySetting,
+              tax_rules_attributes: taxRules,
+            },
+          },
+          {
+            headers: {
+              Authorization: localStorage.token,
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const updateSalarySetting = (e) => {
     delete errors[e.target.name];
     if (
@@ -157,9 +181,12 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
 
         <DataTable
           data={salarySettings}
-          rowClick={(row) =>
-            router.push(`/admin/salarySettings/${row.original.id}`)
-          }
+          rowClick={(row) => {
+            console.log(row.original);
+            setSalarySetting(row.original);
+            setTaxRules(row.original.tax_rules);
+            setUpdatingSalarySetting(true);
+          }}
           columns={columns}
         />
       </TableContainer>
@@ -175,7 +202,26 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
             salarySetting={salarySetting}
             errors={errors}
             taxRules={taxRules}
-            createSalarySetting={createSalarySetting}
+            onSubmit={createSalarySetting}
+            setTaxRules={setTaxRules}
+            updateTaxRules={updateTaxRules}
+            removeTaxRule={removeTaxRule}
+          />
+        </Modal>
+      )}
+
+      {updatingSalarySetting && (
+        <Modal
+          showModal={updatingSalarySetting}
+          setShowModal={setUpdatingSalarySetting}
+          title={"Update Salary Setting"}
+        >
+          <SalarySettingForm
+            updateSalarySetting={updateSalarySetting}
+            salarySetting={salarySetting}
+            errors={errors}
+            taxRules={taxRules}
+            onSubmit={remoteUpdateSalarySetting}
             setTaxRules={setTaxRules}
             updateTaxRules={updateTaxRules}
             removeTaxRule={removeTaxRule}

@@ -8,7 +8,7 @@ const SalarySettingForm = ({
   salarySetting,
   errors,
   taxRules,
-  createSalarySetting,
+  onSubmit,
   setTaxRules,
   updateTaxRules,
   removeTaxRule,
@@ -103,7 +103,7 @@ const SalarySettingForm = ({
 
       <Btn
         className="bg-teal-500 hover:bg-teal-600"
-        onClick={createSalarySetting}
+        onClick={onSubmit}
       >
         Submit
       </Btn>

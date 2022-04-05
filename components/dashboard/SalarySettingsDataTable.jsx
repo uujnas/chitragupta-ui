@@ -238,12 +238,13 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
               {taxRules.length <= 0 ? (
                 <div>N/A</div>
               ) : (
-                taxRules.map((taxRule) => (
+                taxRules.map((taxRule, index) => (
                   <TaxRuleForm
                     errors={errors}
                     taxRule={taxRule}
                     onChange={updateTaxRules}
                     removeTaxRule={removeTaxRule}
+                    key={index}
                   />
                 ))
               )}

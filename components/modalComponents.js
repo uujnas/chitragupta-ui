@@ -1,4 +1,4 @@
-import tw from 'tailwind-styled-components';
+import tw from "tailwind-styled-components";
 
 export const ModalContainer = tw.div`
 fixed inset-0 z-50 flex justify-center items-center h-full
@@ -9,7 +9,7 @@ abosulte px-4 w-full  h-full inset-0 bg-gray-500 bg-opacity-75 transition-opacit
 `;
 
 export const ModalBox = tw.div`
-relative bg-white rounded-lg shadow dark:bg-gray-700 w-full lg:w-6/12
+relative bg-white rounded-lg shadow dark:bg-gray-700 w-full lg:w-6/12 max-h-full overflow-y-auto
 `;
 
 export const ModalHeader = tw.div`

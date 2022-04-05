@@ -1,7 +1,7 @@
 import React from "react";
 import { Label, Input } from "./formComponents";
 
-const InputWIthLabelAndError = ({ name, errors, value, onChange }) => {
+const InputWithLabelAndError = ({ name, errors, value, onChange }) => {
   return (
     <div className="w-full pr-4 mb-4 md:w-1/2">
       <Label className={`${errors[name] ? "text-red-500" : "text-gray-500"} uppercase`}>
@@ -20,4 +20,4 @@ const InputWIthLabelAndError = ({ name, errors, value, onChange }) => {
   );
 };
 
-export default InputWIthLabelAndError;
+export default InputWithLabelAndError;

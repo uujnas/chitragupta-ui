@@ -7,6 +7,7 @@ import Modal from "../modal";
 import axios from "axios";
 import Jsona from "jsona";
 import InputWithLabelAndError from "../InputWithLabelAndError";
+import TaxRuleForm from "../taxRuleForm";
 import { useRouter } from "next/router";
 
 const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
@@ -80,7 +81,6 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings.json`,
           {
             salary_setting: {
-
               ...salarySetting,
               tax_rules_attributes: taxRules,
             },
@@ -99,6 +99,7 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
           ]);
           setCreateNew(false);
           setSalarySetting({});
+          setTaxRules([]);
         }
       } catch (error) {
         console.log(error);
@@ -130,8 +131,8 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
     const index = taxRules.findIndex(
       (taxRule) => taxRule.id == e.target.key || taxRule.key == e.target.key
     );
-    const name_with_key = e.target.name
-    const name_without_key = name_with_key.split("_").slice(0, -1).join("_")
+    const name_with_key = e.target.name;
+    const name_without_key = name_with_key.split("_").slice(0, -1).join("_");
 
     taxRules[index][name_with_key] = e.target.value;
     taxRules[index][name_without_key] = e.target.value;
@@ -238,113 +239,18 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
                 <div>N/A</div>
               ) : (
                 taxRules.map((taxRule) => (
-                  <div
-                    className="flex flex-wrap"
-                    key={taxRule.id || taxRule.key}
-                  >
-                    <div className="w-full pr-4 mb-4 md:w-1/3">
-                      <Label
-                        className={`${
-                          errors[`amount_from_${taxRule.id || taxRule.key}`]
-                            ? "text-red-500"
-                            : "text-gray-500"
-                        } uppercase`}
-                      >
-                        From Amount
-                      </Label>
-                      <Input
-                        name={`amount_from_${taxRule.id || taxRule.key}`}
-                        value={taxRule.amount_from}
-                        onChange={updateTaxRules}
-                        type="text"
-                        className={
-                          errors[`amount_from_${taxRule.id || taxRule.key}`]
-                            ? "border-red-500"
-                            : ""
-                        }
-                      />
-                      {errors[`amount_from_${taxRule.id || taxRule.key}`] && (
-                        <span className="text-sm text-red-500">
-                          {errors[`amount_from_${taxRule.id || taxRule.key}`]}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="w-full pr-4 mb-4 md:w-1/3">
-                      <Label
-                        className={`${
-                          errors[`amount_to_${taxRule.id || taxRule.key}`]
-                            ? "text-red-500"
-                            : "text-gray-500"
-                        } uppercase`}
-                      >
-                        To Amount
-                      </Label>
-                      <Input
-                        name={`amount_to_${taxRule.id || taxRule.key}`}
-                        value={salarySetting.amount_to}
-                        onChange={updateTaxRules}
-                        type="text"
-                        className={
-                          errors[`amount_to_${taxRule.id || taxRule.key}`]
-                            ? "border-red-500"
-                            : ""
-                        }
-                      />
-                      {errors[`amount_to_${taxRule.id || taxRule.key}`] && (
-                        <span className="text-sm text-red-500">
-                          {errors[`amount_to_${taxRule.id || taxRule.key}`]}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="w-full pr-4 mb-4 md:w-1/6">
-                      <Label
-                        className={`${
-                          errors[`rate_${taxRule.id || taxRule.key}`]
-                            ? "text-red-500"
-                            : "text-gray-500"
-                        } uppercase`}
-                      >
-                        Tax Rate
-                      </Label>
-                      <Input
-                        name={`rate_${taxRule.id || taxRule.key}`}
-                        value={salarySetting.rate}
-                        onChange={updateTaxRules}
-                        type="text"
-                        className={
-                          errors[`rate_${taxRule.id || taxRule.key}`]
-                            ? "border-red-500"
-                            : ""
-                        }
-                      />
-                      {errors[`rate_${taxRule.id || taxRule.key}`] && (
-                        <span className="text-sm text-red-500">
-                          {errors[`rate_${taxRule.id || taxRule.key}`]}
-                        </span>
-                      )}
-                    </div>
-
-                    {taxRule.id ? (
-                      ""
-                    ) : (
-                      <div className="w-full pr-4 mt-4 mb-4 md:w-1/6">
-                        <Btn
-                          className="bg-red-400 hover:bg-red-500"
-                          onClick={() => removeTaxRule(taxRule.key)}
-                        >
-                          Delete
-                        </Btn>
-                      </div>
-                    )}
-                  </div>
+                  <TaxRuleForm
+                    errors={errors}
+                    taxRule={taxRule}
+                    onChange={updateTaxRules}
+                    removeTaxRule={removeTaxRule}
+                  />
                 ))
               )}
             </div>
             <button
               type="button"
-              className="py-2.5 px-5 mr-2 my-2 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+              className="py-2.5 px-5 mr-2 my-2 text-xs font-medium text-gray-900 border-0 hover:text-blue-700"
               onClick={() =>
                 setTaxRules([...taxRules, { key: new Date().getTime() }])
               }

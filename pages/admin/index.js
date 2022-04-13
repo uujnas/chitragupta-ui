@@ -9,33 +9,36 @@ const Admin = () => {
     {
       topic: "User",
       description: "View and manage users",
-      link: "/admin/users"
+      link: "/admin/users",
     },
     {
       topic: "Salary",
       description: "View and manage salaries",
-      link: "/admin/salaries"
+      link: "/admin/salaries",
     },
     {
       topic: "Salary Settings",
       description: "View and manage salary settings",
-      link: "/admin/salarySettings"
-    }
-  ]
+      link: "/admin/salarySettings",
+    },
+    {
+      topic: "Salary Records",
+      description: "View and manage salary records",
+      link: "/admin/salaryRecords",
+    },
+  ];
 
   return (
     <>
       <Navbar />
       <div className="flex flex-wrap m-5">
-        {
-          adminPages.map((page) => (
-            <Card topic={page.topic} description={page.description}>
-              <Link href={page.link}>
-                <Btn className="bg-gray-500">Visit</Btn>
-              </Link>
-            </Card>
-          ))
-        }
+        {adminPages.map((page) => (
+          <Card topic={page.topic} description={page.description}>
+            <Link href={page.link}>
+              <Btn className="bg-gray-500">Visit</Btn>
+            </Link>
+          </Card>
+        ))}
       </div>
     </>
   );

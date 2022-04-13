@@ -40,6 +40,8 @@ export default function AppProvider({ children }) {
     return () => userController?.abort();
   });
 
+  const isAdmin = () => user && user.role == "admin";
+
   useEffect(() => fetchUser(), []);
 
   return (
@@ -53,6 +55,7 @@ export default function AppProvider({ children }) {
         setUsers,
         loading,
         setLoading,
+        isAdmin,
       }}
     >
       {children}

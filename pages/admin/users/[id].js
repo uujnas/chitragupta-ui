@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../components/layout/Navbar";
+import { Btn } from "../../../components/formComponents";
 import { useRouter } from "next/router";
+import { useGlobalContext } from "../../../context";
 import axios from "axios";
 import Jsona from "jsona";
+import {
+  Label,
+  Select,
+  Input,
+  Option,
+} from "../../../components/formComponents";
+import Modal from "../../../components/modal";
 
 const User = () => {
+  const { isAdmin } = useGlobalContext();
   const [user, setUser] = useState(null);
+  const [updatingUser, setUpdatingUser] = useState(false);
+  const [salaries, setSalaries] = useState([]);
+  const [salary, setSalary] = useState(null);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [errors, setErrors] = useState({});
   const router = useRouter();
+  const { id: user_id } = router.query;
 
   const MAX_SICK_LEAVE_BALANCE = 5;
   const MAX_PAID_LEAVE_BALANCE = 18;
@@ -16,37 +34,107 @@ const User = () => {
     user ? Math.round((leave_balance / total) * 100) : 0;
 
   useEffect(() => {
-    let controller = new AbortController();
     const dataFormatter = new Jsona();
+    let user_controller = new AbortController();
+    let salary_controller = new AbortController();
 
-    const fetch_user = async (id) => {
+    const fetch_user = async (user_id) => {
       try {
         // fetch user from remote api
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${id}.json`,
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
           {
             headers: { Authorization: localStorage.token },
-            signal: controller.signal,
+            signal: user_controller.signal,
           }
         );
 
         setUser(dataFormatter.deserialize(response.data));
-        controller = null;
+        user_controller = null;
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetch_user(router.query.id);
+    const fetch_salaries = async () => {
+      try {
+        // fetch salaries from remote api
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
+          {
+            headers: { Authorization: localStorage.token },
+            signal: salary_controller.signal,
+          }
+        );
 
-    return () => controller?.abort();
+        setSalaries(dataFormatter.deserialize(response.data));
+        salary_controller = null;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetch_user(user_id);
+    fetch_salaries();
+
+    return () => {
+      user_controller?.abort();
+      salary_controller?.abort();
+    };
   }, []);
 
-  useEffect(() => console.log(user), [user]);
+  const checkIfFormIsValid = () => {
+    const errorCount = 0;
+    if (!salary) {
+      errors["salary"] = "Can't be blank.";
+      console.log(errors);
+      setErrors({ ...errors });
+      errorCount += 1;
+    }
+
+    return errorCount;
+  };
+
+  const updateUserSalary = async () => {
+    if (checkIfFormIsValid() === 0) {
+      // make request to remote api to create or update user salary
+      try {
+        const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
+          {
+            user: {
+              user_salaries_attributes: [{
+                salary_id: salary,
+                start_date: startDate,
+              }],
+            },
+          },
+          {
+            headers: {
+              Authorization: localStorage.token,
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <>
       <Navbar />
+
+      {isAdmin() && (
+        <div className="flex flex-row-reverse">
+          <Btn
+            className="mr-4 bg-gray-500 hover:bg-gray-400"
+            onClick={() => setUpdatingUser(true)}
+          >
+            Edit
+          </Btn>
+        </div>
+      )}
 
       <div className="bg-white w-[300px] mx-auto">
         <div className="pt-10 text-center">
@@ -192,6 +280,50 @@ const User = () => {
           </div>
         </div>
       </div>
+
+      {updatingUser && (
+        <Modal
+          showModal={updatingUser}
+          setShowModal={setUpdatingUser}
+          title={"Update User"}
+        >
+          <div>
+            <Label
+              className={`${
+                errors["salary"] ? "text-red-500" : "text-gray-500"
+              }`}
+            >
+              Select salary
+            </Label>
+            <Select
+              onChange={(e) => setSalary(e.target.value)}
+              className={errors["salary"] ? "border-red-500" : ""}
+            >
+              <Option>...</Option>
+              {salaries.map((salary) => (
+                <Option value={salary.id} key={salary.id}>
+                  Base: {salary.basic_salary}, Cash In Hand:
+                  {salary.cash_in_hand}
+                </Option>
+              ))}
+            </Select>
+            {errors["salary"] && (
+              <span className="text-sm text-red-500">{errors["salary"]}</span>
+            )}
+
+            <Label>Start Date</Label>
+            <Input
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              type="date"
+            />
+
+            <Btn className="bg-green-400" onClick={updateUserSalary}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

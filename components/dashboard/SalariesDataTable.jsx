@@ -32,7 +32,6 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
       "commitment_bonus",
       "allowance",
       "festival_bonus",
-      "monthly_dispatch",
     ].forEach((field) => {
       if (salary[field] === undefined) {
         errorCount += 1;
@@ -102,10 +101,6 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
               "commitment_bonus",
               "allowance",
               "festival_bonus",
-              "income_tax",
-              "net_ctc",
-              "cash_in_hand",
-              "monthly_dispatch",
               "life_insurance_deduction",
             ].map((field) => (
               <InputWithLabelAndError

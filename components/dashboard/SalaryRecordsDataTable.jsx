@@ -5,11 +5,38 @@ import { Btn, Input } from "../formComponents";
 import DataTable from "./DataTable";
 import axios from "axios";
 import Alert from "../alert";
+import Jsona from "jsona";
 
-const SalaryRecordsDataTable = ({ salaryRecords }) => {
+const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [date, setDate] = useState(null);
+  const dataFormatter = new Jsona();
+
+  useEffect(() => {
+    const fetchSalaryRecords = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records`,
+          {
+            headers: {
+              Authorization: localStorage.token,
+            },
+            params: {
+              date,
+            },
+          }
+        );
+
+        setSalaryRecords(dataFormatter.deserialize(response.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchSalaryRecords();
+  }, [date]);
+
   // make request to remote api for salary records generation
   const generateSalaryRecords = async () => {
     if (!date) {

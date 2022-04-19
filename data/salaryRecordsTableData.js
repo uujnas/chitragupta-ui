@@ -43,4 +43,8 @@ export const columns = [
     Header: "Monthly Dispatch",
     accessor: "monthly_dispatch",
   },
+  {
+    Header: "Date",
+    accessor: "date",
+  },
 ];

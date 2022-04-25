@@ -3,9 +3,15 @@ import Navbar from "../../../components/layout/Navbar";
 import SalaryRecordsDataTable from "../../../components/dashboard/SalaryRecordsDataTable";
 import axios from "axios";
 import Jsona from "jsona";
+import { handleUnauthorized } from "../../../lib/utils";
+import { useRouter } from "next/router";
+import { useGlobalContext } from "../../../context";
 
 const SalaryRecords = () => {
+  const router = useRouter();
+
   const [salaryRecords, setSalaryRecords] = useState([]);
+  const { setToken } = useGlobalContext();
 
   useEffect(() => {
     const fetchSalaryRecords = async () => {
@@ -19,6 +25,7 @@ const SalaryRecords = () => {
         setSalaryRecords(dataFormatter.deserialize(response.data));
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
     };
 

@@ -7,15 +7,20 @@ import {
 } from "react";
 import axios from "axios";
 import Jsona from "jsona";
+import { useRouter } from "next/router";
+import { handleUnauthorized } from "./lib/utils";
 
 export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
+  const router = useRouter();
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true); // this is only to check if user is loading
 
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [users, setUsers] = useState([]);
+
+  const [token, setToken] = useState("");
 
   const dataFormatter = new Jsona();
 
@@ -35,6 +40,7 @@ export default function AppProvider({ children }) {
       userController = null;
     } catch (error) {
       console.log(error);
+      handleUnauthorized(error, setToken, router);
     }
 
     return () => userController?.abort();
@@ -42,7 +48,17 @@ export default function AppProvider({ children }) {
 
   const isAdmin = () => user && user.role == "admin";
 
-  useEffect(() => fetchUser(), []);
+  useEffect(() => {
+    setToken(localStorage.token);
+    if (localStorage.token && localStorage.token !== "") {
+      fetchUser();
+    } else {
+      router.push({
+        pathname: "/login",
+        query: { returnUrl: window.location.pathname },
+      });
+    }
+  }, []);
 
   return (
     <AppContext.Provider
@@ -56,6 +72,8 @@ export default function AppProvider({ children }) {
         loading,
         setLoading,
         isAdmin,
+        token,
+        setToken,
       }}
     >
       {children}

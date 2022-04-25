@@ -16,6 +16,8 @@ import {
 } from "../components/formComponents";
 import { useGlobalContext } from "../context";
 import LeaveBalanceBadge from "../components/leaveBalanceBadge";
+import { handleUnauthorized } from "../lib/utils";
+import { useRouter } from "next/router";
 
 const Calendar = () => {
   const pageProps = { label: "Dashboard", link: "/home" };
@@ -23,6 +25,8 @@ const Calendar = () => {
     { label: "Calendar", link: "/calendar" },
     { label: "Admin", link: "/admin" },
   ];
+
+  const router = useRouter();
 
   // const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState({});
@@ -32,7 +36,7 @@ const Calendar = () => {
 
   const dataFormatter = new Jsona();
 
-  const { user, leaveRequests, setLeaveRequests } = useGlobalContext();
+  const { user, leaveRequests, setLeaveRequests, setToken } = useGlobalContext();
 
   useEffect(async () => {
     let events = [...leaveRequests];
@@ -104,7 +108,7 @@ const Calendar = () => {
     // create leave request
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests`,
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
         {
           leave_request: leaveRequest,
         },
@@ -127,6 +131,7 @@ const Calendar = () => {
           (error.response.data.message || error.response.data.error)) ||
           error.message
       );
+      handleUnauthorized(error, setToken, router);
     }
   };
 
@@ -140,7 +145,7 @@ const Calendar = () => {
     // update leave request
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}`,
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
         {
           leave_request: leave_request,
         },
@@ -171,6 +176,7 @@ const Calendar = () => {
       setError(
         (error.response && JSON.stringify(error.response.data)) || error.message
       );
+      handleUnauthorized(error, setToken, router);
     }
   };
 

@@ -4,10 +4,13 @@ import UsersDataTable from "../../../components/dashboard/UsersDataTable";
 import { useGlobalContext } from "../../../context";
 import axios from "axios";
 import Jsona from "jsona";
+import { handleUnauthorized } from "../../../lib/utils";
+import { useRouter } from "next/router";
 
 const Users = () => {
   const dataFormatter = new Jsona();
-  const { setUsers, user } = useGlobalContext();
+  const router = useRouter();
+  const { setUsers, user, setToken } = useGlobalContext();
 
   const fetchUsers = useCallback(async () => {
     const usersController = new AbortController();
@@ -25,6 +28,7 @@ const Users = () => {
       usersController = null;
     } catch (error) {
       console.log(error);
+      handleUnauthorized(error, setToken, router);
     }
 
     return () => usersController?.abort();

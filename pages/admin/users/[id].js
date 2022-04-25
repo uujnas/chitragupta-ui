@@ -12,9 +12,10 @@ import {
   Option,
 } from "../../../components/formComponents";
 import Modal from "../../../components/modal";
+import { handleUnauthorized } from "../../../lib/utils";
 
 const User = () => {
-  const { isAdmin } = useGlobalContext();
+  const { isAdmin, setToken } = useGlobalContext();
   const [user, setUser] = useState(null);
   const [updatingUser, setUpdatingUser] = useState(false);
   const [salaries, setSalaries] = useState([]);
@@ -53,6 +54,7 @@ const User = () => {
         user_controller = null;
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
     };
 
@@ -71,6 +73,7 @@ const User = () => {
         salary_controller = null;
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
     };
 
@@ -103,10 +106,12 @@ const User = () => {
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
           {
             user: {
-              user_salaries_attributes: [{
-                salary_id: salary,
-                start_date: startDate,
-              }],
+              user_salaries_attributes: [
+                {
+                  salary_id: salary,
+                  start_date: startDate,
+                },
+              ],
             },
           },
           {
@@ -117,6 +122,7 @@ const User = () => {
         );
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
     }
   };

@@ -7,6 +7,8 @@ import { useGlobalContext } from "../context";
 import axios from "axios";
 import Jsona from "jsona";
 import LeaveBalanceBadge from "../components/leaveBalanceBadge";
+import { handleUnauthorized } from "../lib/utils";
+import { useRouter } from "next/router";
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -14,8 +16,10 @@ const Home = () => {
   const [error, setError] = useState("");
   const [allLeaves, setAllLeaves] = useState(false);
 
-  const { user, leaveRequests, setLeaveRequests } = useGlobalContext();
+  const { user, leaveRequests, setLeaveRequests, setToken } =
+    useGlobalContext();
   const dataFormatter = new Jsona();
+  const router = useRouter();
 
   const isAdmin = () => user && user.role === "admin";
 
@@ -29,7 +33,7 @@ const Home = () => {
     try {
       // send update request to remote api
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/leave_requests/${leaveRequest.id}`,
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
         {
           leave_request: leave_request,
         },
@@ -59,6 +63,7 @@ const Home = () => {
       }
     } catch (error) {
       setError((error.response && error.response.data) || error.message);
+      handleUnauthorized(error, setToken, router);
     }
   };
 
@@ -81,6 +86,7 @@ const Home = () => {
         leaveController = null;
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
 
       return () => leaveController?.abort();

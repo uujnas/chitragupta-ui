@@ -3,8 +3,13 @@ import Navbar from "../../../components/layout/Navbar";
 import SalarySettingsDataTable from "../../../components/dashboard/SalarySettingsDataTable";
 import axios from "axios";
 import Jsona from "jsona";
+import { handleUnauthorized } from "../../../lib/utils";
+import { useGlobalContext } from "../../../context";
+import { useRouter } from "router";
 
 const salarySettings = () => {
+  const router = useRouter();
+  const { setToken } = useGlobalContext();
   const [salarySettings, setSalarySettings] = useState([]);
 
   useEffect(() => {
@@ -19,6 +24,7 @@ const salarySettings = () => {
         setSalarySettings(dataFormatter.deserialize(response.data));
       } catch (error) {
         console.log(error);
+        handleUnauthorized(error, setToken, router);
       }
     };
 

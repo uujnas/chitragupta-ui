@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import Jsona from "jsona";
 import { data } from "autoprefixer";
+import { handleUnauthorized } from "../../../lib/utils";
+import { useGlobalContext } from "../../../context";
 
 const SalarySetting = () => {
   const router = useRouter();
@@ -11,15 +13,21 @@ const SalarySetting = () => {
   const dataFormatter = new Jsona();
 
   const [salarySetting, setSalarySetting] = useState({});
+  const { setToken } = useGlobalContext();
 
   useEffect(() => {
     const fetchSalarySetting = async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings/${id}`,
-        { headers: { Authorization: localStorage.token } }
-      );
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings/${id}.json`,
+          { headers: { Authorization: localStorage.token } }
+        );
 
-      setSalarySetting(dataFormatter.deserialize(response.data));
+        setSalarySetting(dataFormatter.deserialize(response.data));
+      } catch (error) {
+        console.log(error);
+        handleUnauthorized(error, setToken, router);
+      }
     };
 
     fetchSalarySetting();
@@ -38,14 +46,13 @@ const SalarySetting = () => {
             "ssf_tax_exemption_max",
             "from_date",
             "to_date",
-          ].map(field => (
+          ].map((field) => (
             <li class="flex flex-row uppercase h-20">
               <div className="my-auto ml-4 align-middle">
-              {field.split("_").join(" ")}: {salarySetting[field]}
-                </div>
-              </li>
-          ))
-          }
+                {field.split("_").join(" ")}: {salarySetting[field]}
+              </div>
+            </li>
+          ))}
         </ul>
       </div>
     </>

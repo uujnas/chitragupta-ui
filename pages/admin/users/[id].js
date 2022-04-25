@@ -23,6 +23,7 @@ const User = () => {
   const [startDate, setStartDate] = useState(
     new Date().toISOString().slice(0, 10)
   );
+  const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({});
   const router = useRouter();
   const { id: user_id } = router.query;
@@ -30,6 +31,12 @@ const User = () => {
   const MAX_SICK_LEAVE_BALANCE = 5;
   const MAX_PAID_LEAVE_BALANCE = 18;
   const MAX_UNPAID_LEAVE_BALANCE = 25;
+
+  const statuses = [
+    { id: 0, status: "invited" },
+    { id: 1, status: "active" },
+    { id: 2, status: "disabled" },
+  ];
 
   const leave_percentage = (leave_balance, total) =>
     user ? Math.round((leave_balance / total) * 100) : 0;
@@ -51,6 +58,7 @@ const User = () => {
         );
 
         setUser(dataFormatter.deserialize(response.data));
+        setSalary(dataFormatter.deserialize(response.data).active_salary.id);
         user_controller = null;
       } catch (error) {
         console.log(error);
@@ -112,6 +120,7 @@ const User = () => {
                   start_date: startDate,
                 },
               ],
+              status: status,
             },
           },
           {
@@ -316,6 +325,29 @@ const User = () => {
             </Select>
             {errors["salary"] && (
               <span className="text-sm text-red-500">{errors["salary"]}</span>
+            )}
+
+            <Label
+              className={`${
+                errors["salary"] ? "text-red-500" : "text-gray-500"
+              }`}
+            >
+              Select Status
+            </Label>
+            <Select
+              onChange={(e) => setStatus(e.target.value)}
+              className={errors["status"] ? "border-red-500" : ""}
+              defaultValue={user.status}
+            >
+              <Option value={null}>...</Option>
+              {statuses.map((status) => (
+                <Option value={status.status} key={status.id}>
+                  {status.status}
+                </Option>
+              ))}
+            </Select>
+            {errors["status"] && (
+              <span className="text-sm text-red-500">{errors["status"]}</span>
             )}
 
             <Label>Start Date</Label>

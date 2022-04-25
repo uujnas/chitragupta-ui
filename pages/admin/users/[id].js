@@ -304,6 +304,7 @@ const User = () => {
             <Select
               onChange={(e) => setSalary(e.target.value)}
               className={errors["salary"] ? "border-red-500" : ""}
+              defaultValue={user.active_salary.id}
             >
               <Option>...</Option>
               {salaries.map((salary) => (

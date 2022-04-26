@@ -57,8 +57,10 @@ const User = () => {
           }
         );
 
-        setUser(dataFormatter.deserialize(response.data));
-        setSalary(dataFormatter.deserialize(response.data).active_salary.id);
+        const deserialized_user_data = dataFormatter.deserialize(response.data)
+
+        setUser(deserialized_user_data);
+        setSalary(deserialized_user_data.active_salary && deserialized_user_data.active_salary.id);
         user_controller = null;
       } catch (error) {
         console.log(error);
@@ -313,7 +315,7 @@ const User = () => {
             <Select
               onChange={(e) => setSalary(e.target.value)}
               className={errors["salary"] ? "border-red-500" : ""}
-              defaultValue={user.active_salary.id}
+              defaultValue={user.active_salary && user.active_salary.id}
             >
               <Option>...</Option>
               {salaries.map((salary) => (

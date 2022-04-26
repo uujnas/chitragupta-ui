@@ -1,8 +1,31 @@
-import React from "react";
-import { useTable, useSortBy, usePagination } from "react-table";
+import React, { useState } from "react";
+import {
+  useTable,
+  useSortBy,
+  usePagination,
+  useGlobalFilter,
+  useAsyncDebounce,
+} from "react-table";
+
+function GlobalFilter({ globalFilter, setGlobalFilter }) {
+  const [value, setValue] = useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || undefined);
+  }, 200);
+
+  return (
+    <input
+      value={value || ""}
+      onChange={(e) => {
+        setValue(e.target.value);
+        onChange(e.target.value);
+      }}
+      placeholder={`Search`}
+    />
+  );
+}
 
 const DataTable = ({ children, data, rowClick, columns }) => {
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -15,11 +38,13 @@ const DataTable = ({ children, data, rowClick, columns }) => {
     pageOptions,
     state,
     prepareRow,
+    setGlobalFilter,
   } = useTable(
     {
       columns,
       data: data,
     },
+    useGlobalFilter,
     useSortBy,
     usePagination
   );
@@ -28,7 +53,7 @@ const DataTable = ({ children, data, rowClick, columns }) => {
 
   return (
     <div className="relative">
-      { children }
+      {children}
       <table
         {...getTableProps()}
         className="min-w-full divide-y divide-gray-200"
@@ -44,6 +69,14 @@ const DataTable = ({ children, data, rowClick, columns }) => {
                 >
                   <div className="flex justify-between">
                     {column.render("Header")}
+                    {column.filter ? (
+                      <GlobalFilter
+                        globalFilter={state.globalFilter}
+                        setGlobalFilter={setGlobalFilter}
+                      />
+                    ) : (
+                      ""
+                    )}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (

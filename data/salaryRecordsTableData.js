@@ -2,6 +2,7 @@ export const columns = [
   {
     Header: "User",
     accessor: "full_name",
+    filter: true,
   },
   {
     Header: "SSF Office",

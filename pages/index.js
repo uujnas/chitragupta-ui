@@ -9,19 +9,20 @@ import Jsona from "jsona";
 import LeaveBalanceBadge from "../components/leaveBalanceBadge";
 import { handleUnauthorized } from "../lib/utils";
 import { useRouter } from "next/router";
+import { connect } from "react-redux";
 
-const Home = () => {
+const Home = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [leaveRequest, setLeaveRequest] = useState({});
   const [error, setError] = useState("");
   const [allLeaves, setAllLeaves] = useState(false);
 
-  const { user, leaveRequests, setLeaveRequests, setToken } =
-    useGlobalContext();
+  // const {leaveRequests, setLeaveRequests, setToken } =
+  //   useGlobalContext();
   const dataFormatter = new Jsona();
   const router = useRouter();
 
-  const isAdmin = () => user && user.role === "admin";
+  const isAdmin = () => props.user && props.user.role === "admin";
 
   const updateLeaveRequest = async (status) => {
     const leave_request = {
@@ -56,7 +57,7 @@ const Home = () => {
         );
 
         // now replace leave request at the index with updated one
-        const leave_requests = [...leaveRequests];
+        const leave_requests = [];
         leave_requests[index] = updatedLeaveRequest;
 
         setLeaveRequests(leave_requests);
@@ -91,7 +92,7 @@ const Home = () => {
 
       return () => leaveController?.abort();
     },
-    [leaveRequests]
+    []
   );
 
   useEffect(() => fetchLeaveRequests(), []);
@@ -211,4 +212,8 @@ const Home = () => {
   );
 };
 
-export default Home;
+const mapStateToProps = state => ({
+  user: state.auth.user,
+  error: state.error
+})
+export default connect(mapStateToProps)(Home)

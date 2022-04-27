@@ -9,12 +9,13 @@ import {
 } from "../dropdownComponents";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { connect } from "react-redux";
 
-const Navbar = () => {
-  const { user } = useGlobalContext();
+const Navbar = (props) => {
+  debugger
   const [showDropdown, setShowDropDown] = useState(false);
 
-  const isAdmin = () => user && user.role === "admin";
+  const isAdmin = () => props.user && props.user.role === "admin";
 
   const page = { label: "Dashboard", link: "/" };
   const subPages = [{ label: "Calendar", link: "/calendar" }];
@@ -55,7 +56,7 @@ const Navbar = () => {
             id="dropdown-menu"
             onClick={() => setShowDropDown(!showDropdown)}
           >
-            {user.first_name} {user.last_name}
+
           </DropdownTrigger>
 
           {showDropdown && (
@@ -145,4 +146,8 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+const mapStateToProps = state => ({
+  user: state.auth.user,
+  error: state.error
+})
+export default connect(mapStateToProps)(Navbar);

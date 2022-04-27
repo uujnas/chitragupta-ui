@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import {
   FormContainer,
   Input,
@@ -6,22 +7,63 @@ import {
   FormControl,
   Btn,
 } from "../components/formComponents";
-import { login } from '../actions/authActions'
-import { connect } from 'react-redux'
+import { useRouter } from "next/router";
+import { useGlobalContext } from "../context";
+import { verify_token } from "../components/routeGuard/RouteGuard";
 
-
-const Login = (props) => {
+const Login = () => {
+  const router = useRouter();
+  const { setUser, setLoading } = useGlobalContext();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
-    const user = {
-      email,
-      password
+  const token_verified = async () => {
+    const token_verified = await verify_token();
+    if (token_verified) {
+      router.push(getRedirect());
     }
-    props.login(user)
+  };
+
+  const getRedirect = () => {
+    return router.query && router.query.returnUrl
+      ? router.query.returnUrl
+      : "/";
+  };
+
+  useEffect(() => token_verified(), []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    try {
+      // make request to remote api login endpoint
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
+        {
+          user: { email, password },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(response);
+
+      localStorage.setItem("token", response.headers.authorization);
+      // we are not deserializing data because it is not serialized in first place
+      // we send every data as serialized,
+      // but this one is returned by sessions_controller#new so we have no control over it
+      setUser(response.data);
+      setLoading(false);
+
+      router.push(getRedirect());
+    } catch (error) {
+      localStorage.removeItem("token");
+      setError("Invalid user or password.");
+    }
   };
 
   return (
@@ -70,9 +112,4 @@ const Login = (props) => {
   );
 };
 
-
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated,
-  error: state.error
-})
-export default connect(mapStateToProps, { login })(Login)
+export default Login;

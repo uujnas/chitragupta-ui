@@ -63,6 +63,8 @@ export default function AppProvider({ children }) {
   return (
     <AppContext.Provider
       value={{
+        user,
+        setUser,
         leaveRequests,
         setLeaveRequests,
         users,

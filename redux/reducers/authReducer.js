@@ -12,7 +12,8 @@ const initialState = {
     token: null,
     isAuthenticated: null,
     isLoading: false,
-    user: null
+    user: null,
+    verify_token: false
 }
 
 export default function (state = initialState, action) {
@@ -32,7 +33,8 @@ export default function (state = initialState, action) {
                 ...state,
                 isAuthenticated: true,
                 isLoading: false,
-                user: action.payload
+                user: action.payload,
+                verify_token: true
             }
         case LOGIN_SUCCESS:
             localStorage.setItem("token", action.payload.headers.authorization);
@@ -51,7 +53,8 @@ export default function (state = initialState, action) {
                 isAuthenticated: false,
                 token: null,
                 user: null,
-                isLoading: false
+                isLoading: false,
+                verify_token: false
             }
 
         default:

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useGlobalContext } from "../../context";
 import {
   Dropdown,
   DropdownTrigger,
@@ -12,7 +11,6 @@ import { useRouter } from "next/router";
 import { connect } from "react-redux";
 
 const Navbar = (props) => {
-  debugger
   const [showDropdown, setShowDropDown] = useState(false);
 
   const isAdmin = () => props.user && props.user.role === "admin";
@@ -43,12 +41,11 @@ const Navbar = (props) => {
     );
 
     localStorage.removeItem("token");
-
-    router.push("/login");
+    router.reload(window.location.pathname)
   };
 
   return (
-    <header className="px-4 py-8 text-white bg-blue-500">
+        <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
         <div className="text-sm uppercase">dashboard</div>
         <Dropdown>
@@ -56,7 +53,7 @@ const Navbar = (props) => {
             id="dropdown-menu"
             onClick={() => setShowDropDown(!showDropdown)}
           >
-
+            {props.user.first_name} {props.user.last_name}
           </DropdownTrigger>
 
           {showDropdown && (
@@ -147,6 +144,7 @@ const Navbar = (props) => {
 };
 
 const mapStateToProps = state => ({
+  token: state.auth.token,
   user: state.auth.user,
   error: state.error
 })

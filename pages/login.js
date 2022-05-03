@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import { useRouter } from "next/router";
 import {
   FormContainer,
   Input,
@@ -6,15 +7,23 @@ import {
   FormControl,
   Btn,
 } from "../components/formComponents";
-import { login } from '../actions/authActions'
+import { login, loadUser } from '../redux/actions/authActions'
 import { connect } from 'react-redux'
 
 
 const Login = (props) => {
-
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const token_verified =  () => {
+    if (props.isAuthenticated) {
+      props.loadUser()
+      router.push('/');
+    }
+  };
+
+  useEffect(() => token_verified(), [props.isAuthenticated]);
   const handleSubmit = (e) => {
     const user = {
       email,
@@ -23,7 +32,6 @@ const Login = (props) => {
     props.login(user)
     e.preventDefault();
   };
-
   return (
     <section className="my-8 pt-14">
       <FormContainer>
@@ -75,4 +83,4 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
   error: state.error
 })
-export default connect(mapStateToProps, { login })(Login)
+export default connect(mapStateToProps, { login , loadUser})(Login)

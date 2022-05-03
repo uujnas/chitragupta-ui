@@ -7,12 +7,19 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     LOGOUT_SUCCESS,
-    SET_TOKEN
+    SET_TOKEN,
+    UNSET_TOKEN,
+    SET_IS_SERVER
 } from './types'
 
 //*set initial token on page access
 export const setToken = (token) => (dispatch, getState) => {
     dispatch({ type: SET_TOKEN, payload: token })
+}
+
+//check status of server
+export const serverCheck = () => (dispatch) => {
+    dispatch({ type: SET_IS_SERVER })
 }
 
 //*check token and load user

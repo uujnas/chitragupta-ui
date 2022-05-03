@@ -1,45 +1,39 @@
-import { useEffect } from 'react';
-import { Provider } from 'react-redux'
-import { createStore, applyMiddleware, compose } from 'redux'
-import reduxThunk from 'redux-thunk'
+import App from 'next/app'
+import { wrapper } from "../redux/store"
 import RouteGuard from '../components/routeGuard/RouteGuard'
-import reducers from '../reducers'
 import Head from 'next/head'
-import { setToken, loadUser } from '../actions/authActions'
 import '../styles/globals.css'
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
-let composeEnhancers = compose
-if (typeof window !== 'undefined') {
-  composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-}
-const store = createStore(
-  reducers,
-  composeEnhancers(applyMiddleware(reduxThunk))
-)
-function MyApp ({ Component, pageProps }) {
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token){
-      store.dispatch(setToken(token))
-      store.dispatch(loadUser())
+
+
+class WrappedApp extends App {
+  static getInitialProps = wrapper.getInitialAppProps((store) => async ({ Component, ctx }) => {
+    const pageProps = {
+      ...(Component.getInitialProps ? await Component.getInitialProps({ ...ctx, store }) : {}),
     }
-  }, [])
-  return (
-    <>
-      <Provider store={store}>
-        <RouteGuard>
-          <Head>
-            <title>Chitragupta App</title>
-            <meta name='description' content='chitragupta' />
-            <link rel='icon' href='/favicon.ico' />
-          </Head>
+    return {
+      pageProps,
+    }
+  })
+  componentDidMount(){
+  }
+  render() {
+    const { Component, pageProps } = this.props
+    return (
+      <>
+      <RouteGuard>
+        <Head>
+          <title>Chitragupta App</title>
+          <meta name='description' content='chitragupta' />
+          <link rel='icon' href='/favicon.ico' />
+        </Head>
 
-          <Component {...pageProps} />
-        </RouteGuard>
-      </Provider>
+        <Component {...pageProps} />
+      </RouteGuard>
     </>
-  )
+    )
+  }
 }
 
-export default MyApp
+export default wrapper.withRedux(WrappedApp)

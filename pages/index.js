@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 import { fetchLeaveRequests,setSelectedLeave,updateLeaveRequest,setLeaveModal } from '../redux/actions/leaveActions'
 
 const Home = props => {
-  const [allLeaves, setAllLeaves] = useState(true)
+  const [allLeaves, setAllLeaves] = useState(false)
   const isAdmin = () => props.user && props.user.role === 'admin'
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const Home = props => {
             aria-checked="false"
             onClick={() => {
               setAllLeaves(!allLeaves);
-              fetchLeaveRequests(!allLeaves);
+              props.fetchLeaveRequests(!allLeaves);
             }}
           >
             <span className="sr-only">Use setting</span>

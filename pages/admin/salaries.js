@@ -12,29 +12,41 @@ const Salaries = () => {
   const { setToken } = useGlobalContext();
   const [salaries, setSalaries] = useState([]);
 
+  const fetchSalaries = async (page = 1, batch = null) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
+        {
+          headers: { Authorization: localStorage.token },
+          params: { page, batch },
+        }
+      );
+
+      const dataFormatter = new Jsona();
+      setSalaries(dataFormatter.deserialize(response.data));
+
+      return [
+        dataFormatter.deserialize(response.data.data),
+        response.data.total,
+      ];
+    } catch (error) {
+      console.log(error);
+      handleUnauthorized(error, setToken, router);
+    }
+  };
+
   useEffect(() => {
-    const fetchSalaries = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          { headers: { Authorization: localStorage.token } }
-        );
-
-        const dataFormatter = new Jsona();
-        setSalaries(dataFormatter.deserialize(response.data));
-      } catch (error) {
-        console.log(error);
-        handleUnauthorized(error, setToken, router);
-      }
-    };
-
     fetchSalaries();
   }, []);
 
   return (
     <>
       <Navbar />
-      <SalariesDataTable salaries={salaries} setSalaries={setSalaries} />
+      <SalariesDataTable
+        salaries={salaries}
+        setSalaries={setSalaries}
+        fetchRecords={fetchSalaries}
+      />
     </>
   );
 };

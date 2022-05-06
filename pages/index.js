@@ -14,7 +14,7 @@ const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const [leaveRequest, setLeaveRequest] = useState({});
   const [error, setError] = useState("");
-  const [allLeaves, setAllLeaves] = useState(false);
+  const { fetchAllData: allLeaves, setFetchAllData: setAllLeaves } = useGlobalContext()
 
   const { user, leaveRequests, setLeaveRequests, setToken } =
     useGlobalContext();
@@ -67,32 +67,30 @@ const Home = () => {
     }
   };
 
-  const fetchLeaveRequests = useCallback(
-    async (allLeaves = false) => {
-      const leaveController = new AbortController();
+  const fetchLeaveRequests = async (
+    page = 0,
+    batch = null
+  ) => {
+    try {
+      const leave_requests = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+        {
+          headers: { Authorization: localStorage.token },
+          params: { all_leaves: allLeaves, page: page, batch: batch },
+        }
+      );
 
-      try {
-        const leave_requests = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: leaveController.signal,
-            params: { all_leaves: allLeaves },
-          }
-        );
-
-        // sets global state for leave requests
-        setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-        leaveController = null;
-      } catch (error) {
-        console.log(error);
-        handleUnauthorized(error, setToken, router);
-      }
-
-      return () => leaveController?.abort();
-    },
-    [leaveRequests]
-  );
+      // sets global state for leave requests
+      // setLeaveRequests(dataFormatter.deserialize(leave_requests.data.data));
+      return [
+        dataFormatter.deserialize(leave_requests.data.data),
+        leave_requests.data.total,
+      ];
+    } catch (error) {
+      console.log(error);
+      handleUnauthorized(error, setToken, router);
+    }
+  };
 
   useEffect(() => fetchLeaveRequests(), []);
 
@@ -128,6 +126,7 @@ const Home = () => {
           showModal={showModal}
           setShowModal={setShowModal}
           setLeaveRequest={setLeaveRequest}
+          fetchRecords={fetchLeaveRequests}
         />
         {showModal && (
           <Modal

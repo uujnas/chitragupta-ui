@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import Alert from "../alert";
 
-const UsersDataTable = () => {
+const UsersDataTable = ({ fetchRecords }) => {
   const { users } = useGlobalContext();
   const router = useRouter();
   const [error, setError] = useState("");
@@ -16,7 +16,7 @@ const UsersDataTable = () => {
 
   const rowClick = (row) => router.push(`/admin/users/${row.original.id}`);
 
-  const exportData = users.map((d) => Object.values(d));
+  const exportData = users && users.map((d) => Object.values(d));
 
   const handleBulkImport = async () => {
     setError("");
@@ -71,7 +71,12 @@ const UsersDataTable = () => {
         />
       }
       {users && (
-        <DataTable data={users} rowClick={rowClick} columns={columns}>
+        <DataTable
+          data={users}
+          rowClick={rowClick}
+          columns={columns}
+          fetchRecords={fetchRecords}
+        >
           <div className="flex justify-between my-4">
             <Btn
               className="bg-teal-500 hover:bg-teal-600"
@@ -86,14 +91,14 @@ const UsersDataTable = () => {
               onChange={handleBulkImport}
             />
 
-            <Btn className="bg-teal-500 hover:bg-teal-600">
+            {users && (<Btn className="bg-teal-500 hover:bg-teal-600">
               <CSVLink
                 data={exportData}
                 filename={`${new Date().toISOString().slice(0, 18)}_report.csv`}
               >
                 Export Data
               </CSVLink>
-            </Btn>
+            </Btn>)}
           </div>
         </DataTable>
       )}

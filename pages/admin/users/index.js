@@ -12,27 +12,26 @@ const Users = () => {
   const router = useRouter();
   const { setUsers, user, setToken } = useGlobalContext();
 
-  const fetchUsers = useCallback(async () => {
-    const usersController = new AbortController();
-
+  const fetchUsers = async (page = 0, batch = null) => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
         {
           headers: { Authorization: localStorage.token },
-          signal: usersController.signal,
+          params: { page, batch }
         }
       );
 
-      setUsers(dataFormatter.deserialize(response.data));
-      usersController = null;
+      setUsers(dataFormatter.deserialize(response.data.data));
+      return [
+        dataFormatter.deserialize(response.data.data),
+        response.data.total,
+      ];
     } catch (error) {
       console.log(error);
       handleUnauthorized(error, setToken, router);
     }
-
-    return () => usersController?.abort();
-  }, [user]);
+  };
 
   useEffect(() => fetchUsers(), []);
 
@@ -40,7 +39,7 @@ const Users = () => {
     <>
       <Navbar />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
-        <UsersDataTable />
+        <UsersDataTable fetchRecords={fetchUsers} />
       </div>
     </>
   );

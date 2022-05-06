@@ -8,7 +8,7 @@ import axios from "axios";
 import Jsona from "jsona";
 import InputWithLabelAndError from "../InputWithLabelAndError";
 
-const SalariesDataTable = ({ salaries, setSalaries }) => {
+const SalariesDataTable = ({ salaries, setSalaries, fetchRecords }) => {
   const [salary, setSalary] = useState({});
   const [createNewSalary, setCreateNewSalary] = useState(false);
   const [errors, setErrors] = useState({});
@@ -87,6 +87,7 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
           data={salaries}
           rowClick={() => console.log()}
           columns={columns}
+          fetchRecords={fetchRecords}
         />
       </TableContainer>
       {createNewSalary && (

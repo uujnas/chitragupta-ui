@@ -10,7 +10,7 @@ import InputWithLabelAndError from "../InputWithLabelAndError";
 import SalarySettingForm from "../salarySettingForm";
 import { useRouter } from "next/router";
 
-const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
+const SalariesDataTable = ({ salarySettings, setSalarySettings, fetchRecords }) => {
   const [salarySetting, setSalarySetting] = useState({});
   const [createNew, setCreateNew] = useState(false);
   const [errors, setErrors] = useState({});
@@ -188,6 +188,7 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
             setUpdatingSalarySetting(true);
           }}
           columns={columns}
+          fetchRecords={fetchRecords}
         />
       </TableContainer>
 

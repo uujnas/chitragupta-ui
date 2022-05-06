@@ -20,6 +20,9 @@ export default function AppProvider({ children }) {
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [users, setUsers] = useState([]);
 
+  const [data, setData] = useState([]);
+  const [fetchAllData, setFetchAllData] = useState(true);
+
   const [token, setToken] = useState("");
 
   const dataFormatter = new Jsona();
@@ -74,6 +77,10 @@ export default function AppProvider({ children }) {
         isAdmin,
         token,
         setToken,
+        data,
+        setData,
+        fetchAllData,
+        setFetchAllData
       }}
     >
       {children}

@@ -221,7 +221,7 @@ const Calendar = () => {
               }
             );
 
-            let leave_requests = dataFormatter.deserialize(response.data);
+            let leave_requests = dataFormatter.deserialize(response.data.data);
 
             return leave_requests.map((leave) => {
               return {

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
+import { useGlobalContext } from "../../context";
 
-const DataTable = ({ children, data, rowClick, columns }) => {
+const DataTable = ({ children, rowClick, columns, fetchRecords, refetchData }) => {
+  const { data, setData, fetchAllData } = useGlobalContext();
+  const [total, setTotal] = useState(data.length);
 
   const {
     getTableProps,
@@ -12,23 +15,32 @@ const DataTable = ({ children, data, rowClick, columns }) => {
     previousPage,
     canNextPage,
     canPreviousPage,
-    pageOptions,
-    state,
+    state: { pageIndex },
     prepareRow,
+    pageCount,
   } = useTable(
     {
       columns,
       data: data,
+      manualPagination: true,
+      pageCount: total > 0 ? Math.ceil(total / 10) : 0,
+      autoResetPage: false,
     },
     useSortBy,
     usePagination
   );
 
-  const { pageIndex } = state;
+  useEffect(async () => {
+    const [records, count] = await fetchRecords(pageIndex + 1, 10);
+
+    console.log("records", records);
+    setData(records);
+    setTotal(count);
+  }, [pageIndex, fetchAllData, refetchData]);
 
   return (
     <div className="relative">
-      { children }
+      {children}
       <table
         {...getTableProps()}
         className="min-w-full divide-y divide-gray-200"
@@ -126,7 +138,7 @@ const DataTable = ({ children, data, rowClick, columns }) => {
         <span className="mr-4">
           Page
           <strong>
-            {pageIndex + 1} of {pageOptions.length}
+            {pageIndex + 1} of {pageCount}
           </strong>
         </span>
         <button

@@ -9,6 +9,7 @@ const LeaveRequestDataTable = ({
   showModal,
   setShowModal,
   setLeaveRequest,
+  fetchRecords
 }) => {
   const { leaveRequests } = useGlobalContext();
 
@@ -20,7 +21,7 @@ const LeaveRequestDataTable = ({
   const exportData = leaveRequests.map((d) => Object.values(d));
 
   return (
-    <DataTable data={leaveRequests} rowClick={rowClick} columns={columns} />
+    <DataTable data={leaveRequests} rowClick={rowClick} columns={columns} fetchRecords={fetchRecords} />
   );
 };
 

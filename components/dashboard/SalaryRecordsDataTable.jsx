@@ -7,33 +7,33 @@ import axios from "axios";
 import Alert from "../alert";
 import Jsona from "jsona";
 
-const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
+const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords, total }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [date, setDate] = useState(null);
   const dataFormatter = new Jsona();
 
+  const fetchSalaryRecords = async (page = 1, batch = null) => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records?page=${page}&batch=${batch}`,
+        {
+          headers: {
+            Authorization: localStorage.token,
+          },
+          params: {
+            date,
+          },
+        }
+      );
+
+      return [dataFormatter.deserialize(response.data.data), response.data.total]
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchSalaryRecords = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records`,
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-            params: {
-              date,
-            },
-          }
-        );
-
-        setSalaryRecords(dataFormatter.deserialize(response.data));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchSalaryRecords();
   }, [date]);
 
@@ -104,6 +104,8 @@ const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
           data={salaryRecords}
           rowClick={() => console.log()}
           columns={columns}
+          fetchRecords={fetchSalaryRecords}
+          refetchData={date}
         />
       </TableContainer>
     </>

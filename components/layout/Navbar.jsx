@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useGlobalContext } from "../../context";
 import {
   Dropdown,
   DropdownTrigger,
@@ -9,12 +8,12 @@ import {
 } from "../dropdownComponents";
 import axios from "axios";
 import { useRouter } from "next/router";
-
-const Navbar = () => {
-  const { user } = useGlobalContext();
+import { connect } from "react-redux";
+import { logout } from "../../redux/actions/authActions";
+const Navbar = (props) => {
   const [showDropdown, setShowDropDown] = useState(false);
 
-  const isAdmin = () => user && user.role === "admin";
+  const isAdmin = () => props.user && props.user.role === "admin";
 
   const page = { label: "Dashboard", link: "/" };
   const subPages = [{ label: "Calendar", link: "/calendar" }];
@@ -34,19 +33,11 @@ const Navbar = () => {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-
-    // send logout request to remote endpoint
-    const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_out.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-
-    localStorage.removeItem("token");
-
+    props.logout();
     router.push("/login");
   };
 
-  return (
+  return props.user ? (
     <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
         <div className="text-sm uppercase">dashboard</div>
@@ -55,7 +46,7 @@ const Navbar = () => {
             id="dropdown-menu"
             onClick={() => setShowDropDown(!showDropdown)}
           >
-            {user.first_name} {user.last_name}
+            {props.user.first_name} {props.user.last_name}
           </DropdownTrigger>
 
           {showDropdown && (
@@ -142,7 +133,14 @@ const Navbar = () => {
         </ol>
       </nav>
     </header>
+  ) : (
+    <></>
   );
 };
 
-export default Navbar;
+const mapStateToProps = (state) => ({
+  token: state.auth.token,
+  user: state.auth.user,
+  error: state.error,
+});
+export default connect(mapStateToProps, { logout })(Navbar);

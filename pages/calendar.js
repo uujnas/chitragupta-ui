@@ -1,236 +1,102 @@
-import React, { useState, useEffect, useContext } from "react";
-import Head from "next/head";
-import Navbar from "../components/layout/Navbar";
-import FullCalendar from "@fullcalendar/react"; // must go before plugins
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
-import axios from "axios";
-import Jsona from "jsona";
-import Modal from "../components/modal";
+import React, { useState, useEffect, useContext } from 'react'
+import Head from 'next/head'
+import Navbar from '../components/layout/Navbar'
+import FullCalendar from '@fullcalendar/react' // must go before plugins
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
+import axios from 'axios'
+import Modal from '../components/modal'
+import { Input, Label, Select, Option, Btn } from '../components/formComponents'
+import Loader from '../components/ui/loader'
+import LeaveBalanceBadge from '../components/leaveBalanceBadge'
+import { handleUnauthorized } from '../lib/utils'
+import { connect } from 'react-redux'
 import {
-  Input,
-  Label,
-  Select,
-  Option,
-  Btn,
-} from "../components/formComponents";
-import { useGlobalContext } from "../context";
-import LeaveBalanceBadge from "../components/leaveBalanceBadge";
-import { handleUnauthorized } from "../lib/utils";
-import { useRouter } from "next/router";
+  fetchLeaveRequests,
+  getLeaveById,
+  setLeaveModal,
+  setSelectedLeave,
+  updateLeaveRequest,
+  addLeaveRequest
+} from '../redux/actions/leaveActions'
 
-const Calendar = () => {
-  const pageProps = { label: "Dashboard", link: "/home" };
+const Calendar = props => {
+  const [editModal, setEditModal] = useState(false)
+  const pageProps = { label: 'Dashboard', link: '/home' }
   const subPageProps = [
-    { label: "Calendar", link: "/calendar" },
-    { label: "Admin", link: "/admin" },
-  ];
+    { label: 'Calendar', link: '/calendar' },
+    { label: 'Admin', link: '/admin' }
+  ]
 
-  const router = useRouter();
-
-  // const [leaveRequests, setLeaveRequests] = useState([]);
-  const [leaveRequest, setLeaveRequest] = useState({});
-  const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false);
-  const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false);
-  const [error, setError] = useState("");
-
-  const dataFormatter = new Jsona();
-
-  const { user, leaveRequests, setLeaveRequests, setToken } = useGlobalContext();
-
-  useEffect(async () => {
-    let events = [...leaveRequests];
-
-    //  we need to make some tweaks like set start_date to start and end_date to end as fullCalendar requires
-    events.forEach((event) => {
-      event.start = event.start_date;
-      event.end = fullCalendarEndDate(event.end_date);
-      event.color = colorMap(event.status);
-    });
-
-    setLeaveRequests(events);
-
-    console.log(events);
-  }, []);
-
-  const isAdmin = () => user.role === "admin";
-
-  const colorMap = (status) => {
-    switch (status) {
-      case "pending":
-        return "blue";
-        break;
-      case "rejected":
-        return "red";
-        break;
-      case "approved":
-        return "green";
-        break;
-      default:
-        return "blue";
-        break;
+  useEffect(() => {
+    if (props.user !== null) {
+      props.fetchLeaveRequests(true)
     }
-  };
+  }, [props.user])
 
-  const fullCalendarEndDate = (date) => {
-    let end_date = new Date(date);
-    end_date.setDate(end_date.getDate() + 1);
-    end_date.toLocaleString();
-    // we need to make sure we have date in YY-MM-DD format
-    // '2022-1-1' is not valid date
-    // '2022-01-01' is valid date
-    return `${end_date.getFullYear()}-${`0${end_date.getMonth() + 1}`.slice(
-      -2
-    )}-${`0${end_date.getDate()}`.slice(-2)}`;
-  };
+  const isAdmin = () => props.user.role === 'admin'
 
-  const createLeaveRequest = (info) => {
-    setError("");
+  const colorMap = status => {
+    switch (status) {
+      case 'pending':
+        return 'blue'
+        break
+      case 'rejected':
+        return 'red'
+        break
+      case 'approved':
+        return 'green'
+        break
+      default:
+        return 'blue'
+        break
+    }
+  }
 
+
+  const createLeaveRequest = info => {
     // end date should be the last day of the leave, better not include the present day
-    const endDate = new Date(info.endStr);
-    endDate.setDate(endDate.getDate() - 1);
-    endDate.toLocaleString();
-
-    setCreatingLeaveRequest(true);
-
-    setLeaveRequest({
-      ...leaveRequest,
-      leave_type: "sick_leave",
+    const endDate = new Date(info.endStr)
+    endDate.setDate(endDate.getDate() - 1)
+    endDate.toLocaleString()
+    props.setSelectedLeave({
+      leave_type: 'sick_leave',
       start_date: info.startStr,
       end_date: endDate,
-      status: "pending",
-    });
-  };
-
-  const addEvent = async () => {
-    console.log("Adding leave request....");
-    // create leave request
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-        {
-          leave_request: leaveRequest,
-        },
-        { headers: { Authorization: localStorage.token } }
-      );
-
-      if (response.statusText === "OK") {
-        setCreatingLeaveRequest(false);
-        // add newly created leave request to the calendar
-        const leave_request = dataFormatter.deserialize(response.data);
-        leave_request.start = leave_request.start_date;
-        leave_request.end = leave_request.end_date;
-        setLeaveRequests([...leaveRequests, leave_request]);
-      } else {
-        setError(response.data.message);
-      }
-    } catch (error) {
-      setError(
-        (error.response &&
-          (error.response.data.message || error.response.data.error)) ||
-          error.message
-      );
-      handleUnauthorized(error, setToken, router);
-    }
-  };
-
-  const updateEvent = async (status) => {
-    const leave_request = {
-      ...leaveRequest,
-      status: status,
-      approver_id: (isAdmin() || null) && user.id,
-    };
-
-    // update leave request
-    try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
-        {
-          leave_request: leave_request,
-        },
-        { headers: { Authorization: localStorage.token } }
-      );
-
-      if (response.statusText === "OK") {
-        setUpdatingLeaveRequest(false);
-        // add updated leave request to the calendar
-        const leave_request = dataFormatter.deserialize(response.data);
-        leave_request.start = leave_request.start_date;
-        leave_request.end = leave_request.end_date;
-
-        // find index of the updated leave_request
-        const index = leaveRequests.findIndex(
-          (leave) => leave.id === leave_request.id
-        );
-
-        // update leave_request at the index
-        const leave_requests = [...leaveRequests];
-        leave_requests[index] = leave_request;
-
-        setLeaveRequests(leave_requests);
-      } else {
-        setError(response.data.message);
-      }
-    } catch (error) {
-      setError(
-        (error.response && JSON.stringify(error.response.data)) || error.message
-      );
-      handleUnauthorized(error, setToken, router);
-    }
-  };
+      status: 'pending'
+    })
+    setEditModal(false)
+    props.setLeaveModal(true)
+  }
 
   const updateLeaveRequest = async ({ event }) => {
-    setError("");
+    const id = event.id
+    props.getLeaveById(id)
+    setEditModal(true)
+    props.setLeaveModal(true)
+  }
 
-    //  first get id of leave request with
-    const id = event.id;
-
-    // make request to remote API to get leave request detail
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}`,
-      { headers: { Authorization: localStorage.token } }
-    );
-
-    const leave_request = dataFormatter.deserialize(response.data);
-    setLeaveRequest(leave_request);
-
-    setUpdatingLeaveRequest(true);
-  };
-
-  return (
+  return props.user || props.loading ? (
     <>
       <Head>
         <title>Chitragupta App</title>
-        <meta name="description" content="chitragupta" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name='description' content='chitragupta' />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       <Navbar />
-      <div className="p-8">
+      <div className='p-8'>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
-          events={async (info) => {
-            const start = info.start.toISOString().substring(0, 10);
-            const end = info.end.toISOString().substring(0, 10);
-
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-              {
-                params: { start, end, all_leaves: true },
-                headers: { Authorization: localStorage.token },
-              }
-            );
-
-            let leave_requests = dataFormatter.deserialize(response.data);
-
-            return leave_requests.map((leave) => {
+          events={async info => {
+            let leave_requests = props.leave.items
+            return leave_requests.map(leave => {
               return {
                 ...leave,
                 start: leave.start_date,
                 end: leave.end_date,
-                color: colorMap(leave.status),
-              };
-            });
+                color: colorMap(leave.status)
+              }
+            })
           }}
           selectable={true}
           editable={true}
@@ -238,126 +104,70 @@ const Calendar = () => {
           eventClick={updateLeaveRequest}
         />
       </div>
-      {creatingLeaveRequest && (
+      {editModal && props.showModal && props.selectedLeave.user && (
         <Modal
-          setShowModal={setCreatingLeaveRequest}
-          showModal={creatingLeaveRequest}
-          title={"New Leave Request"}
-          leaveRequest={leaveRequest}
+          setShowModal={props.setLeaveModal}
+          showModal={props.showModal}
+          title={`${props.selectedLeave.user.first_name} ${props.selectedLeave.user.last_name}`}
         >
-          <div>
-            <div className="flex justify-between">
-              <LeaveBalanceBadge
-                label={"Sick Leave Balance"}
-                balance={user.sick_leave_balance || 0}
-              />
-              <LeaveBalanceBadge
-                label={"Paid Leave Balance"}
-                balance={user.paid_leave_balance || 0}
-              />
-              <LeaveBalanceBadge
-                label={"Unpaid Leave Balance"}
-                balance={user.unpaid_leave_balance || 0}
-              />
-            </div>
-
-            {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
-            <Label>Leave Type</Label>
-            <Select
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
-              }
-            >
-              <Option
-                value="sick_leave"
-                selected={leaveRequest.leave_type == "sick_leave"}
-              >
-                Sick Leave
-              </Option>
-              <Option
-                value="personal"
-                selected={leaveRequest.leave_type == "personal"}
-              >
-                Personal
-              </Option>
-              <Option
-                value="others"
-                selected={leaveRequest.leave_type == "others"}
-              >
-                Others
-              </Option>
-            </Select>
-
-            <Label>Reason</Label>
-            <Input
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, title: e.target.value })
-              }
-              value={leaveRequest.title}
-            />
-
-            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
-              Submit
-            </Btn>
-          </div>
-        </Modal>
-      )}
-
-      {updatingLeaveRequest && (
-        <Modal
-          setShowModal={setUpdatingLeaveRequest}
-          showModal={updatingLeaveRequest}
-          title={`${leaveRequest.user.first_name} ${leaveRequest.user.last_name}`}
-        >
-          <div className="flex justify-between">
+          <div className='flex justify-between'>
             <LeaveBalanceBadge
-              label={"Sick Leave Balance"}
-              balance={leaveRequest.user.sick_leave_balance}
+              label={'Sick Leave Balance'}
+              balance={props.selectedLeave.user.sick_leave_balance}
             />
             <LeaveBalanceBadge
-              label={"Paid Leave Balance"}
-              balance={leaveRequest.user.paid_leave_balance}
+              label={'Paid Leave Balance'}
+              balance={props.selectedLeave.user.paid_leave_balance}
             />
             <LeaveBalanceBadge
-              label={"Unpaid Leave Balance"}
-              balance={leaveRequest.user.unpaid_leave_balance}
+              label={'Unpaid Leave Balance'}
+              balance={props.selectedLeave.user.unpaid_leave_balance}
             />
           </div>
           <div>
-            {error !== "" && <span className="mb-2 text-red-500">{error}</span>}
+            {Object.keys(props.error.message).length !== 0 && (
+              <span className='text-red-500'>
+                {JSON.stringify(props.error.message)}
+              </span>
+            )}
             <Label>Leave Type</Label>
             <Select
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
-              }
+              onChange={e => {
+                props.setSelectedLeave({
+                  ...props.selectedLeave,
+                  leave_type: e.target.value
+                })
+              }}
               disabled={isAdmin()}
             >
               <Option
-                value="sick_leave"
-                selected={leaveRequest.leave_type == "sick_leave"}
+                value='sick_leave'
+                selected={props.selectedLeave.leave_type == 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
-                value="personal"
-                selected={leaveRequest.leave_type == "personal"}
+                value='personal'
+                selected={props.selectedLeave.leave_type == 'personal'}
               >
                 Personal
               </Option>
               <Option
-                value="others"
-                selected={leaveRequest.leave_type == "others"}
+                value='others'
+                selected={props.selectedLeave.leave_type == 'others'}
               >
                 Others
               </Option>
             </Select>
-
             <Label>Reason</Label>
             <Input
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, title: e.target.value })
-              }
-              value={leaveRequest.title}
+              onChange={e => {
+                props.setSelectedLeave({
+                  ...props.selectedLeave,
+                  title: e.target.value
+                })
+              }}
+              value={props.selectedLeave.title}
               disabled={isAdmin()}
             />
 
@@ -365,23 +175,41 @@ const Calendar = () => {
               <>
                 <Label>Reply</Label>
                 <Input
-                  onChange={(e) =>
-                    setLeaveRequest({
-                      ...leaveRequest,
-                      reply_attributes: { reason: e.target.value },
+                  value={
+                    props.selectedLeave.reply &&
+                    props.selectedLeave.reply.reason
+                  }
+                  onChange={e =>
+                    props.setSelectedLeave({
+                      ...props.selectedLeave,
+                      reply: { reason: e.target.value },
+                      reply_attributes: { reason: e.target.value }
                     })
                   }
-                  value={leaveRequest.reply && leaveRequest.reply.reason}
                 />
                 <Btn
-                  className="bg-red-500 hover:bg-red-600"
-                  onClick={() => updateEvent("rejected")}
+                  className='bg-red-500 hover:bg-red-600'
+                  onClick={() => {
+                    props.setSelectedLeave({
+                      ...props.selectedLeave,
+                      status: 'rejected',
+                      approver_id: props.user.id
+                    })
+                    props.updateLeaveRequest()
+                  }}
                 >
                   Reject
                 </Btn>
                 <Btn
-                  className="ml-2 bg-green-500 hover:bg-green-600"
-                  onClick={() => updateEvent("approved")}
+                  className='ml-2 bg-green-500 hover:bg-green-600'
+                  onClick={() => {
+                    props.setSelectedLeave({
+                      ...props.selectedLeave,
+                      status: 'approved',
+                      approver_id: props.user.id
+                    })
+                    props.updateLeaveRequest()
+                  }}
                 >
                   Approve
                 </Btn>
@@ -390,8 +218,8 @@ const Calendar = () => {
 
             {!isAdmin() && (
               <Btn
-                className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => updateEvent(leaveRequest.status)}
+                className='bg-blue-500 hover:bg-blue-600'
+                onClick={() => props.updateLeaveRequest()}
               >
                 Update
               </Btn>
@@ -399,8 +227,97 @@ const Calendar = () => {
           </div>
         </Modal>
       )}
-    </>
-  );
-};
 
-export default Calendar;
+      {!editModal && props.showModal && props.user && (
+        <Modal
+          setShowModal={props.setLeaveModal}
+          showModal={props.showModal}
+          title={`${props.user.first_name} ${props.user.last_name}`}
+        >
+          <div className='flex justify-between'>
+            <LeaveBalanceBadge
+              label={'Sick Leave Balance'}
+              balance={props.user.sick_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label={'Paid Leave Balance'}
+              balance={props.user.paid_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label={'Unpaid Leave Balance'}
+              balance={props.user.unpaid_leave_balance}
+            />
+          </div>
+          <div>
+            {Object.keys(props.error.message).length !== 0 && (
+              <span className='text-red-500'>
+                {JSON.stringify(props.error.message)}
+              </span>
+            )}
+            <Label>Leave Type</Label>
+            <Select
+              onChange={e => {
+                props.setSelectedLeave({
+                  ...props.selectedLeave,
+                  leave_type: e.target.value
+                })
+              }}
+            >
+              <Option
+                value='sick_leave'
+                selected={props.selectedLeave.leave_type == 'sick_leave'}
+              >
+                Sick Leave
+              </Option>
+              <Option
+                value='personal'
+                selected={props.selectedLeave.leave_type == 'personal'}
+              >
+                Personal
+              </Option>
+              <Option
+                value='others'
+                selected={props.selectedLeave.leave_type == 'others'}
+              >
+                Others
+              </Option>
+            </Select>
+            <Label>Reason</Label>
+            <Input
+              onChange={e => {
+                props.setSelectedLeave({
+                  ...props.selectedLeave,
+                  title: e.target.value
+                })
+              }}
+              value={props.selectedLeave.title}
+            />
+
+            <Btn className='bg-blue-500 hover:bg-blue-600' onClick={props.addLeaveRequest}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
+    </>
+  ) : (
+    <Loader />
+  )
+}
+
+const mapStateToProps = state => ({
+  user: state.auth.user,
+  leave: state.leave,
+  loading: state.leave.loading,
+  error: state.error,
+  showModal: state.leave.leaveModal,
+  selectedLeave: state.leave.selectedLeave
+})
+export default connect(mapStateToProps, {
+  fetchLeaveRequests,
+  getLeaveById,
+  setLeaveModal,
+  setSelectedLeave,
+  updateLeaveRequest,
+  addLeaveRequest
+})(Calendar)

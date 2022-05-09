@@ -1,102 +1,25 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
-import LeaveRequestDataTable from "../components/dashboard/LeaveRequestDataTable";
-import Navbar from "../components/layout/Navbar";
-import Modal from "../components/modal";
-import { Btn, Input, Label } from "../components/formComponents";
-import { useGlobalContext } from "../context";
-import axios from "axios";
-import Jsona from "jsona";
-import LeaveBalanceBadge from "../components/leaveBalanceBadge";
-import { handleUnauthorized } from "../lib/utils";
-import { useRouter } from "next/router";
+import React, { useEffect, useState } from 'react'
+import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable'
+import Navbar from '../components/layout/Navbar'
+import Modal from '../components/modal'
+import { Btn, Input, Label } from '../components/formComponents'
+import LeaveBalanceBadge from '../components/leaveBalanceBadge'
+import Loader from '../components/ui/loader'
+import { connect } from 'react-redux'
+import { fetchLeaveRequests,setSelectedLeave,updateLeaveRequest,setLeaveModal } from '../redux/actions/leaveActions'
 
-const Home = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [leaveRequest, setLeaveRequest] = useState({});
-  const [error, setError] = useState("");
-  const [allLeaves, setAllLeaves] = useState(false);
+const Home = props => {
+  const [allLeaves, setAllLeaves] = useState(false)
+  const isAdmin = () => props.user && props.user.role === 'admin'
 
-  const { user, leaveRequests, setLeaveRequests, setToken } =
-    useGlobalContext();
-  const dataFormatter = new Jsona();
-  const router = useRouter();
-
-  const isAdmin = () => user && user.role === "admin";
-
-  const updateLeaveRequest = async (status) => {
-    const leave_request = {
-      ...leaveRequest,
-      status: status,
-      approver_id: user.id,
-    };
-
-    try {
-      // send update request to remote api
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
-        {
-          leave_request: leave_request,
-        },
-        {
-          headers: {
-            Authorization: localStorage.token,
-          },
-        }
-      );
-      if (response.statusText == "OK") {
-        setError("");
-        setShowModal(false);
-
-        const updatedLeaveRequest = dataFormatter.deserialize(response.data);
-
-        //  now lets update the leaveRequest in leaveRequests collection (for table view)
-        // first find index of the updatedLeaveRequest
-        const index = leaveRequests.findIndex(
-          (leave) => leave.id == leave_request.id
-        );
-
-        // now replace leave request at the index with updated one
-        const leave_requests = [...leaveRequests];
-        leave_requests[index] = updatedLeaveRequest;
-
-        setLeaveRequests(leave_requests);
-      }
-    } catch (error) {
-      setError((error.response && error.response.data) || error.message);
-      handleUnauthorized(error, setToken, router);
+  useEffect(() => {
+    if(props.token){
+      props.fetchLeaveRequests(allLeaves)
     }
-  };
-
-  const fetchLeaveRequests = useCallback(
-    async (allLeaves = false) => {
-      const leaveController = new AbortController();
-
-      try {
-        const leave_requests = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: leaveController.signal,
-            params: { all_leaves: allLeaves },
-          }
-        );
-
-        // sets global state for leave requests
-        setLeaveRequests(dataFormatter.deserialize(leave_requests.data));
-        leaveController = null;
-      } catch (error) {
-        console.log(error);
-        handleUnauthorized(error, setToken, router);
-      }
-
-      return () => leaveController?.abort();
-    },
-    [leaveRequests]
-  );
-
-  useEffect(() => fetchLeaveRequests(), []);
+  }, [props.token])
 
   return (
+    (!props.leave.loading && props.leave.items) ?
     <>
       <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
@@ -111,7 +34,7 @@ const Home = () => {
             aria-checked="false"
             onClick={() => {
               setAllLeaves(!allLeaves);
-              fetchLeaveRequests(!allLeaves);
+              props.fetchLeaveRequests(!allLeaves);
             }}
           >
             <span className="sr-only">Use setting</span>
@@ -125,40 +48,41 @@ const Home = () => {
         </div>
 
         <LeaveRequestDataTable
-          showModal={showModal}
-          setShowModal={setShowModal}
-          setLeaveRequest={setLeaveRequest}
+          showModal={props.showModal}
+          setShowModal={props.setLeaveModal}
+          leaveRequests={props.leave.items}
+          setLeaveRequest={props.setSelectedLeave}
         />
-        {showModal && (
+        {props.showModal && (
           <Modal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            title={`${leaveRequest.user.first_name} ${leaveRequest.user.last_name}`}
+            showModal={props.showModal}
+            setShowModal={props.setLeaveModal}
+            title={`${props.selectedLeave.user.first_name} ${props.selectedLeave.user.last_name}`}
           >
             <div className="flex justify-between">
               <LeaveBalanceBadge
                 label={"Sick Leave Balance"}
-                balance={leaveRequest.user.sick_leave_balance || 0}
+                balance={props.selectedLeave.user.sick_leave_balance || 0}
               />
               <LeaveBalanceBadge
                 label={"Paid Leave Balance"}
-                balance={leaveRequest.user.paid_leave_balance || 0}
+                balance={props.selectedLeave.user.paid_leave_balance || 0}
               />
               <LeaveBalanceBadge
                 label={"Unpaid Leave Balance"}
-                balance={leaveRequest.user.unpaid_leave_balance || 0}
+                balance={props.selectedLeave.user.unpaid_leave_balance || 0}
               />
             </div>
-            {error !== "" && (
-              <span className="text-red-500">{JSON.stringify(error)}</span>
+           {Object.keys(props.error.message).length !== 0 && (
+              <span className="text-red-500">{JSON.stringify(props.error.message)}</span>
             )}
             <Label>Reason</Label>
             <Input
               type="text"
-              value={leaveRequest.title}
+              value={props.selectedLeave.title}
               onChange={(e) => {
-                setLeaveRequest({
-                  ...leaveRequest,
+                props.setSelectedLeave({
+                  ...props.selectedLeave,
                   title: e.target.value,
                 });
               }}
@@ -169,10 +93,11 @@ const Home = () => {
                 <Label>Reply</Label>
                 <Input
                   type="text"
-                  value={leaveRequest.reply && leaveRequest.reply.reason}
+                  value={props.selectedLeave.reply && props.selectedLeave.reply.reason}
                   onChange={(e) =>
-                    setLeaveRequest({
-                      ...leaveRequest,
+                    props.setSelectedLeave({
+                      ...props.selectedLeave,
+                      reply: {reason: e.target.value},
                       reply_attributes: { reason: e.target.value },
                     })
                   }
@@ -180,18 +105,32 @@ const Home = () => {
               </>
             )}
 
-            {isAdmin() && leaveRequest.status !== "rejected" && (
+            {isAdmin() && props.selectedLeave.status !== "rejected" && (
               <Btn
                 className="bg-red-500 hover:bg-red-600"
-                onClick={() => updateLeaveRequest("rejected")}
+                onClick={() => {
+                  props.setSelectedLeave({
+                    ...props.selectedLeave,
+                    status: "rejected",
+                    approver_id: props.user.id
+                  })
+                  props.updateLeaveRequest()
+                }}
               >
                 Reject
               </Btn>
             )}
-            {isAdmin() && leaveRequest.status !== "approved" && (
+            {isAdmin() && props.selectedLeave.status !== "approved" && (
               <Btn
                 className="ml-2 bg-green-500 hover:bg-green-600"
-                onClick={() => updateLeaveRequest("approved")}
+                onClick={() => {
+                  props.setSelectedLeave({
+                    ...props.selectedLeave,
+                    status: "approved",
+                    approver_id: props.user.id
+                  })
+                  props.updateLeaveRequest()
+                }}
               >
                 Approve
               </Btn>
@@ -199,7 +138,7 @@ const Home = () => {
             {!isAdmin() && (
               <Btn
                 className="ml-2 bg-green-500 hover:bg-green-600"
-                onClick={() => updateLeaveRequest(leaveRequest.status)}
+                onClick={() => updateLeaveRequest(props.selectedLeave.status)}
               >
                 Update
               </Btn>
@@ -207,8 +146,22 @@ const Home = () => {
           </Modal>
         )}
       </div>
-    </>
+    </> :
+     <Loader/>
   );
-};
+}
 
-export default Home;
+const mapStateToProps = state => ({
+  token: state.auth.token,
+  user: state.auth.user,
+  leave: state.leave,
+  error: state.error,
+  showModal: state.leave.leaveModal,
+  selectedLeave: state.leave.selectedLeave
+})
+export default connect(mapStateToProps, {
+  fetchLeaveRequests,
+  setSelectedLeave,
+  updateLeaveRequest,
+  setLeaveModal
+})(Home)

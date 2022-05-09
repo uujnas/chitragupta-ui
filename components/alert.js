@@ -1,6 +1,10 @@
 import React from "react";
-
-const Alert = ({ success, message, show, setError, setSuccess }) => {
+import { connect } from 'react-redux'
+import {clearErrors} from '../redux/actions/errorActions'
+const Alert = (props) => {
+  const show =   props.error.status && Object.keys(props.error.message).length !== 0
+  const message = props.error.message.error
+  const success = false
   return (
     <>
       {show && (
@@ -16,8 +20,7 @@ const Alert = ({ success, message, show, setError, setSuccess }) => {
           <span
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
             onClick={() => {
-              setError("");
-              setSuccess("");
+              props.clearErrors()
             }}
           >
             <svg
@@ -38,4 +41,7 @@ const Alert = ({ success, message, show, setError, setSuccess }) => {
   );
 };
 
-export default Alert;
+const mapStateToProps = state => ({
+  error: state.error
+})
+export default connect(mapStateToProps, {clearErrors})(Alert)

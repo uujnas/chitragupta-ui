@@ -8,10 +8,9 @@ import { Btn } from "../formComponents"
 const LeaveRequestDataTable = ({
   showModal,
   setShowModal,
-  setLeaveRequest,
+  leaveRequests,
+  setLeaveRequest
 }) => {
-  const { leaveRequests } = useGlobalContext();
-
   const rowClick = (row) => {
     setLeaveRequest(row.original);
     setShowModal(!showModal);

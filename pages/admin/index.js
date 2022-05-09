@@ -2,9 +2,11 @@ import React from "react";
 import Card from "../../components/card";
 import Navbar from "../../components/layout/Navbar";
 import { Btn } from "../../components/formComponents";
+import Loader from '../../components/ui/loader'
+import { connect } from 'react-redux'
 import Link from "next/link";
 
-const Admin = () => {
+const Admin = ({ user, loading}) => {
   const adminPages = [
     {
       topic: "User",
@@ -29,19 +31,25 @@ const Admin = () => {
   ];
 
   return (
+    (user && !loading && user.role === 'admin') ?
     <>
       <Navbar />
       <div className="flex flex-wrap m-5">
         {adminPages.map((page) => (
-          <Card topic={page.topic} description={page.description}>
+          <Card topic={page.topic} description={page.description} key={page.topic}>
             <Link href={page.link}>
               <Btn className="bg-gray-500">Visit</Btn>
             </Link>
           </Card>
         ))}
       </div>
-    </>
+    </> : <Loader />
   );
 };
 
-export default Admin;
+
+const mapStateToProps = state => ({
+  user: state.auth.user,
+  loading: state.auth.loading,
+})
+export default connect(mapStateToProps)(Admin)

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { returnErrors } from './errorActions'
+import { returnErrors , clearErrors} from './errorActions'
 import {
   USER_LOADED,
   USER_LOADING,
@@ -61,6 +61,7 @@ export const login = ({ email, password }) => dispatch => {
       config
     )
     .then(res => {
+      dispatch(clearErrors())
       dispatch({ type: LOGIN_SUCCESS, payload: res })
       dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
     })

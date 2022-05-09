@@ -4,6 +4,7 @@ import Navbar from '../components/layout/Navbar'
 import Modal from '../components/modal'
 import { Btn, Input, Label } from '../components/formComponents'
 import LeaveBalanceBadge from '../components/leaveBalanceBadge'
+import Loader from '../components/ui/loader'
 import { connect } from 'react-redux'
 import { fetchLeaveRequests,setSelectedLeave,updateLeaveRequest,setLeaveModal } from '../redux/actions/leaveActions'
 
@@ -145,8 +146,8 @@ const Home = props => {
           </Modal>
         )}
       </div>
-    </> : <>Loading ...</>
-    //to-do make a loader component for all application
+    </> :
+     <Loader/>
   );
 }
 

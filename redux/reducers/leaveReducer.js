@@ -19,6 +19,10 @@ export default (state = initialState, action) => {
         ...state,
         loading: true
       }
+    case ADD_LEAVE_REQUEST:
+      return{
+        ...state, items: [...state.items, action.payload], loading: false
+      }
     case GET_LEAVE_REQUESTS:
       return { ...state, items: action.payload, loading: false }
     case SET_SELECTED_LEAVE:

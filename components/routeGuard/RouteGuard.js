@@ -6,6 +6,19 @@ import {useEffect} from 'react'
 
 const RouteGuard = (props) => {
   const router = useRouter()
+
+  const pathCheck = (url) => {
+    const adminPaths = ["/admin", "/admin/users", "/admin/salaries","/admin/salarySettings", "/admin/salaryRecords"];
+    const path = url.split("?")[0];
+    if(props.user){
+      if(props.user.role !== "admin"){
+        if(adminPaths.includes(path)){
+          router.push("/")
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if(token){
@@ -16,6 +29,7 @@ const RouteGuard = (props) => {
     }else if (!props.isAuthenticated && token){
       props.loadUser()
     }
+    pathCheck(router.asPath)
   })
   return props.children
 };

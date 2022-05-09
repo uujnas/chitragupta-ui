@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 import { useRouter } from "next/router";
 import { connect } from "react-redux";
-
+import { logout } from "../../redux/actions/authActions";
 const Navbar = (props) => {
   const [showDropdown, setShowDropDown] = useState(false);
 
@@ -33,19 +33,12 @@ const Navbar = (props) => {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-
-    // send logout request to remote endpoint
-    const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_out.json`,
-      { headers: { Authorization: localStorage.token } }
-    );
-
-    localStorage.removeItem("token");
-    router.reload(window.location.pathname)
+    props.logout();
+    router.push("/login");
   };
 
-  return (
-        <header className="px-4 py-8 text-white bg-blue-500">
+  return props.user ? (
+    <header className="px-4 py-8 text-white bg-blue-500">
       <div className="flex justify-between">
         <div className="text-sm uppercase">dashboard</div>
         <Dropdown>
@@ -140,12 +133,14 @@ const Navbar = (props) => {
         </ol>
       </nav>
     </header>
+  ) : (
+    <></>
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   token: state.auth.token,
   user: state.auth.user,
-  error: state.error
-})
-export default connect(mapStateToProps)(Navbar);
+  error: state.error,
+});
+export default connect(mapStateToProps, { logout })(Navbar);

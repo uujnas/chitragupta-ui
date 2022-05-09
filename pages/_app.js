@@ -2,6 +2,7 @@ import App from 'next/app'
 import { wrapper } from "../redux/store"
 import RouteGuard from '../components/routeGuard/RouteGuard'
 import Head from 'next/head'
+import Alert from '../components/alert'
 import '../styles/globals.css'
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
@@ -20,6 +21,7 @@ class WrappedApp extends App {
   }
   render() {
     const { Component, pageProps } = this.props
+
     return (
       <>
       <RouteGuard>
@@ -28,7 +30,7 @@ class WrappedApp extends App {
           <meta name='description' content='chitragupta' />
           <link rel='icon' href='/favicon.ico' />
         </Head>
-
+        <Alert/>
         <Component {...pageProps} />
       </RouteGuard>
     </>

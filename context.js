@@ -21,7 +21,7 @@ export default function AppProvider({ children }) {
   const [users, setUsers] = useState([]);
 
   const [data, setData] = useState([]);
-  const [fetchAllData, setFetchAllData] = useState(true);
+  const [fetchAllData, setFetchAllData] = useState(false);
 
   const [token, setToken] = useState("");
 
@@ -80,7 +80,7 @@ export default function AppProvider({ children }) {
         data,
         setData,
         fetchAllData,
-        setFetchAllData
+        setFetchAllData,
       }}
     >
       {children}

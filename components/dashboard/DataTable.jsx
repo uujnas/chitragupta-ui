@@ -2,9 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { useGlobalContext } from "../../context";
 
-const DataTable = ({ children, rowClick, columns, fetchRecords, refetchData }) => {
+const DataTable = ({
+  children,
+  rowClick,
+  columns,
+  fetchRecords,
+  refetchData,
+}) => {
   const { data, setData, fetchAllData } = useGlobalContext();
-  const [total, setTotal] = useState(data.length);
+  const [total, setTotal] = useState(0);
 
   const {
     getTableProps,
@@ -21,7 +27,7 @@ const DataTable = ({ children, rowClick, columns, fetchRecords, refetchData }) =
   } = useTable(
     {
       columns,
-      data: data,
+      data: data || [],
       manualPagination: true,
       pageCount: total > 0 ? Math.ceil(total / 10) : 0,
       autoResetPage: false,
@@ -30,12 +36,15 @@ const DataTable = ({ children, rowClick, columns, fetchRecords, refetchData }) =
     usePagination
   );
 
-  useEffect(async () => {
-    const [records, count] = await fetchRecords(pageIndex + 1, 10);
+  useEffect(() => {
+    const fetchData = async () => {
+      const [records, count] = await fetchRecords(pageIndex + 1, 10);
 
-    console.log("records", records);
-    setData(records);
-    setTotal(count);
+      setData(records);
+      setTotal(count);
+    };
+
+    fetchData();
   }, [pageIndex, fetchAllData, refetchData]);
 
   return (

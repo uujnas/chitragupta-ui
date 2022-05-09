@@ -16,7 +16,7 @@ import {
 } from "../components/formComponents";
 import { useGlobalContext } from "../context";
 import LeaveBalanceBadge from "../components/leaveBalanceBadge";
-import { handleUnauthorized } from "../lib/utils";
+import { handleUnauthorized, fullCalendarDate } from "../lib/utils";
 import { useRouter } from "next/router";
 
 const Calendar = () => {
@@ -120,7 +120,7 @@ const Calendar = () => {
         // add newly created leave request to the calendar
         const leave_request = dataFormatter.deserialize(response.data);
         leave_request.start = leave_request.start_date;
-        leave_request.end = leave_request.end_date;
+        leave_request.end = leave_request.end_date + 1;
         setLeaveRequests([...leaveRequests, leave_request]);
       } else {
         setError(response.data.message);
@@ -227,7 +227,7 @@ const Calendar = () => {
               return {
                 ...leave,
                 start: leave.start_date,
-                end: leave.end_date,
+                end: fullCalendarDate(leave.end_date),
                 color: colorMap(leave.status),
               };
             });

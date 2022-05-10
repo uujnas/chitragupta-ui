@@ -4,6 +4,7 @@ import authReducer from './authReducer'
 import leaveReducer from './leaveReducer'
 import { HYDRATE } from 'next-redux-wrapper'
 export const SET_IS_SERVER = 'SET_IS_SERVER'
+import dashboardReducer from "./dashboardReducer";
 
 //We hydrate only if this is the initial server render
 function hydrate (state = {}, action) {

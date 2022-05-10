@@ -9,7 +9,7 @@ const Alert = (props) => {
     setTimeout(function () {
      props.clearErrors()
     }, 5000);
-  }, []);
+  }, [show]);
   return (
     <>
       {show && (

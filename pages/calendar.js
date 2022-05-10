@@ -33,7 +33,6 @@ const Calendar = props => {
   }, [props.user])
 
   const isAdmin = () => props.user.role === 'admin'
-  const isSameUser = () => {debugger}
 
   const colorMap = status => {
     switch (status) {

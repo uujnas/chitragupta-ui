@@ -1,10 +1,15 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { connect } from 'react-redux'
 import {clearErrors} from '../redux/actions/alertActions'
 const Alert = (props) => {
   const {message, status, id, type} = props.alerts
   const show = (message !== null)
   const success = (type === 'success')
+  useEffect(() => {
+    setTimeout(function () {
+     props.clearErrors()
+    }, 5000);
+  }, []);
   return (
     <>
       {show && (

@@ -4,12 +4,10 @@ import Navbar from '../components/layout/Navbar'
 import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
-import axios from 'axios'
 import Modal from '../components/modal'
 import { Input, Label, Select, Option, Btn } from '../components/formComponents'
 import Loader from '../components/ui/loader'
 import LeaveBalanceBadge from '../components/leaveBalanceBadge'
-import { handleUnauthorized } from '../lib/utils'
 import { connect } from 'react-redux'
 import {
   fetchLeaveRequests,
@@ -125,9 +123,9 @@ const Calendar = props => {
             />
           </div>
           <div>
-            {Object.keys(props.error.message).length !== 0 && (
+            {props.alerts.message && (
               <span className='text-red-500'>
-                {JSON.stringify(props.error.message)}
+                {JSON.stringify(props.alerts.message)}
               </span>
             )}
             <Label>Leave Type</Label>
@@ -187,35 +185,38 @@ const Calendar = props => {
                     })
                   }
                 />
-                <Btn
-                  className='bg-red-500 hover:bg-red-600'
-                  onClick={() => {
-                    props.setSelectedLeave({
-                      ...props.selectedLeave,
-                      status: 'rejected',
-                      approver_id: props.user.id
-                    })
-                    props.updateLeaveRequest()
-                  }}
-                >
-                  Reject
-                </Btn>
-                <Btn
-                  className='ml-2 bg-green-500 hover:bg-green-600'
-                  onClick={() => {
-                    props.setSelectedLeave({
-                      ...props.selectedLeave,
-                      status: 'approved',
-                      approver_id: props.user.id
-                    })
-                    props.updateLeaveRequest()
-                  }}
-                >
-                  Approve
-                </Btn>
+            {isAdmin() && props.selectedLeave.status !== "rejected" && (
+              <Btn
+                className="bg-red-500 hover:bg-red-600"
+                onClick={() => {
+                  props.setSelectedLeave({
+                    ...props.selectedLeave,
+                    status: "rejected",
+                    approver_id: props.user.id
+                  })
+                  props.updateLeaveRequest()
+                }}
+              >
+                Reject
+              </Btn>
+            )}
+              {isAdmin() && props.selectedLeave.status !== "approved" && (
+              <Btn
+                className="ml-2 bg-green-500 hover:bg-green-600"
+                onClick={() => {
+                  props.setSelectedLeave({
+                    ...props.selectedLeave,
+                    status: "approved",
+                    approver_id: props.user.id
+                  })
+                  props.updateLeaveRequest()
+                }}
+              >
+                Approve
+              </Btn>
+            )}
               </>
             )}
-
             {!isAdmin() && (
               <Btn
                 className='bg-blue-500 hover:bg-blue-600'
@@ -249,9 +250,9 @@ const Calendar = props => {
             />
           </div>
           <div>
-            {Object.keys(props.error.message).length !== 0 && (
+            {props.alerts.message && (
               <span className='text-red-500'>
-                {JSON.stringify(props.error.message)}
+                {JSON.stringify(props.alerts.message)}
               </span>
             )}
             <Label>Leave Type</Label>
@@ -309,7 +310,7 @@ const mapStateToProps = state => ({
   user: state.auth.user,
   leave: state.leave,
   loading: state.leave.loading,
-  error: state.error,
+  alerts: state.alerts,
   showModal: state.leave.leaveModal,
   selectedLeave: state.leave.selectedLeave
 })

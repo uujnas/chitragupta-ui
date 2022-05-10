@@ -73,8 +73,8 @@ const Home = props => {
                 balance={props.selectedLeave.user.unpaid_leave_balance || 0}
               />
             </div>
-           {Object.keys(props.error.message).length !== 0 && (
-              <span className="text-red-500">{JSON.stringify(props.error.message)}</span>
+           {props.alerts.message && (
+              <span className="text-red-500">{JSON.stringify(props.alerts.message)}</span>
             )}
             <Label>Reason</Label>
             <Input
@@ -138,7 +138,7 @@ const Home = props => {
             {!isAdmin() && (
               <Btn
                 className="ml-2 bg-green-500 hover:bg-green-600"
-                onClick={() => updateLeaveRequest(props.selectedLeave.status)}
+                onClick={() => props.updateLeaveRequest(props.selectedLeave.status)}
               >
                 Update
               </Btn>
@@ -155,7 +155,7 @@ const mapStateToProps = state => ({
   token: state.auth.token,
   user: state.auth.user,
   leave: state.leave,
-  error: state.error,
+  alerts: state.alerts,
   showModal: state.leave.leaveModal,
   selectedLeave: state.leave.selectedLeave
 })

@@ -23,7 +23,6 @@ const Salaries = () => {
         const dataFormatter = new Jsona();
         setSalaries(dataFormatter.deserialize(response.data));
       } catch (error) {
-        console.log(error);
         handleUnauthorized(error, setToken, router);
       }
     };

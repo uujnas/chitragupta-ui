@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import Alert from '../components/alert'
 import {
   FormContainer,
   Input,
@@ -9,7 +8,6 @@ import {
   Btn
 } from '../components/formComponents'
 import { login, loadUser } from '../redux/actions/authActions'
-import { clearErrors } from '../redux/actions/errorActions'
 import { connect } from 'react-redux'
 
 const Login = props => {
@@ -80,7 +78,6 @@ const Login = props => {
 }
 
 const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated,
-  error: state.error
+  isAuthenticated: state.auth.isAuthenticated
 })
-export default connect(mapStateToProps, { login, loadUser, clearErrors })(Login)
+export default connect(mapStateToProps, { login, loadUser })(Login)

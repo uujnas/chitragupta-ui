@@ -20,8 +20,9 @@ function hydrate (state = {}, action) {
 const combinedReducer = combineReducers({
   error: errorReducer,
   auth: authReducer,
-  leave: leaveReducer
-})
+  leave: leaveReducer,
+  records: dashboardReducer,
+});
 
 function rootReducer (state, action) {
   const intermediateState = combinedReducer(state, action)

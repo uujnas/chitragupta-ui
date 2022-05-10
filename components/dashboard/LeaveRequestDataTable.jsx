@@ -1,25 +1,24 @@
 import React from "react";
-import { CSVLink } from "react-csv";
-import { useGlobalContext } from "../../context";
 import DataTable from "./DataTable";
-import { columns } from "../../data/leaveTableData.js"
-import { Btn } from "../formComponents"
+import { columns } from "../../data/leaveTableData.js";
 
 const LeaveRequestDataTable = ({
   showModal,
   setShowModal,
   leaveRequests,
-  setLeaveRequest
+  setLeaveRequest,
+  fetchLeaveRequests,
 }) => {
   const rowClick = (row) => {
     setLeaveRequest(row.original);
     setShowModal(!showModal);
   };
 
-  const exportData = leaveRequests.map((d) => Object.values(d));
-
   return (
-    <DataTable data={leaveRequests} rowClick={rowClick} columns={columns} />
+    <DataTable
+      rowClick={rowClick}
+      columns={columns}
+    />
   );
 };
 

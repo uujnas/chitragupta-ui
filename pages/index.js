@@ -1,25 +1,29 @@
-import React, { useEffect, useState } from 'react'
-import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable'
-import Navbar from '../components/layout/Navbar'
-import Modal from '../components/modal'
-import { Btn, Input, Label } from '../components/formComponents'
-import LeaveBalanceBadge from '../components/leaveBalanceBadge'
-import Loader from '../components/ui/loader'
-import { connect } from 'react-redux'
-import { fetchLeaveRequests,setSelectedLeave,updateLeaveRequest,setLeaveModal } from '../redux/actions/leaveActions'
+import React, { useEffect, useState } from "react";
+import LeaveRequestDataTable from "../components/dashboard/LeaveRequestDataTable";
+import Navbar from "../components/layout/Navbar";
+import Modal from "../components/modal";
+import { Btn, Input, Label } from "../components/formComponents";
+import LeaveBalanceBadge from "../components/leaveBalanceBadge";
+import Loader from "../components/ui/loader";
+import { connect } from "react-redux";
+import {
+  fetchLeaveRequests,
+  setSelectedLeave,
+  updateLeaveRequest,
+  setLeaveModal,
+} from "../redux/actions/leaveActions";
+import { setFetchAllRecords } from "../redux/actions/dashboardActions";
 
-const Home = props => {
-  const [allLeaves, setAllLeaves] = useState(false)
-  const isAdmin = () => props.user && props.user.role === 'admin'
+const Home = (props) => {
+  const isAdmin = () => props.user && props.user.role === "admin";
 
   useEffect(() => {
-    if(props.token){
-      props.fetchLeaveRequests(allLeaves)
+    if (props.token) {
+      props.fetchLeaveRequests(props.fetchAllRecords);
     }
-  }, [props.token])
+  }, [props.token]);
 
-  return (
-    (!props.leave.loading && props.leave.items) ?
+  return !props.leave.loading && props.leave.items ? (
     <>
       <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
@@ -28,20 +32,20 @@ const Home = props => {
           <button
             type="button"
             className={`${
-              allLeaves ? "bg-indigo-600" : "bg-gray-200"
+              props.fetchAllRecords ? "bg-indigo-600" : "bg-gray-200"
             } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
             role="switch"
             aria-checked="false"
             onClick={() => {
-              setAllLeaves(!allLeaves);
-              props.fetchLeaveRequests(!allLeaves);
+              props.setFetchAllRecords(!props.fetchAllRecords);
+              props.fetchLeaveRequests();
             }}
           >
             <span className="sr-only">Use setting</span>
             <span
               aria-hidden="true"
               className={`inline-block w-5 h-5 transition duration-200 ease-in-out transform ${
-                allLeaves ? "translate-x-5" : "translate-x-0"
+                props.fetchAllRecords ? "translate-x-5" : "translate-x-0"
               } bg-white rounded-full shadow pointer-events-none ring-0`}
             ></span>
           </button>
@@ -73,8 +77,10 @@ const Home = props => {
                 balance={props.selectedLeave.user.unpaid_leave_balance || 0}
               />
             </div>
-           {Object.keys(props.error.message).length !== 0 && (
-              <span className="text-red-500">{JSON.stringify(props.error.message)}</span>
+            {Object.keys(props.error.message).length !== 0 && (
+              <span className="text-red-500">
+                {JSON.stringify(props.error.message)}
+              </span>
             )}
             <Label>Reason</Label>
             <Input
@@ -93,11 +99,14 @@ const Home = props => {
                 <Label>Reply</Label>
                 <Input
                   type="text"
-                  value={props.selectedLeave.reply && props.selectedLeave.reply.reason}
+                  value={
+                    props.selectedLeave.reply &&
+                    props.selectedLeave.reply.reason
+                  }
                   onChange={(e) =>
                     props.setSelectedLeave({
                       ...props.selectedLeave,
-                      reply: {reason: e.target.value},
+                      reply: { reason: e.target.value },
                       reply_attributes: { reason: e.target.value },
                     })
                   }
@@ -112,9 +121,9 @@ const Home = props => {
                   props.setSelectedLeave({
                     ...props.selectedLeave,
                     status: "rejected",
-                    approver_id: props.user.id
-                  })
-                  props.updateLeaveRequest()
+                    approver_id: props.user.id,
+                  });
+                  props.updateLeaveRequest();
                 }}
               >
                 Reject
@@ -127,9 +136,9 @@ const Home = props => {
                   props.setSelectedLeave({
                     ...props.selectedLeave,
                     status: "approved",
-                    approver_id: props.user.id
-                  })
-                  props.updateLeaveRequest()
+                    approver_id: props.user.id,
+                  });
+                  props.updateLeaveRequest();
                 }}
               >
                 Approve
@@ -146,22 +155,25 @@ const Home = props => {
           </Modal>
         )}
       </div>
-    </> :
-     <Loader/>
+    </>
+  ) : (
+    <Loader />
   );
-}
+};
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   token: state.auth.token,
   user: state.auth.user,
   leave: state.leave,
   error: state.error,
   showModal: state.leave.leaveModal,
-  selectedLeave: state.leave.selectedLeave
-})
+  selectedLeave: state.leave.selectedLeave,
+  fetchAllRecords: state.records.fetchAllRecords,
+});
 export default connect(mapStateToProps, {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
-  setLeaveModal
-})(Home)
+  setLeaveModal,
+  setFetchAllRecords,
+})(Home);

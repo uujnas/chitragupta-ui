@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from "axios";
 import {
   GET_LEAVE_REQUESTS,
   ADD_LEAVE_REQUEST,
@@ -6,107 +6,117 @@ import {
   UPDATE_LEAVE_REQUEST,
   SET_SELECTED_LEAVE,
   LEAVE_REQUESTS_LOADING,
-  SHOW_LEAVE_MODAL
-} from './types'
-import { returnErrors, clearErrors } from './errorActions'
-import { tokenConfig } from './authActions'
-import Jsona from 'jsona'
+  SHOW_LEAVE_MODAL,
+  GET_RECORDS,
+} from "./types";
+import { returnErrors, clearErrors } from "./errorActions";
+import { tokenConfig } from "./authActions";
+import Jsona from "jsona";
 
-const dataFormatter = new Jsona()
+const dataFormatter = new Jsona();
 
 //adding leave a new leave request
 export const addLeaveRequest = () => (dispatch, getState) => {
-  dispatch(setLoadingState(true))
-  const leaveData = getState().leave.selectedLeave
-  const body = JSON.stringify({ leave_request: leaveData })
+  dispatch(setLoadingState(true));
+  const leaveData = getState().leave.selectedLeave;
+  const body = JSON.stringify({ leave_request: leaveData });
   axios
     .post(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
       body,
       tokenConfig(getState)
     )
-    .then(res => {
+    .then((res) => {
       dispatch({
         type: ADD_LEAVE_REQUEST,
-        payload: dataFormatter.deserialize(res.data)
-      })
-      dispatch(setLeaveModal(false))
+        payload: dataFormatter.deserialize(res.data),
+      });
+      dispatch(setLeaveModal(false));
     })
-    .catch(err =>
+    .catch((err) =>
       dispatch(returnErrors(err.response.data, err.response.status))
-    )
-}
+    );
+};
 
 //action to get leave requests
-export const fetchLeaveRequests = allRequests => (dispatch, getState) => {
-  dispatch(setLoadingState(true))
+export const fetchLeaveRequests = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true));
   axios
     .get(
-      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json?all_leaves=${allRequests}`,
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
       tokenConfig(getState)
     )
-    .then(res =>
+    .then((res) => {
       dispatch({
         type: GET_LEAVE_REQUESTS,
-        payload: dataFormatter.deserialize(res.data)
-      })
-    )
-    .catch(err =>
-      dispatch(returnErrors(err.response.data, err.response.status))
-    )
-}
+        payload: dataFormatter.deserialize(res.data.data),
+      });
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status
+        )
+      );
+    });
+};
 
 //set selected leave requests
-export const setSelectedLeave = leave => dispatch => {
-  dispatch({ type: SET_SELECTED_LEAVE, payload: leave })
-}
+export const setSelectedLeave = (leave) => (dispatch) => {
+  dispatch({ type: SET_SELECTED_LEAVE, payload: leave });
+};
 
 //get leave requests by id
-export const getLeaveById = id => (dispatch, getState) => {
-  dispatch(setLoadingState(true))
+export const getLeaveById = (id) => (dispatch, getState) => {
+  dispatch(setLoadingState(true));
   axios
     .get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}.json`,
       tokenConfig(getState)
     )
-    .then(res =>
+    .then((res) =>
       dispatch({
         type: SET_SELECTED_LEAVE,
-        payload: dataFormatter.deserialize(res.data)
+        payload: dataFormatter.deserialize(res.data),
       })
     )
-    .catch(err =>
+    .catch((err) =>
       dispatch(returnErrors(err.response.data, err.response.status))
-    )
-}
+    );
+};
 
 //action to show hide leave modal
-export const setLeaveModal = modal => dispatch => {
-  dispatch(clearErrors())
-  dispatch({ type: SHOW_LEAVE_MODAL, payload: modal })
-}
+export const setLeaveModal = (modal) => (dispatch) => {
+  dispatch(clearErrors());
+  dispatch({ type: SHOW_LEAVE_MODAL, payload: modal });
+};
 
 //action to update leave requests
 export const updateLeaveRequest = () => (dispatch, getState) => {
   //get currently selected leave
-  const leave_request = getState().leave.selectedLeave
-  const body = JSON.stringify({ leave_request: leave_request })
+  const leave_request = getState().leave.selectedLeave;
+  const body = JSON.stringify({ leave_request: leave_request });
   axios
     .put(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leave_request.id}.json`,
       body,
       tokenConfig(getState)
     )
-    .then(res => {
-      dispatch({ type: UPDATE_LEAVE_REQUEST })
-      dispatch(fetchLeaveRequests(true))
-      dispatch(setLeaveModal(false))
+    .then((res) => {
+      dispatch({ type: UPDATE_LEAVE_REQUEST });
+      dispatch(fetchLeaveRequests(true));
+      dispatch(setLeaveModal(false));
     })
-    .catch(err => {
-      dispatch(returnErrors(err.response.data, err.response.status))
-    })
-}
+    .catch((err) => {
+      dispatch(returnErrors(err.response.data, err.response.status));
+    });
+};
 
-export const setLoadingState = state => dispatch => {
-  dispatch({ type: LEAVE_REQUESTS_LOADING, payload: state })
-}
+export const setLoadingState = (state) => (dispatch) => {
+  dispatch({ type: LEAVE_REQUESTS_LOADING, payload: state });
+};

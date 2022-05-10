@@ -1,8 +1,18 @@
 import React from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
+import { connect } from "react-redux";
+import { fetchRecords, setPage } from "../../redux/actions/dashboardActions";
 
-const DataTable = ({ children, data, rowClick, columns }) => {
-
+const DataTable = ({
+  children,
+  data,
+  rowClick,
+  columns,
+  total,
+  fetchRecords,
+  setPage,
+  pageIndex,
+}) => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -19,16 +29,20 @@ const DataTable = ({ children, data, rowClick, columns }) => {
     {
       columns,
       data: data,
+      manualPagination: true,
+      pageCount: total > 0 ? Math.ceil(total / 10) : 0,
+      autoResetPage: false,
+      initialState: {
+        pageIndex: pageIndex - 1, // react table's index starts with 0 but for backend req we start at 1
+      },
     },
     useSortBy,
     usePagination
   );
 
-  const { pageIndex } = state;
-
   return (
     <div className="relative">
-      { children }
+      {children}
       <table
         {...getTableProps()}
         className="min-w-full divide-y divide-gray-200"
@@ -117,7 +131,11 @@ const DataTable = ({ children, data, rowClick, columns }) => {
       <div className="flex items-center justify-center py-4">
         <button
           type="button"
-          onClick={() => previousPage()}
+          onClick={() => {
+            previousPage();
+            setPage(pageIndex - 1);
+            fetchRecords();
+          }}
           disabled={!canPreviousPage}
           className="px-3 py-2 mr-4 text-white bg-blue-500 rounded"
         >
@@ -126,12 +144,16 @@ const DataTable = ({ children, data, rowClick, columns }) => {
         <span className="mr-4">
           Page
           <strong>
-            {pageIndex + 1} of {pageOptions.length}
+            {pageIndex} of {pageOptions.length}
           </strong>
         </span>
         <button
           type="button"
-          onClick={() => nextPage()}
+          onClick={() => {
+            nextPage();
+            setPage(pageIndex + 1);
+            fetchRecords();
+          }}
           disabled={!canNextPage}
           className="px-3 py-2 text-white bg-blue-500 rounded "
         >
@@ -142,4 +164,10 @@ const DataTable = ({ children, data, rowClick, columns }) => {
   );
 };
 
-export default DataTable;
+const mapStateToProps = (state) => ({
+  data: state.records.records,
+  total: state.records.total,
+  pageIndex: state.records.page,
+});
+
+export default connect(mapStateToProps, { fetchRecords, setPage })(DataTable);

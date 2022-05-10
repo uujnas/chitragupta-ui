@@ -9,7 +9,7 @@ import {
   SHOW_LEAVE_MODAL,
   GET_RECORDS,
 } from "./types";
-import { returnErrors, returnAlerts, clearErrors } from "./errorActions";
+import { returnErrors, returnAlerts, clearErrors } from "./alertActions";
 import { tokenConfig } from "./authActions";
 import Jsona from "jsona";
 

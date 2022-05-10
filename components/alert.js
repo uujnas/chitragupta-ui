@@ -1,10 +1,15 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { connect } from 'react-redux'
-import {clearErrors} from '../redux/actions/errorActions'
+import {clearErrors} from '../redux/actions/alertActions'
 const Alert = (props) => {
-  const show =   props.error.status && Object.keys(props.error.message).length !== 0
-  const message = props.error.message.error
-  const success = false
+  const {message, status, id, type} = props.alerts
+  const show = (message !== null)
+  const success = (type === 'success')
+  useEffect(() => {
+    setTimeout(function () {
+     props.clearErrors()
+    }, 5000);
+  }, [show]);
   return (
     <>
       {show && (
@@ -16,7 +21,7 @@ const Alert = (props) => {
           } border px-4 py-3 rounded relative`}
           role="alert"
         >
-          <span className="block sm:inline">{message}</span>
+          <span className="block sm:inline">{JSON.stringify(message)}</span>
           <span
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
             onClick={() => {
@@ -42,6 +47,6 @@ const Alert = (props) => {
 };
 
 const mapStateToProps = state => ({
-  error: state.error
+  alerts: state.alerts,
 })
 export default connect(mapStateToProps, {clearErrors})(Alert)

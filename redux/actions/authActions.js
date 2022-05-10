@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { returnErrors , clearErrors} from './errorActions'
+import { returnErrors , returnAlerts, clearErrors} from './alertActions'
 import {
   USER_LOADED,
   USER_LOADING,
@@ -62,6 +62,7 @@ export const login = ({ email, password }) => dispatch => {
     )
     .then(res => {
       dispatch(clearErrors())
+      dispatch(returnAlerts('Logged in successfully', res.status, 'LOGIN_SUCCESS'))
       dispatch({ type: LOGIN_SUCCESS, payload: res })
       dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
     })
@@ -83,6 +84,7 @@ export const logout = () => (dispatch, getState) =>{
       tokenConfig(getState)
     )
     .then(res => {
+      dispatch(returnAlerts('Logged out successfully', res.status, 'LOGOUT_SUCCESS'))
       dispatch({ type: LOGOUT_SUCCESS })
     })
     .catch(err => {

@@ -9,7 +9,7 @@ import {
   SHOW_LEAVE_MODAL,
   GET_RECORDS,
 } from "./types";
-import { returnErrors, clearErrors } from "./errorActions";
+import { returnErrors, returnAlerts, clearErrors } from "./errorActions";
 import { tokenConfig } from "./authActions";
 import Jsona from "jsona";
 
@@ -29,9 +29,10 @@ export const addLeaveRequest = () => (dispatch, getState) => {
     .then((res) => {
       dispatch({
         type: ADD_LEAVE_REQUEST,
-        payload: dataFormatter.deserialize(res.data),
-      });
-      dispatch(setLeaveModal(false));
+        payload: dataFormatter.deserialize(res.data)
+      })
+      dispatch(setLeaveModal(false))
+      dispatch(returnAlerts('Leave Request Added Successfully', res.status, 'LEAVE_REQUEST_ADDED'))
     })
     .catch((err) =>
       dispatch(returnErrors(err.response.data, err.response.status))
@@ -107,10 +108,11 @@ export const updateLeaveRequest = () => (dispatch, getState) => {
       body,
       tokenConfig(getState)
     )
-    .then((res) => {
-      dispatch({ type: UPDATE_LEAVE_REQUEST });
-      dispatch(fetchLeaveRequests(true));
-      dispatch(setLeaveModal(false));
+    .then(res => {
+      dispatch({ type: UPDATE_LEAVE_REQUEST })
+      dispatch(fetchLeaveRequests(true))
+      dispatch(setLeaveModal(false))
+      dispatch(returnAlerts('Leave Request updated Successfully', res.status, 'LEAVE_REQUEST_UPDATED'))
     })
     .catch((err) => {
       dispatch(returnErrors(err.response.data, err.response.status));

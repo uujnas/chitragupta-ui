@@ -8,8 +8,9 @@ export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
 export const SET_TOKEN = "SET_TOKEN";
 export const UNSET_TOKEN = "UNSET_TOKEN";
 //types for error actions
-export const GET_ERRORS = "GET_ERRORS";
-export const CLEAR_ERRORS = "CLEAR_ERRORS";
+export const GET_ERRORS_ALERT = "GET_ERRORS_ALERT";
+export const CLEAR_ALERTS = "CLEAR_ALERTS"
+export const GET_SUCCESS_ALERT = "GET_SUCCESS_ALERT";
 
 //types for user actions
 export const USER_LOADING = "USER_LOADING";

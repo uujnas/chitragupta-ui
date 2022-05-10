@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import errorReducer from './errorReducers'
+import alertReducers from './alertReducers'
 import authReducer from './authReducer'
 import leaveReducer from './leaveReducer'
 import { HYDRATE } from 'next-redux-wrapper'
@@ -19,7 +19,7 @@ function hydrate (state = {}, action) {
 }
 
 const combinedReducer = combineReducers({
-  error: errorReducer,
+  alerts: alertReducers,
   auth: authReducer,
   leave: leaveReducer,
   records: dashboardReducer,

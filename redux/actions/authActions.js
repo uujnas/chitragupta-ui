@@ -93,18 +93,23 @@ export const logout = () => (dispatch, getState) =>{
 }
 
 //!setup config headers and token
-export const tokenConfig = getState => {
+export const tokenConfig = (getState) => {
   //get token from local storage
-  const token = getState().auth.token
+  const state = getState();
   //add it to the header
   const config = {
     headers: {
-      'Content-type': 'application/json'
-    }
-  }
+      "Content-type": "application/json",
+    },
+    params: {
+      fetch_all: state.records.fetchAllRecords,
+      page: state.records.page,
+      batch: state.records.batch,
+    },
+  };
   //if there is a token add to header
-  if (token) {
-    config.headers['Authorization'] = token
+  if (state.auth.token) {
+    config.headers["Authorization"] = state.auth.token;
   }
-  return config
-}
+  return config;
+};

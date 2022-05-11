@@ -1,3 +1,4 @@
+import Jsona from 'jsona';
 import {
   LOADING,
   LOADED,
@@ -5,8 +6,7 @@ import {
   SET_FETCH_ALL_RECORDS,
   SET_PAGE,
   SET_BATCH,
-} from "../actions/types";
-import Jsona from "jsona";
+} from '../actions/types';
 
 const dataFormatter = new Jsona();
 
@@ -19,7 +19,7 @@ const initialState = {
   batch: 10,
 };
 
-export default function (state = initialState, action) {
+export default function (action, state = initialState) {
   switch (action.type) {
     case LOADING:
       return {

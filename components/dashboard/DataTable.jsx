@@ -1,9 +1,8 @@
-import React from "react";
-import { useTable, useSortBy, usePagination } from "react-table";
-import { connect } from "react-redux";
-import { fetchRecords, setPage } from "../../redux/actions/dashboardActions";
+import { useTable, useSortBy, usePagination } from 'react-table';
+import { connect } from 'react-redux';
+import { fetchRecords, setPage } from '../../redux/actions/dashboardActions';
 
-const DataTable = ({
+function DataTable({
   children,
   data,
   rowClick,
@@ -12,7 +11,7 @@ const DataTable = ({
   fetchRecords,
   setPage,
   pageIndex,
-}) => {
+}) {
   const {
     getTableProps,
     getTableBodyProps,
@@ -23,12 +22,11 @@ const DataTable = ({
     canNextPage,
     canPreviousPage,
     pageOptions,
-    state,
     prepareRow,
   } = useTable(
     {
       columns,
-      data: data,
+      data,
       manualPagination: true,
       pageCount: total > 0 ? Math.ceil(total / 10) : 0,
       autoResetPage: false,
@@ -37,7 +35,7 @@ const DataTable = ({
       },
     },
     useSortBy,
-    usePagination
+    usePagination,
   );
 
   return (
@@ -54,10 +52,10 @@ const DataTable = ({
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   className="p-2 text-sm font-bold tracking-wider text-left text-gray-900 uppercase "
-                  key={column["Header"]}
+                  key={column.Header}
                 >
                   <div className="flex justify-between">
-                    {column.render("Header")}
+                    {column.render('Header')}
                     <span>
                       {column.isSorted ? (
                         column.isSortedDesc ? (
@@ -112,17 +110,15 @@ const DataTable = ({
                 onClick={() => rowClick(row)}
                 key={row.id}
               >
-                {row.cells.map((cell, index) => {
-                  return (
-                    <td
-                      {...cell.getCellProps()}
-                      className="p-2 py-4"
-                      key={`${index} ${row.id} ${cell.value}`}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
+                {row.cells.map((cell, index) => (
+                  <td
+                    {...cell.getCellProps()}
+                    className="p-2 py-4"
+                    key={`${index} ${row.id} ${cell.value}`}
+                  >
+                    {cell.render('Cell')}
+                  </td>
+                ))}
               </tr>
             );
           })}
@@ -162,7 +158,7 @@ const DataTable = ({
       </div>
     </div>
   );
-};
+}
 
 const mapStateToProps = (state) => ({
   data: state.records.records,

@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
-import LeaveRequestDataTable from "../components/dashboard/LeaveRequestDataTable";
-import Navbar from "../components/layout/Navbar";
-import Modal from "../components/modal";
-import { Btn, Input, Label } from "../components/formComponents";
-import LeaveBalanceBadge from "../components/leaveBalanceBadge";
-import Loader from "../components/ui/loader";
-import { connect } from "react-redux";
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
+import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable';
+import Navbar from '../components/layout/Navbar';
+import Modal from '../components/modal';
+import { Btn, Input, Label } from '../components/formComponents';
+import LeaveBalanceBadge from '../components/leaveBalanceBadge';
+import Loader from '../components/ui/loader';
 import {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
   setLeaveModal,
-} from "../redux/actions/leaveActions";
-import { setFetchAllRecords } from "../redux/actions/dashboardActions";
+} from '../redux/actions/leaveActions';
+import { setFetchAllRecords } from '../redux/actions/dashboardActions';
 
-const Home = (props) => {
-  const isAdmin = () => props.user && props.user.role === "admin";
+function Home(props) {
+  const isAdmin = () => props.user && props.user.role === 'admin';
 
   useEffect(() => {
     if (props.token) {
@@ -25,14 +25,14 @@ const Home = (props) => {
 
   return !props.leave.loading && props.leave.items ? (
     <>
-      <Navbar page={"Dashboard"} subPages={["Calendar", "Admin"]} />
+      <Navbar page="Dashboard" subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <div className="flex justify-end py-4">
           <label className="mr-2">All Leaves</label>
           <button
             type="button"
             className={`${
-              props.fetchAllRecords ? "bg-indigo-600" : "bg-gray-200"
+              props.fetchAllRecords ? 'bg-indigo-600' : 'bg-gray-200'
             } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
             role="switch"
             aria-checked="false"
@@ -45,9 +45,9 @@ const Home = (props) => {
             <span
               aria-hidden="true"
               className={`inline-block w-5 h-5 transition duration-200 ease-in-out transform ${
-                props.fetchAllRecords ? "translate-x-5" : "translate-x-0"
+                props.fetchAllRecords ? 'translate-x-5' : 'translate-x-0'
               } bg-white rounded-full shadow pointer-events-none ring-0`}
-            ></span>
+            />
           </button>
         </div>
 
@@ -65,20 +65,22 @@ const Home = (props) => {
           >
             <div className="flex justify-between">
               <LeaveBalanceBadge
-                label={"Sick Leave Balance"}
+                label="Sick Leave Balance"
                 balance={props.selectedLeave.user.sick_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={"Paid Leave Balance"}
+                label="Paid Leave Balance"
                 balance={props.selectedLeave.user.paid_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={"Unpaid Leave Balance"}
+                label="Unpaid Leave Balance"
                 balance={props.selectedLeave.user.unpaid_leave_balance || 0}
               />
             </div>
-           {props.alerts.message && (
-              <span className="text-red-500">{JSON.stringify(props.alerts.message)}</span>
+            {props.alerts.message && (
+              <span className="text-red-500">
+                {JSON.stringify(props.alerts.message)}
+              </span>
             )}
             <Label>Reason</Label>
             <Input
@@ -112,13 +114,13 @@ const Home = (props) => {
               </>
             )}
 
-            {isAdmin() && props.selectedLeave.status !== "rejected" && (
+            {isAdmin() && props.selectedLeave.status !== 'rejected' && (
               <Btn
                 className="bg-red-500 hover:bg-red-600"
                 onClick={() => {
                   props.setSelectedLeave({
                     ...props.selectedLeave,
-                    status: "rejected",
+                    status: 'rejected',
                     approver_id: props.user.id,
                   });
                   props.updateLeaveRequest();
@@ -127,13 +129,13 @@ const Home = (props) => {
                 Reject
               </Btn>
             )}
-            {isAdmin() && props.selectedLeave.status !== "approved" && (
+            {isAdmin() && props.selectedLeave.status !== 'approved' && (
               <Btn
                 className="ml-2 bg-green-500 hover:bg-green-600"
                 onClick={() => {
                   props.setSelectedLeave({
                     ...props.selectedLeave,
-                    status: "approved",
+                    status: 'approved',
                     approver_id: props.user.id,
                   });
                   props.updateLeaveRequest();
@@ -145,7 +147,9 @@ const Home = (props) => {
             {!isAdmin() && (
               <Btn
                 className="ml-2 bg-green-500 hover:bg-green-600"
-                onClick={() => props.updateLeaveRequest(props.selectedLeave.status)}
+                onClick={() =>
+                  props.updateLeaveRequest(props.selectedLeave.status)
+                }
               >
                 Update
               </Btn>
@@ -157,7 +161,7 @@ const Home = (props) => {
   ) : (
     <Loader />
   );
-};
+}
 
 const mapStateToProps = (state) => ({
   token: state.auth.token,

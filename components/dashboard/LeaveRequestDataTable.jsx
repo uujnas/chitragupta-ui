@@ -1,25 +1,13 @@
-import React from "react";
-import DataTable from "./DataTable";
-import { columns } from "../../data/leaveTableData.js";
+import DataTable from './DataTable';
+import { columns } from '../../data/leaveTableData';
 
-const LeaveRequestDataTable = ({
-  showModal,
-  setShowModal,
-  leaveRequests,
-  setLeaveRequest,
-  fetchLeaveRequests,
-}) => {
+function LeaveRequestDataTable({ showModal, setShowModal, setLeaveRequest }) {
   const rowClick = (row) => {
     setLeaveRequest(row.original);
     setShowModal(!showModal);
   };
 
-  return (
-    <DataTable
-      rowClick={rowClick}
-      columns={columns}
-    />
-  );
-};
+  return <DataTable rowClick={rowClick} columns={columns} />;
+}
 
 export default LeaveRequestDataTable;

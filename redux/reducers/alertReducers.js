@@ -1,4 +1,5 @@
 import { GET_ERRORS_ALERT, CLEAR_ALERTS, GET_SUCCESS_ALERT } from '../actions/types'
+
 const initialState = {
     message: null,
     status: null,

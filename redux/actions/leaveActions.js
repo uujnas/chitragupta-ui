@@ -1,4 +1,5 @@
 import axios from "axios";
+import Jsona from "jsona";
 import {
   GET_LEAVE_REQUESTS,
   ADD_LEAVE_REQUEST,
@@ -11,11 +12,10 @@ import {
 } from "./types";
 import { returnErrors, returnAlerts, clearErrors } from "./alertActions";
 import { tokenConfig } from "./authActions";
-import Jsona from "jsona";
 
 const dataFormatter = new Jsona();
 
-//adding leave a new leave request
+// adding leave a new leave request
 export const addLeaveRequest = () => (dispatch, getState) => {
   dispatch(setLoadingState(true));
   const leaveData = getState().leave.selectedLeave;
@@ -39,7 +39,7 @@ export const addLeaveRequest = () => (dispatch, getState) => {
     );
 };
 
-//action to get leave requests
+// action to get leave requests
 export const fetchLeaveRequests = () => (dispatch, getState) => {
   dispatch(setLoadingState(true));
   axios
@@ -67,12 +67,12 @@ export const fetchLeaveRequests = () => (dispatch, getState) => {
     });
 };
 
-//set selected leave requests
+// set selected leave requests
 export const setSelectedLeave = (leave) => (dispatch) => {
   dispatch({ type: SET_SELECTED_LEAVE, payload: leave });
 };
 
-//get leave requests by id
+// get leave requests by id
 export const getLeaveById = (id) => (dispatch, getState) => {
   dispatch(setLoadingState(true));
   axios
@@ -91,17 +91,17 @@ export const getLeaveById = (id) => (dispatch, getState) => {
     );
 };
 
-//action to show hide leave modal
+// action to show hide leave modal
 export const setLeaveModal = (modal) => (dispatch) => {
   dispatch(clearErrors());
   dispatch({ type: SHOW_LEAVE_MODAL, payload: modal });
 };
 
-//action to update leave requests
+// action to update leave requests
 export const updateLeaveRequest = () => (dispatch, getState) => {
-  //get currently selected leave
+  // get currently selected leave
   const leave_request = getState().leave.selectedLeave;
-  const body = JSON.stringify({ leave_request: leave_request });
+  const body = JSON.stringify({ leave_request });
   axios
     .put(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leave_request.id}.json`,

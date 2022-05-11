@@ -6,6 +6,7 @@ import {
   SHOW_LEAVE_MODAL,
   LEAVE_REQUESTS_LOADING
 } from "../actions/types";
+
 const initialState = {
   loading: false,
   selectedLeave: {},

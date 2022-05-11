@@ -6,10 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
     "lint:eslint": "eslint . --ext .js,.jsx",
     "lint:prettier": "prettier --check .",
-    "fix": "npm run fix:eslint && npm run fix:prettier",
+    "fix": "yarn fix:eslint && yarn fix:prettier",
     "fix:eslint": "eslint . --fix --ext .js,.jsx",
     "fix:prettier": "prettier --write .",
     "lint:conflict": "eslint-config-prettier .eslintrc.json"

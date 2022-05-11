@@ -1,3 +1,4 @@
+import Jsona from "jsona";
 import {
   LOADING,
   LOADED,
@@ -6,7 +7,6 @@ import {
   SET_PAGE,
   SET_BATCH,
 } from "../actions/types";
-import Jsona from "jsona";
 
 const dataFormatter = new Jsona();
 

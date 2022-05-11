@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { columns } from "../../data/salaryRecordsTableData";
-import { TableContainer } from "../modalComponents";
-import { Btn, Input } from "../formComponents";
-import DataTable from "./DataTable";
-import axios from "axios";
-import Alert from "../alert";
-import Jsona from "jsona";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import Jsona from 'jsona';
+import { columns } from '../../data/salaryRecordsTableData';
+import { TableContainer } from '../modalComponents';
+import { Btn, Input } from '../formComponents';
+import DataTable from './DataTable';
+import Alert from '../alert';
 
-const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+function SalaryRecordsDataTable({ salaryRecords, setSalaryRecords }) {
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [date, setDate] = useState(null);
   const dataFormatter = new Jsona();
 
@@ -25,12 +25,12 @@ const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
             params: {
               date,
             },
-          }
+          },
         );
 
         setSalaryRecords(dataFormatter.deserialize(response.data));
-      } catch (error) {
-        console.log(error);
+      } catch (rerror) {
+        // error block of code
       }
     };
 
@@ -40,7 +40,7 @@ const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
   // make request to remote api for salary records generation
   const generateSalaryRecords = async () => {
     if (!date) {
-      setError("Date Must be present.");
+      setError('Date Must be present.');
     } else {
       try {
         const response = await axios.post(
@@ -52,62 +52,56 @@ const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
             headers: {
               Authorization: localStorage.token,
             },
-          }
+          },
         );
 
-        if (response.statusText === "OK") {
-          setError("");
+        if (response.statusText === 'OK') {
+          setError('');
           setSuccess(response.data.message);
         } else {
-          setSuccess("");
+          setSuccess('');
           setError(
-            response.data.message || "Couldn't generate salary records..."
+            response.data.message || "Couldn't generate salary records...",
           );
         }
-      } catch (error) {
-        setSuccess("");
+      } catch (rerror) {
+        setSuccess('');
         setError(
-          error.response.data.message ||
-            error.response.data.error ||
-            "Couldn't generate salary records"
+          rerror.response.data.message ||
+            rerror.response.data.error ||
+            "Couldn't generate salary records",
         );
       }
     }
   };
 
   return (
-    <>
-      <TableContainer>
-        <Alert
-          success={success.length > 0}
-          message={success.length > 0 ? success : error}
-          show={success.length > 0 || error.length > 0}
-          setError={setError}
-          setSuccess={setSuccess}
+    <TableContainer>
+      <Alert
+        success={success.length > 0}
+        message={success.length > 0 ? success : error}
+        show={success.length > 0 || error.length > 0}
+        setError={setError}
+        setSuccess={setSuccess}
+      />
+      <div className="flex justify-end py-4">
+        <Input
+          className="w-full mr-4 sm:w-1/2 md:w-1/3"
+          onChange={(e) => setDate(e.target.value)}
+          type="date"
         />
-        <div className="flex justify-end py-4">
-          <Input
-            className="w-full mr-4 sm:w-1/2 md:w-1/3"
-            onChange={(e) => setDate(e.target.value)}
-            type="date"
-          />
-          {error.length > 0 ? <span>{error}</span> : ""}
-          <Btn
-            className="bg-teal-500 hover:bg-teal-600"
-            onClick={generateSalaryRecords}
-          >
-            Generate
-          </Btn>
-        </div>
+        {error.length > 0 ? <span>{error}</span> : ''}
+        <Btn
+          className="bg-teal-500 hover:bg-teal-600"
+          onClick={generateSalaryRecords}
+        >
+          Generate
+        </Btn>
+      </div>
 
-        <DataTable
-          data={salaryRecords}
-          rowClick={() => console.log()}
-          columns={columns}
-        />
-      </TableContainer>
-    </>
+      <DataTable data={salaryRecords} columns={columns} />
+    </TableContainer>
   );
-};
+}
 
 export default SalaryRecordsDataTable;

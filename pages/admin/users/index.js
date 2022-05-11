@@ -1,19 +1,19 @@
-import React, { useEffect, useCallback } from "react";
-import Navbar from "../../../components/layout/Navbar";
-import UsersDataTable from "../../../components/dashboard/UsersDataTable";
-import { useGlobalContext } from "../../../context";
-import axios from "axios";
-import Jsona from "jsona";
-import { handleUnauthorized } from "../../../lib/utils";
-import { useRouter } from "next/router";
+import { useEffect, useCallback } from 'react';
+import axios from 'axios';
+import Jsona from 'jsona';
+import { useRouter } from 'next/router';
+import Navbar from '../../../components/layout/Navbar';
+import UsersDataTable from '../../../components/dashboard/UsersDataTable';
+import { useGlobalContext } from '../../../context';
+import { handleUnauthorized } from '../../../lib/utils';
 
-const Users = () => {
+function Users() {
   const dataFormatter = new Jsona();
   const router = useRouter();
   const { setUsers, user, setToken } = useGlobalContext();
 
   const fetchUsers = useCallback(async () => {
-    const usersController = new AbortController();
+    let usersController = new AbortController();
 
     try {
       const response = await axios.get(
@@ -21,13 +21,13 @@ const Users = () => {
         {
           headers: { Authorization: localStorage.token },
           signal: usersController.signal,
-        }
+        },
       );
 
       setUsers(dataFormatter.deserialize(response.data));
       usersController = null;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       handleUnauthorized(error, setToken, router);
     }
 
@@ -44,6 +44,6 @@ const Users = () => {
       </div>
     </>
   );
-};
+}
 
 export default Users;

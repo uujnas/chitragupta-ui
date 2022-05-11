@@ -1,9 +1,8 @@
-import React from "react";
-import InputWithLabelAndError from "./InputWithLabelAndError";
-import { Btn, Label, Input } from "./formComponents";
-import TaxRuleForm from "./taxRuleForm";
+import InputWithLabelAndError from './InputWithLabelAndError';
+import { Btn, Label, Input } from './formComponents';
+import TaxRuleForm from './taxRuleForm';
 
-const SalarySettingForm = ({
+function SalarySettingForm({
   updateSalarySetting,
   salarySetting,
   errors,
@@ -12,16 +11,16 @@ const SalarySettingForm = ({
   setTaxRules,
   updateTaxRules,
   removeTaxRule,
-}) => {
+}) {
   return (
     <>
-      <div className={"flex flex-wrap"}>
+      <div className="flex flex-wrap">
         {[
-          "ssf_office",
-          "ssf_employee",
-          "life_insurance_max",
-          "ssf_tax_exemption_rate",
-          "ssf_tax_exemption_max",
+          'ssf_office',
+          'ssf_employee',
+          'life_insurance_max',
+          'ssf_tax_exemption_rate',
+          'ssf_tax_exemption_max',
         ].map((field, index) => (
           <InputWithLabelAndError
             name={field}
@@ -35,40 +34,40 @@ const SalarySettingForm = ({
         <div className="w-full pr-4 mb-4 md:w-1/2">
           <Label
             className={`${
-              errors["from_date"] ? "text-red-500" : "text-gray-500"
+              errors.from_date ? 'text-red-500' : 'text-gray-500'
             } uppercase`}
           >
             From Date
           </Label>
           <Input
-            name={"from_date"}
+            name="from_date"
             value={salarySetting.from_date}
             onChange={updateSalarySetting}
             type="date"
-            className={errors["from_date"] ? "border-red-500" : ""}
+            className={errors.from_date ? 'border-red-500' : ''}
           />
-          {errors["from_date"] && (
-            <span className="text-sm text-red-500">{errors["from_date"]}</span>
+          {errors.from_date && (
+            <span className="text-sm text-red-500">{errors.from_date}</span>
           )}
         </div>
 
         <div className="w-full pr-4 mb-4 md:w-1/2">
           <Label
             className={`${
-              errors["to_date"] ? "text-red-500" : "text-gray-500"
+              errors.to_date ? 'text-red-500' : 'text-gray-500'
             } uppercase`}
           >
             To Date
           </Label>
           <Input
-            name={"to_date"}
+            name="to_date"
             value={salarySetting.to_date}
             onChange={updateSalarySetting}
             type="date"
-            className={errors["to_date"] ? "border-red-500" : ""}
+            className={errors.to_date ? 'border-red-500' : ''}
           />
-          {errors["to_date"] && (
-            <span className="text-sm text-red-500">{errors["to_date"]}</span>
+          {errors.to_date && (
+            <span className="text-sm text-red-500">{errors.to_date}</span>
           )}
         </div>
 
@@ -101,14 +100,11 @@ const SalarySettingForm = ({
         </button>
       </div>
 
-      <Btn
-        className="bg-teal-500 hover:bg-teal-600"
-        onClick={onSubmit}
-      >
+      <Btn className="bg-teal-500 hover:bg-teal-600" onClick={onSubmit}>
         Submit
       </Btn>
     </>
   );
-};
+}
 
 export default SalarySettingForm;

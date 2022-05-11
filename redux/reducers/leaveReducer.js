@@ -1,12 +1,12 @@
 import {
   GET_LEAVE_REQUESTS,
   ADD_LEAVE_REQUEST,
-  DELETE_LEAVE_REQUEST,
   UPDATE_LEAVE_REQUEST,
   SET_SELECTED_LEAVE,
   SHOW_LEAVE_MODAL,
   LEAVE_REQUESTS_LOADING
 } from "../actions/types";
+
 const initialState = {
   loading: false,
   selectedLeave: {},
@@ -14,11 +14,6 @@ const initialState = {
 }
 export default (state = initialState, action) => {
   switch (action.type) {
-    case LEAVE_REQUESTS_LOADING:
-      return {
-        ...state,
-        loading: true
-      }
     case ADD_LEAVE_REQUEST:
       return{
         ...state, items: [...state.items, action.payload], loading: false

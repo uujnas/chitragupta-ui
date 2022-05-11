@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import Navbar from "../../components/layout/Navbar";
-import axios from "axios";
-import Jsona from "jsona";
-import SalariesDataTable from "../../components/dashboard/SalariesDataTable";
-import { handleUnauthorized } from "../../lib/utils";
-import { useGlobalContext } from "../../context";
-import { useRouter } from "next/router";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import Jsona from 'jsona';
+import { useRouter } from 'next/router';
+import Navbar from '../../components/layout/Navbar';
+import SalariesDataTable from '../../components/dashboard/SalariesDataTable';
+import { handleUnauthorized } from '../../lib/utils';
+import { useGlobalContext } from '../../context';
 
-const Salaries = () => {
+function Salaries() {
   const router = useRouter();
   const { setToken } = useGlobalContext();
   const [salaries, setSalaries] = useState([]);
@@ -17,7 +17,7 @@ const Salaries = () => {
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          { headers: { Authorization: localStorage.token } }
+          { headers: { Authorization: localStorage.token } },
         );
 
         const dataFormatter = new Jsona();
@@ -36,6 +36,6 @@ const Salaries = () => {
       <SalariesDataTable salaries={salaries} setSalaries={setSalaries} />
     </>
   );
-};
+}
 
 export default Salaries;

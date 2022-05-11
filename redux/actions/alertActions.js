@@ -2,26 +2,20 @@ import {
   GET_ERRORS_ALERT,
   CLEAR_ALERTS,
   GET_SUCCESS_ALERT
-} from '../actions/types'
-//RETURN ERRORS
-export const returnErrors = (message, status, id = null) => {
-  return {
+} from "./types"
+// RETURN ERRORS
+export const returnErrors = (message, status, id = null) => ({
     type: GET_ERRORS_ALERT,
     payload: { message, status, id }
-  }
-}
+  })
 
-//RETURN ALERTS
-export const returnAlerts = (message, status, id = null) => {
-  return {
+// RETURN ALERTS
+export const returnAlerts = (message, status, id = null) => ({
     type: GET_SUCCESS_ALERT,
     payload: { message, status, id }
-  }
-}
+  })
 
-//CLEAR ERRORS
-export const clearErrors = () => {
-  return {
+// CLEAR ERRORS
+export const clearErrors = () => ({
     type: CLEAR_ALERTS
-  }
-}
+  })

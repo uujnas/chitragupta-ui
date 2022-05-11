@@ -1,26 +1,26 @@
-//types for authentication errors
+// types for authentication errors
 export const AUTH_ERROR = "AUTH_ERROR";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGIN_FAIL = "LOGIN_FAIL";
 export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
 
-//types for token actions
+// types for token actions
 export const SET_TOKEN = "SET_TOKEN";
 export const UNSET_TOKEN = "UNSET_TOKEN";
-//types for error actions
+// types for error actions
 export const GET_ERRORS_ALERT = "GET_ERRORS_ALERT";
 export const CLEAR_ALERTS = "CLEAR_ALERTS"
 export const GET_SUCCESS_ALERT = "GET_SUCCESS_ALERT";
 
-//types for user actions
+// types for user actions
 export const USER_LOADING = "USER_LOADING";
 export const USER_LOADED = "USER_LOADED";
 
-//types for loading
+// types for loading
 export const LOADING = "LOADING";
 export const LOADED = "LOADED";
 
-//types for leave actions
+// types for leave actions
 export const GET_LEAVE_REQUESTS = "GET_LEAVE_REQUESTS";
 export const ADD_LEAVE_REQUEST = "ADD_LEAVE_REQUEST";
 export const DELETE_LEAVE_REQUEST = "DELETE_LEAVE_REQUEST";
@@ -35,5 +35,5 @@ export const SET_FETCH_ALL_RECORDS = "SET_FETCH_ALL_RECORDS";
 export const SET_PAGE = "SET_PAGE";
 export const SET_BATCH = "SET_BATCH";
 
-//types for server
+// types for server
 export const SET_IS_SERVER = "SET_IS_SERVER";

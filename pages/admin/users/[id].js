@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
-import Navbar from "../../../components/layout/Navbar";
-import { Btn } from "../../../components/formComponents";
-import { useRouter } from "next/router";
-import { useGlobalContext } from "../../../context";
-import axios from "axios";
-import Jsona from "jsona";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
+import Jsona from 'jsona';
+import Navbar from '../../../components/layout/Navbar';
 import {
+  Btn,
   Label,
   Select,
   Input,
   Option,
-} from "../../../components/formComponents";
-import Modal from "../../../components/modal";
-import { handleUnauthorized } from "../../../lib/utils";
+} from '../../../components/formComponents';
+import { useGlobalContext } from '../../../context';
+import Modal from '../../../components/modal';
+import { handleUnauthorized } from '../../../lib/utils';
 
-const User = () => {
+function User() {
   const { isAdmin, setToken } = useGlobalContext();
   const [user, setUser] = useState(null);
   const [updatingUser, setUpdatingUser] = useState(false);
   const [salaries, setSalaries] = useState([]);
   const [salary, setSalary] = useState(null);
   const [startDate, setStartDate] = useState(
-    new Date().toISOString().slice(0, 10)
+    new Date().toISOString().slice(0, 10),
   );
   const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({});
@@ -33,9 +33,9 @@ const User = () => {
   const MAX_UNPAID_LEAVE_BALANCE = 25;
 
   const statuses = [
-    { id: 0, status: "invited" },
-    { id: 1, status: "active" },
-    { id: 2, status: "disabled" },
+    { id: 0, status: 'invited' },
+    { id: 1, status: 'active' },
+    { id: 2, status: 'disabled' },
   ];
 
   const leave_percentage = (leave_balance, total) =>
@@ -54,16 +54,19 @@ const User = () => {
           {
             headers: { Authorization: localStorage.token },
             signal: user_controller.signal,
-          }
+          },
         );
 
-        const deserialized_user_data = dataFormatter.deserialize(response.data)
+        const deserialized_user_data = dataFormatter.deserialize(response.data);
 
         setUser(deserialized_user_data);
-        setSalary(deserialized_user_data.active_salary && deserialized_user_data.active_salary.id);
+        setSalary(
+          deserialized_user_data.active_salary &&
+            deserialized_user_data.active_salary.id,
+        );
         user_controller = null;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         handleUnauthorized(error, setToken, router);
       }
     };
@@ -76,13 +79,13 @@ const User = () => {
           {
             headers: { Authorization: localStorage.token },
             signal: salary_controller.signal,
-          }
+          },
         );
 
         setSalaries(dataFormatter.deserialize(response.data));
         salary_controller = null;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         handleUnauthorized(error, setToken, router);
       }
     };
@@ -97,10 +100,10 @@ const User = () => {
   }, []);
 
   const checkIfFormIsValid = () => {
-    const errorCount = 0;
+    let errorCount = 0;
     if (!salary) {
-      errors["salary"] = "Can't be blank.";
-      console.log(errors);
+      errors.salary = "Can't be blank.";
+      // console.log(errors);
       setErrors({ ...errors });
       errorCount += 1;
     }
@@ -112,7 +115,7 @@ const User = () => {
     if (checkIfFormIsValid() === 0) {
       // make request to remote api to create or update user salary
       try {
-        const response = await axios.put(
+        await axios.put(
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
           {
             user: {
@@ -122,17 +125,17 @@ const User = () => {
                   start_date: startDate,
                 },
               ],
-              status: status,
+              status,
             },
           },
           {
             headers: {
               Authorization: localStorage.token,
             },
-          }
+          },
         );
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         handleUnauthorized(error, setToken, router);
       }
     }
@@ -168,7 +171,7 @@ const User = () => {
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
                 </div>
-                <div className="w-full my-4 border-b-2"></div>
+                <div className="w-full my-4 border-b-2" />
               </div>
             </div>
 
@@ -188,8 +191,8 @@ const User = () => {
                       strokeLinejoin="round"
                       className="feather feather-mail"
                     >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                      <polyline points="22,6 12,13 2,6"></polyline>
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                      <polyline points="22,6 12,13 2,6" />
                     </svg>
                   </span>
                   {user && user.email}
@@ -211,17 +214,10 @@ const User = () => {
                       strokeLinejoin="round"
                       className="feather feather-calendar"
                     >
-                      <rect
-                        x="3"
-                        y="4"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
                   </span>
                   {user && user.start_date}
@@ -243,10 +239,10 @@ const User = () => {
                     style={{
                       width: `${leave_percentage(
                         user ? user.sick_leave_balance : 0,
-                        MAX_SICK_LEAVE_BALANCE
+                        MAX_SICK_LEAVE_BALANCE,
                       )}%`,
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
 
@@ -265,10 +261,10 @@ const User = () => {
                     style={{
                       width: `${leave_percentage(
                         user ? user.paid_leave_balance : 0,
-                        MAX_PAID_LEAVE_BALANCE
+                        MAX_PAID_LEAVE_BALANCE,
                       )}%`,
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
 
@@ -287,10 +283,10 @@ const User = () => {
                     style={{
                       width: `${leave_percentage(
                         user ? user.unpaid_leave_balance : 0,
-                        MAX_UNPAID_LEAVE_BALANCE
+                        MAX_UNPAID_LEAVE_BALANCE,
                       )}%`,
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -302,19 +298,17 @@ const User = () => {
         <Modal
           showModal={updatingUser}
           setShowModal={setUpdatingUser}
-          title={"Update User"}
+          title="Update User"
         >
           <div>
             <Label
-              className={`${
-                errors["salary"] ? "text-red-500" : "text-gray-500"
-              }`}
+              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
             >
               Select salary
             </Label>
             <Select
               onChange={(e) => setSalary(e.target.value)}
-              className={errors["salary"] ? "border-red-500" : ""}
+              className={errors.salary ? 'border-red-500' : ''}
               defaultValue={user.active_salary && user.active_salary.id}
             >
               <Option>...</Option>
@@ -325,20 +319,18 @@ const User = () => {
                 </Option>
               ))}
             </Select>
-            {errors["salary"] && (
-              <span className="text-sm text-red-500">{errors["salary"]}</span>
+            {errors.salary && (
+              <span className="text-sm text-red-500">{errors.salary}</span>
             )}
 
             <Label
-              className={`${
-                errors["salary"] ? "text-red-500" : "text-gray-500"
-              }`}
+              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
             >
               Select Status
             </Label>
             <Select
               onChange={(e) => setStatus(e.target.value)}
-              className={errors["status"] ? "border-red-500" : ""}
+              className={errors.status ? 'border-red-500' : ''}
               defaultValue={user.status}
             >
               <Option value={null}>...</Option>
@@ -348,8 +340,8 @@ const User = () => {
                 </Option>
               ))}
             </Select>
-            {errors["status"] && (
-              <span className="text-sm text-red-500">{errors["status"]}</span>
+            {errors.status && (
+              <span className="text-sm text-red-500">{errors.status}</span>
             )}
 
             <Label>Start Date</Label>
@@ -367,6 +359,6 @@ const User = () => {
       )}
     </>
   );
-};
+}
 
 export default User;

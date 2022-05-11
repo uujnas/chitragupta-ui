@@ -12,19 +12,19 @@ import {
   SET_IS_SERVER
 } from './types'
 
-//*set initial token on page access
+//* set initial token on page access
 export const setToken = token => (dispatch, getState) => {
   dispatch({ type: SET_TOKEN, payload: token })
 }
 
-//check status of server
+// check status of server
 export const serverCheck = () => dispatch => {
   dispatch({ type: SET_IS_SERVER })
 }
 
-//*check token and load user
+//* check token and load user
 export const loadUser = () => (dispatch, getState) => {
-  //user loading
+  // user loading
   dispatch({ type: USER_LOADING })
 
   axios
@@ -44,15 +44,15 @@ export const loadUser = () => (dispatch, getState) => {
     })
 }
 
-//*log in user
+//* log in user
 export const login = ({ email, password }) => dispatch => {
-  //headers
+  // headers
   const config = {
     headers: {
       'Content-type': 'application/json'
     }
   }
-  //request body
+  // request body
   const body = JSON.stringify({ user: { email, password } })
   axios
     .post(
@@ -76,7 +76,7 @@ export const login = ({ email, password }) => dispatch => {
     })
 }
 
-//*logout user
+//* logout user
 export const logout = () => (dispatch, getState) =>{
   axios
     .delete(
@@ -94,11 +94,11 @@ export const logout = () => (dispatch, getState) =>{
     })
 }
 
-//!setup config headers and token
+//! setup config headers and token
 export const tokenConfig = (getState) => {
-  //get token from local storage
+  // get token from local storage
   const state = getState();
-  //add it to the header
+  // add it to the header
   const config = {
     headers: {
       "Content-type": "application/json",
@@ -109,9 +109,9 @@ export const tokenConfig = (getState) => {
       batch: state.records.batch,
     },
   };
-  //if there is a token add to header
+  // if there is a token add to header
   if (state.auth.token) {
-    config.headers["Authorization"] = state.auth.token;
+    config.headers.Authorization = state.auth.token;
   }
   return config;
 };

@@ -4,11 +4,11 @@ import {
   useCallback,
   useEffect,
   useContext,
-} from "react";
-import axios from "axios";
-import Jsona from "jsona";
-import { useRouter } from "next/router";
-import { handleUnauthorized } from "./lib/utils";
+} from 'react';
+import axios from 'axios';
+import Jsona from 'jsona';
+import { useRouter } from 'next/router';
+import { handleUnauthorized } from './lib/utils';
 
 export const AppContext = createContext();
 
@@ -20,7 +20,7 @@ export default function AppProvider({ children }) {
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [users, setUsers] = useState([]);
 
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState('');
 
   const dataFormatter = new Jsona();
 
@@ -32,29 +32,29 @@ export default function AppProvider({ children }) {
         {
           headers: { Authorization: localStorage.token },
           signal: userController.signal,
-        }
+        },
       );
 
       setUser(dataFormatter.deserialize(response.data));
       setLoading(false);
       userController = null;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       handleUnauthorized(error, setToken, router);
     }
 
     return () => userController?.abort();
   });
 
-  const isAdmin = () => user && user.role == "admin";
+  const isAdmin = () => user && user.role === 'admin';
 
   useEffect(() => {
     setToken(localStorage.token);
-    if (localStorage.token && localStorage.token !== "") {
+    if (localStorage.token && localStorage.token !== '') {
       fetchUser();
     } else {
       router.push({
-        pathname: "/login",
+        pathname: '/login',
         query: { returnUrl: window.location.pathname },
       });
     }
@@ -79,6 +79,4 @@ export default function AppProvider({ children }) {
   );
 }
 
-export const useGlobalContext = () => {
-  return useContext(AppContext);
-};
+export const useGlobalContext = () => useContext(AppContext);

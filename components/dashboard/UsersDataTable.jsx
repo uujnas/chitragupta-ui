@@ -1,31 +1,31 @@
-import React, { useState } from "react";
-import { CSVLink } from "react-csv";
-import { columns } from "../../data/usersTableData";
-import { Btn } from "../formComponents";
-import { useGlobalContext } from "../../context";
-import DataTable from "./DataTable";
-import { useRouter } from "next/router";
-import axios from "axios";
-import Alert from "../alert";
+import { useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { useRouter } from 'next/router';
+import axios from 'axios';
+import { columns } from '../../data/usersTableData';
+import { Btn } from '../formComponents';
+import { useGlobalContext } from '../../context';
+import DataTable from './DataTable';
+import Alert from '../alert';
 
-const UsersDataTable = () => {
+function UsersDataTable() {
   const { users } = useGlobalContext();
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const rowClick = (row) => router.push(`/admin/users/${row.original.id}`);
 
   const exportData = users.map((d) => Object.values(d));
 
   const handleBulkImport = async () => {
-    setError("");
-    setSuccess("");
+    setError('');
+    setSuccess('');
 
-    let formData = new FormData();
-    const csv = document.querySelector("#file-upload");
+    const formData = new FormData();
+    const csv = document.querySelector('#file-upload');
 
-    formData.append("userFile", csv.files[0]);
+    formData.append('userFile', csv.files[0]);
 
     try {
       const response = await axios.post(
@@ -33,49 +33,44 @@ const UsersDataTable = () => {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
             Authorization: localStorage.token,
           },
-        }
+        },
       );
 
-      if (response.statusText === "OK") {
+      if (response.statusText === 'OK') {
         setSuccess(response.data.message);
       }
-    } catch (error) {
-      console.log(error.response);
+    } catch (rerror) {
       setError(
-        (error.response && error.response.data.message) || error.message
+        (rerror.response && rerror.response.data.message) || rerror.message,
       );
     }
   };
 
   return (
     <>
-      {
-        <Alert
-          success={error == ""}
-          message={error}
-          show={error !== ""}
-          setError={setError}
-          setSuccess={setSuccess}
-        />
-      }
-      {
-        <Alert
-          success={success !== ""}
-          message={success}
-          show={success !== ""}
-          setError={setError}
-          setSuccess={setSuccess}
-        />
-      }
+      <Alert
+        success={error === ''}
+        message={error}
+        show={error !== ''}
+        setError={setError}
+        setSuccess={setSuccess}
+      />
+      <Alert
+        success={success !== ''}
+        message={success}
+        show={success !== ''}
+        setError={setError}
+        setSuccess={setSuccess}
+      />
       {users && (
         <DataTable data={users} rowClick={rowClick} columns={columns}>
           <div className="flex justify-between my-4">
             <Btn
               className="bg-teal-500 hover:bg-teal-600"
-              onClick={() => document.getElementById("file-upload").click()}
+              onClick={() => document.getElementById('file-upload').click()}
             >
               Bulk Upload
             </Btn>
@@ -99,6 +94,6 @@ const UsersDataTable = () => {
       )}
     </>
   );
-};
+}
 
 export default UsersDataTable;

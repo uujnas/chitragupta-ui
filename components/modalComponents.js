@@ -1,4 +1,4 @@
-import tw from "tailwind-styled-components";
+import tw from 'tailwind-styled-components';
 
 export const ModalContainer = tw.div`
 fixed inset-0 z-50 flex justify-center items-center h-full

@@ -16,6 +16,10 @@ export const GET_SUCCESS_ALERT = "GET_SUCCESS_ALERT";
 export const USER_LOADING = "USER_LOADING";
 export const USER_LOADED = "USER_LOADED";
 
+// actions for Users
+export const USERS_LOADING = "USERS_LOADING";
+export const USERS_LOADED = "USERS_LOADED"
+
 // types for loading
 export const LOADING = "LOADING";
 export const LOADED = "LOADED";

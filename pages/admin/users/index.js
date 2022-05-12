@@ -1,19 +1,21 @@
-import { useEffect, useCallback } from 'react';
-import axios from 'axios';
-import Jsona from 'jsona';
-import { useRouter } from 'next/router';
-import Navbar from '../../../components/layout/Navbar';
-import UsersDataTable from '../../../components/dashboard/UsersDataTable';
-import { useGlobalContext } from '../../../context';
-import { handleUnauthorized } from '../../../lib/utils';
+import { useEffect, useCallback } from 'react'
+import axios from 'axios'
+import Jsona from 'jsona'
+import { useRouter } from 'next/router'
+import Navbar from '../../../components/layout/Navbar'
+import UsersDataTable from '../../../components/dashboard/UsersDataTable'
+import { useGlobalContext } from '../../../context'
+import { handleUnauthorized } from '../../../lib/utils'
+import { connect } from 'react-redux'
+import { fetchUsers } from '../../../redux/actions/usersActions'
 
-function Users() {
-  const dataFormatter = new Jsona();
-  const router = useRouter();
-  const { setUsers, user, setToken } = useGlobalContext();
+function Users(props) {
+  const dataFormatter = new Jsona()
+  const router = useRouter()
+  // const { setUsers, user, setToken } = useGlobalContext();
 
   const fetchUsers = useCallback(async () => {
-    let usersController = new AbortController();
+    let usersController = new AbortController()
 
     try {
       const response = await axios.get(
@@ -22,19 +24,23 @@ function Users() {
           headers: { Authorization: localStorage.token },
           signal: usersController.signal,
         },
-      );
+      )
 
-      setUsers(dataFormatter.deserialize(response.data));
-      usersController = null;
+      setUsers(dataFormatter.deserialize(response.data))
+      usersController = null
     } catch (error) {
-      // console.log(error);
-      handleUnauthorized(error, setToken, router);
+      console.log(error)
+      // handleUnauthorized(error, setToken, router);
     }
 
-    return () => usersController?.abort();
-  }, [user]);
+    return () => usersController?.abort()
+  }, [])
 
-  useEffect(() => fetchUsers(), []);
+  useEffect(() => {
+    if (props.token) {
+      props.fetchUsers()
+    }
+  }, [props.token])
 
   return (
     <>
@@ -43,7 +49,14 @@ function Users() {
         <UsersDataTable />
       </div>
     </>
-  );
+  )
 }
 
-export default Users;
+const mapStateToProps = (state) => ({
+  token: state.auth.token,
+  user: state.auth.user,
+})
+
+export default connect(mapStateToProps, {
+  fetchUsers,
+})(Users)

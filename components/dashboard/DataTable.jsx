@@ -1,6 +1,6 @@
-import { useTable, useSortBy, usePagination } from 'react-table';
-import { connect } from 'react-redux';
-import { fetchRecords, setPage } from '../../redux/actions/dashboardActions';
+import { useTable, useSortBy, usePagination } from 'react-table'
+import { connect } from 'react-redux'
+import { fetchRecords, setPage } from '../../redux/actions/dashboardActions'
 
 function DataTable({
   children,
@@ -11,6 +11,7 @@ function DataTable({
   fetchRecords,
   setPage,
   pageIndex,
+  fetchFunction,
 }) {
   const {
     getTableProps,
@@ -36,7 +37,7 @@ function DataTable({
     },
     useSortBy,
     usePagination,
-  );
+  )
 
   return (
     <div className="relative">
@@ -102,7 +103,7 @@ function DataTable({
         </thead>
         <tbody {...getTableBodyProps()}>
           {page.map((row) => {
-            prepareRow(row);
+            prepareRow(row)
             return (
               <tr
                 {...row.getRowProps()}
@@ -120,7 +121,7 @@ function DataTable({
                   </td>
                 ))}
               </tr>
-            );
+            )
           })}
         </tbody>
       </table>
@@ -128,9 +129,9 @@ function DataTable({
         <button
           type="button"
           onClick={() => {
-            previousPage();
-            setPage(pageIndex - 1);
-            fetchRecords();
+            previousPage()
+            setPage(pageIndex - 1)
+            fetchRecords(fetchFunction)
           }}
           disabled={!canPreviousPage}
           className="px-3 py-2 mr-4 text-white bg-blue-500 rounded"
@@ -146,9 +147,9 @@ function DataTable({
         <button
           type="button"
           onClick={() => {
-            nextPage();
-            setPage(pageIndex + 1);
-            fetchRecords();
+            nextPage()
+            setPage(pageIndex + 1)
+            fetchRecords(fetchFunction)
           }}
           disabled={!canNextPage}
           className="px-3 py-2 text-white bg-blue-500 rounded "
@@ -157,13 +158,13 @@ function DataTable({
         </button>
       </div>
     </div>
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
   data: state.records.records,
   total: state.records.total,
   pageIndex: state.records.page,
-});
+})
 
-export default connect(mapStateToProps, { fetchRecords, setPage })(DataTable);
+export default connect(mapStateToProps, { fetchRecords, setPage })(DataTable)

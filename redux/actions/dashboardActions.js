@@ -1,5 +1,13 @@
-import { SET_FETCH_ALL_RECORDS, SET_PAGE, SET_BATCH } from './types'
-import { fetchLeaveRequests } from './leaveActions'
+import axios from 'axios'
+import { returnErrors } from './alertActions'
+import { tokenConfig } from './authActions'
+import {
+  SET_FETCH_ALL_RECORDS,
+  SET_PAGE,
+  SET_BATCH,
+  LEAVE_REQUESTS_LOADING,
+  GET_RECORDS,
+} from './types'
 
 export const setFetchAllRecords = (fetchAll) => (dispatch) => {
   dispatch({ type: SET_FETCH_ALL_RECORDS, payload: fetchAll })
@@ -15,4 +23,80 @@ export const setBatch = (batch) => (dispatch) => {
 
 export const fetchRecords = (fetchFunction) => (dispatch) => {
   dispatch(fetchFunction())
+}
+
+export const fetchSalaries = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.resposne && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchSalarySettings = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchSalaryRecords = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const setLoadingState = (state) => (dispatch) => {
+  dispatch({ type: LEAVE_REQUESTS_LOADING, payload: state })
 }

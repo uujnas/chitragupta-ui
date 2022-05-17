@@ -11,7 +11,6 @@ function SalaryRecords() {
   const router = useRouter();
 
   const [salaryRecords, setSalaryRecords] = useState([]);
-  const { setToken } = useGlobalContext();
 
   useEffect(() => {
     const fetchSalaryRecords = async () => {

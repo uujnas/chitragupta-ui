@@ -17,13 +17,7 @@ import { setFetchAllRecords } from '../redux/actions/dashboardActions';
 function Home(props) {
   const isAdmin = () => props.user && props.user.role === 'admin';
 
-  useEffect(() => {
-    if (props.token) {
-      props.fetchLeaveRequests(props.fetchAllRecords);
-    }
-  }, [props.token]);
-
-  return !props.leave.loading && props.leave.items ? (
+  return true ? (
     <>
       <Navbar page="Dashboard" subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">

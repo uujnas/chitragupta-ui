@@ -1,46 +1,28 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import Jsona from 'jsona';
-import { columns } from '../../data/salaryRecordsTableData';
-import { TableContainer } from '../modalComponents';
-import { Btn, Input } from '../formComponents';
-import DataTable from './DataTable';
-import Alert from '../alert';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import Jsona from 'jsona'
+import { columns } from '../../data/salaryRecordsTableData'
+import { TableContainer } from '../modalComponents'
+import { Btn, Input } from '../formComponents'
+import DataTable from './DataTable'
+import Alert from '../alert'
+import { fetchSalaryRecords } from '../../redux/actions/dashboardActions'
+import { connect } from 'react-redux'
 
-function SalaryRecordsDataTable({ salaryRecords, setSalaryRecords }) {
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [date, setDate] = useState(null);
-  const dataFormatter = new Jsona();
-
-  useEffect(() => {
-    const fetchSalaryRecords = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records`,
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-            params: {
-              date,
-            },
-          },
-        );
-
-        setSalaryRecords(dataFormatter.deserialize(response.data));
-      } catch (rerror) {
-        // error block of code
-      }
-    };
-
-    fetchSalaryRecords();
-  }, [date]);
+function SalaryRecordsDataTable({
+  salaryRecords,
+  setSalaryRecords,
+  fetchSalaryRecords,
+}) {
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [date, setDate] = useState(null)
+  const dataFormatter = new Jsona()
 
   // make request to remote api for salary records generation
   const generateSalaryRecords = async () => {
     if (!date) {
-      setError('Date Must be present.');
+      setError('Date Must be present.')
     } else {
       try {
         const response = await axios.post(
@@ -53,27 +35,27 @@ function SalaryRecordsDataTable({ salaryRecords, setSalaryRecords }) {
               Authorization: localStorage.token,
             },
           },
-        );
+        )
 
         if (response.statusText === 'OK') {
-          setError('');
-          setSuccess(response.data.message);
+          setError('')
+          setSuccess(response.data.message)
         } else {
-          setSuccess('');
+          setSuccess('')
           setError(
             response.data.message || "Couldn't generate salary records...",
-          );
+          )
         }
       } catch (rerror) {
-        setSuccess('');
+        setSuccess('')
         setError(
           rerror.response.data.message ||
             rerror.response.data.error ||
             "Couldn't generate salary records",
-        );
+        )
       }
     }
-  };
+  }
 
   return (
     <TableContainer>
@@ -99,9 +81,15 @@ function SalaryRecordsDataTable({ salaryRecords, setSalaryRecords }) {
         </Btn>
       </div>
 
-      <DataTable data={salaryRecords} columns={columns} />
+      <DataTable
+        data={salaryRecords}
+        columns={columns}
+        fetchFunction={fetchSalaryRecords}
+      />
     </TableContainer>
-  );
+  )
 }
 
-export default SalaryRecordsDataTable;
+export default connect(() => ({}), { fetchSalaryRecords })(
+  SalaryRecordsDataTable,
+)

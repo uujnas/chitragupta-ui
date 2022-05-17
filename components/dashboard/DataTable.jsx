@@ -1,6 +1,7 @@
 import { useTable, useSortBy, usePagination } from 'react-table'
 import { connect } from 'react-redux'
 import { fetchRecords, setPage } from '../../redux/actions/dashboardActions'
+import { useEffect } from 'react'
 
 function DataTable({
   children,
@@ -12,6 +13,7 @@ function DataTable({
   setPage,
   pageIndex,
   fetchFunction,
+  token,
 }) {
   const {
     getTableProps,
@@ -38,6 +40,10 @@ function DataTable({
     useSortBy,
     usePagination,
   )
+
+  useEffect(() => {
+    token && fetchFunction()
+  }, [token])
 
   return (
     <div className="relative">
@@ -131,7 +137,7 @@ function DataTable({
           onClick={() => {
             previousPage()
             setPage(pageIndex - 1)
-            fetchRecords(fetchFunction)
+            fetchFunction()
           }}
           disabled={!canPreviousPage}
           className="px-3 py-2 mr-4 text-white bg-blue-500 rounded"
@@ -149,7 +155,7 @@ function DataTable({
           onClick={() => {
             nextPage()
             setPage(pageIndex + 1)
-            fetchRecords(fetchFunction)
+            fetchFunction()
           }}
           disabled={!canNextPage}
           className="px-3 py-2 text-white bg-blue-500 rounded "
@@ -165,6 +171,7 @@ const mapStateToProps = (state) => ({
   data: state.records.records,
   total: state.records.total,
   pageIndex: state.records.page,
+  token: state.auth.token,
 })
 
 export default connect(mapStateToProps, { fetchRecords, setPage })(DataTable)

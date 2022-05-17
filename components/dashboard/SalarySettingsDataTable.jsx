@@ -1,30 +1,36 @@
-import { useState } from 'react';
-import axios from 'axios';
-import Jsona from 'jsona';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import Jsona from 'jsona'
 // import { useRouter } from 'next/router';
-import DataTable from './DataTable';
-import { columns } from '../../data/salarySettingsTableData';
-import { TableContainer } from '../modalComponents';
-import { Btn } from '../formComponents';
-import Modal from '../modal';
-import SalarySettingForm from '../salarySettingForm';
+import DataTable from './DataTable'
+import { columns } from '../../data/salarySettingsTableData'
+import { TableContainer } from '../modalComponents'
+import { Btn } from '../formComponents'
+import Modal from '../modal'
+import SalarySettingForm from '../salarySettingForm'
+import { fetchSalarySettings } from '../../redux/actions/dashboardActions'
+import { connect } from 'react-redux'
 
-function SalariesDataTable({ salarySettings, setSalarySettings }) {
-  const [salarySetting, setSalarySetting] = useState({});
-  const [createNew, setCreateNew] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [taxRules, setTaxRules] = useState([]);
-  const [updatingSalarySetting, setUpdatingSalarySetting] = useState(false);
+function SalariesDataTable({
+  salarySettings,
+  setSalarySettings,
+  fetchSalarySettings,
+}) {
+  const [salarySetting, setSalarySetting] = useState({})
+  const [createNew, setCreateNew] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [taxRules, setTaxRules] = useState([])
+  const [updatingSalarySetting, setUpdatingSalarySetting] = useState(false)
 
-  const dataFormatter = new Jsona();
-  const creatingNew = () => setCreateNew(true);
-  const numberRegEx = /^\d+.?\d*$/;
+  const dataFormatter = new Jsona()
+  const creatingNew = () => setCreateNew(true)
+  const numberRegEx = /^\d+.?\d*$/
   // const router = useRouter();
 
   // this is required because if we submit empty form we are getting error but status is stil 200:OK
   const checkIfFormIsValid = () => {
-    let errorCount = 0;
-    [
+    let errorCount = 0
+    ;[
       'ssf_office',
       'ssf_employee',
       'life_insurance_max',
@@ -33,46 +39,46 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
       'from_date',
     ].forEach((field) => {
       if (salarySetting[field] === undefined) {
-        errorCount += 1;
-        errors[field] = "Can't be blank.";
-        setErrors({ ...errors });
+        errorCount += 1
+        errors[field] = "Can't be blank."
+        setErrors({ ...errors })
       }
-    });
+    })
 
     // make sure to_date is greater than from_date
     if (
       salarySetting.to_date &&
       new Date(salarySetting.from_date) > new Date(salarySetting.to_date)
     ) {
-      errorCount += 1;
+      errorCount += 1
       setErrors({
         ...errors,
         from_date: "Can't be greater than To Date.",
         to_date: "Can't be less than From Date.",
-      });
+      })
     }
 
     // make sure each field in tax rules are valid
     taxRules.forEach((taxRule) => {
-      ['amount_from', 'amount_to', 'rate'].forEach((field) => {
+      ;['amount_from', 'amount_to', 'rate'].forEach((field) => {
         if (taxRule[`${field}_${taxRule.id || taxRule.key}`] === undefined) {
-          errorCount += 1;
+          errorCount += 1
 
-          errors[`${field}_${taxRule.id || taxRule.key}`] = "Can't be blank.";
-          setErrors({ ...errors });
+          errors[`${field}_${taxRule.id || taxRule.key}`] = "Can't be blank."
+          setErrors({ ...errors })
         } else if (
           !taxRule[`${field}_${taxRule.id || taxRule.key}`].match(numberRegEx)
         ) {
-          errorCount += 1;
+          errorCount += 1
 
-          errors[`${field}_${taxRule.id || taxRule.key}`] = 'Must be a number.';
-          setErrors({ ...errors });
+          errors[`${field}_${taxRule.id || taxRule.key}`] = 'Must be a number.'
+          setErrors({ ...errors })
         }
-      });
-    });
+      })
+    })
 
-    return errorCount;
-  };
+    return errorCount
+  }
 
   const createSalarySetting = async () => {
     if (checkIfFormIsValid() === 0) {
@@ -90,22 +96,22 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
               Authorization: localStorage.token,
             },
           },
-        );
+        )
 
         if (response.statusText === 'OK') {
           setSalarySettings([
             dataFormatter.deserialize(response.data),
             ...salarySettings,
-          ]);
-          setCreateNew(false);
-          setSalarySetting({});
-          setTaxRules([]);
+          ])
+          setCreateNew(false)
+          setSalarySetting({})
+          setTaxRules([])
         }
       } catch (error) {
         // console.log(error);
       }
     }
-  };
+  }
 
   const remoteUpdateSalarySetting = async () => {
     if (checkIfFormIsValid() === 0) {
@@ -123,15 +129,15 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
               Authorization: localStorage.token,
             },
           },
-        );
+        )
       } catch (error) {
         // console.log(error);
       }
     }
-  };
+  }
 
   const updateSalarySetting = (e) => {
-    delete errors[e.target.name];
+    delete errors[e.target.name]
     if (
       [
         'ssf_office',
@@ -142,32 +148,32 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
       ].includes(e.target.name) &&
       !e.target.value.match(numberRegEx)
     ) {
-      setErrors({ ...errors, [e.target.name]: 'Must be a number.' });
+      setErrors({ ...errors, [e.target.name]: 'Must be a number.' })
     }
-    setSalarySetting({ ...salarySetting, [e.target.name]: e.target.value });
-  };
+    setSalarySetting({ ...salarySetting, [e.target.name]: e.target.value })
+  }
 
   const updateTaxRules = (e) => {
     if (!e.target.value.match(numberRegEx)) {
-      setErrors({ ...errors, [e.target.name]: 'Must be a number.' });
+      setErrors({ ...errors, [e.target.name]: 'Must be a number.' })
     }
     const index = taxRules.findIndex(
       (taxRule) => taxRule.id === e.target.key || taxRule.key === e.target.key,
-    );
-    const name_with_key = e.target.name;
-    const name_without_key = name_with_key.split('_').slice(0, -1).join('_');
+    )
+    const name_with_key = e.target.name
+    const name_without_key = name_with_key.split('_').slice(0, -1).join('_')
 
-    taxRules[index][name_with_key] = e.target.value;
-    taxRules[index][name_without_key] = e.target.value;
-    setTaxRules([...taxRules]);
-  };
+    taxRules[index][name_with_key] = e.target.value
+    taxRules[index][name_without_key] = e.target.value
+    setTaxRules([...taxRules])
+  }
 
   const removeTaxRule = (key) => {
-    const index = taxRules.findIndex((taxRule) => taxRule.key === key);
+    const index = taxRules.findIndex((taxRule) => taxRule.key === key)
 
-    taxRules.splice(index, 1);
-    setTaxRules([...taxRules]);
-  };
+    taxRules.splice(index, 1)
+    setTaxRules([...taxRules])
+  }
 
   return (
     <>
@@ -179,14 +185,14 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
         </div>
 
         <DataTable
-          data={salarySettings}
           rowClick={(row) => {
             // console.log(row.original);
-            setSalarySetting(row.original);
-            setTaxRules(row.original.tax_rules);
-            setUpdatingSalarySetting(true);
+            setSalarySetting(row.original)
+            setTaxRules(row.original.tax_rules)
+            setUpdatingSalarySetting(true)
           }}
           columns={columns}
+          fetchFunction={fetchSalarySettings}
         />
       </TableContainer>
 
@@ -228,7 +234,7 @@ function SalariesDataTable({ salarySettings, setSalarySettings }) {
         </Modal>
       )}
     </>
-  );
+  )
 }
 
-export default SalariesDataTable;
+export default connect(() => ({}), { fetchSalarySettings })(SalariesDataTable)

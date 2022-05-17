@@ -3,7 +3,7 @@ import { columns } from '../../data/leaveTableData'
 import { fetchLeaveRequests } from '../../redux/actions/leaveActions'
 import { connect } from 'react-redux'
 
-function LeaveRequestDataTable({ showModal, setShowModal, setLeaveRequest }) {
+function LeaveRequestDataTable({ showModal, setShowModal, setLeaveRequest, fetchLeaveRequests }) {
   const rowClick = (row) => {
     setLeaveRequest(row.original)
     setShowModal(!showModal)
@@ -18,4 +18,6 @@ function LeaveRequestDataTable({ showModal, setShowModal, setLeaveRequest }) {
   )
 }
 
-export default connect(() => {}, { fetchLeaveRequests })(LeaveRequestDataTable)
+export default connect(() => ({}), { fetchLeaveRequests })(
+  LeaveRequestDataTable,
+)

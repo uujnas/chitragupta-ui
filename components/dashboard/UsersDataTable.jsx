@@ -10,7 +10,7 @@ import Alert from '../alert'
 import { fetchUsers } from '../../redux/actions/usersActions'
 import { connect } from 'react-redux'
 
-function UsersDataTable() {
+function UsersDataTable({ fetchUsers }) {
   // const { users } = useGlobalContext()
   const router = useRouter()
   const [error, setError] = useState('')
@@ -100,4 +100,4 @@ function UsersDataTable() {
   )
 }
 
-export default connect(() => {}, { fetchUsers })(UsersDataTable)
+export default connect(() => ({}), { fetchUsers })(UsersDataTable)

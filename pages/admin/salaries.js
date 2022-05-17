@@ -9,7 +9,6 @@ import { useGlobalContext } from '../../context';
 
 function Salaries() {
   const router = useRouter();
-  const { setToken } = useGlobalContext();
   const [salaries, setSalaries] = useState([]);
 
   useEffect(() => {

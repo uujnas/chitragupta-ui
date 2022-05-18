@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import {  useState } from 'react'
+import { connect } from 'react-redux'
 import axios from 'axios'
 import Jsona from 'jsona'
-// import { useRouter } from 'next/router';
 import DataTable from './DataTable'
 import { columns } from '../../data/salarySettingsTableData'
 import { TableContainer } from '../modalComponents'
@@ -9,7 +9,6 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import SalarySettingForm from '../salarySettingForm'
 import { fetchSalarySettings } from '../../redux/actions/dashboardActions'
-import { connect } from 'react-redux'
 
 function SalariesDataTable({
   salarySettings,
@@ -25,7 +24,6 @@ function SalariesDataTable({
   const dataFormatter = new Jsona()
   const creatingNew = () => setCreateNew(true)
   const numberRegEx = /^\d+.?\d*$/
-  // const router = useRouter();
 
   // this is required because if we submit empty form we are getting error but status is stil 200:OK
   const checkIfFormIsValid = () => {
@@ -156,9 +154,11 @@ function SalariesDataTable({
   const updateTaxRules = (e) => {
     if (!e.target.value.match(numberRegEx)) {
       setErrors({ ...errors, [e.target.name]: 'Must be a number.' })
+    } else {
+      setErrors({ ...errors, [e.target.name]: null })
     }
     const index = taxRules.findIndex(
-      (taxRule) => taxRule.id === e.target.key || taxRule.key === e.target.key,
+      (taxRule) => taxRule.id == e.target.id || taxRule.key == e.target.id,
     )
     const name_with_key = e.target.name
     const name_without_key = name_with_key.split('_').slice(0, -1).join('_')

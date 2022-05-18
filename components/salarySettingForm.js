@@ -78,13 +78,13 @@ function SalarySettingForm({
           {taxRules.length <= 0 ? (
             <div>N/A</div>
           ) : (
-            taxRules.map((taxRule, index) => (
+            taxRules.map((taxRule) => (
               <TaxRuleForm
                 errors={errors}
                 taxRule={taxRule}
                 onChange={updateTaxRules}
                 removeTaxRule={removeTaxRule}
-                key={index}
+                key={taxRule.id || taxRule.key}
               />
             ))
           )}

@@ -1,23 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { connect } from 'react-redux'
 import axios from 'axios'
-import Jsona from 'jsona'
 import { columns } from '../../data/salaryRecordsTableData'
 import { TableContainer } from '../modalComponents'
 import { Btn, Input } from '../formComponents'
 import DataTable from './DataTable'
 import Alert from '../alert'
 import { fetchSalaryRecords } from '../../redux/actions/dashboardActions'
-import { connect } from 'react-redux'
 
-function SalaryRecordsDataTable({
-  salaryRecords,
-  setSalaryRecords,
-  fetchSalaryRecords,
-}) {
+function SalaryRecordsDataTable({ fetchSalaryRecords }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [date, setDate] = useState(null)
-  const dataFormatter = new Jsona()
 
   // make request to remote api for salary records generation
   const generateSalaryRecords = async () => {
@@ -81,11 +75,7 @@ function SalaryRecordsDataTable({
         </Btn>
       </div>
 
-      <DataTable
-        data={salaryRecords}
-        columns={columns}
-        fetchFunction={fetchSalaryRecords}
-      />
+      <DataTable columns={columns} fetchFunction={fetchSalaryRecords} />
     </TableContainer>
   )
 }

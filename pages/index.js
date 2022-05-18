@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect } from 'react-redux';
 import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable';
 import Navbar from '../components/layout/Navbar';
@@ -22,7 +21,7 @@ function Home(props) {
       <Navbar page="Dashboard" subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <div className="flex justify-end py-4">
-          <label className="mr-2">All Leaves</label>
+          <span className="mr-2">All Leaves</span>
           <button
             type="button"
             className={`${
@@ -48,7 +47,6 @@ function Home(props) {
         <LeaveRequestDataTable
           showModal={props.showModal}
           setShowModal={props.setLeaveModal}
-          leaveRequests={props.leave.items}
           setLeaveRequest={props.setSelectedLeave}
         />
         {props.showModal && (

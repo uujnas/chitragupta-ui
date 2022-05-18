@@ -15,7 +15,8 @@ function TaxRuleForm({ taxRule, errors, onChange, removeTaxRule }) {
         </Label>
         <Input
           name={`amount_from_${taxRule.id || taxRule.key}`}
-          value={taxRule.amount_from}
+          value={taxRule[`amount_from_${taxRule.id || taxRule.key}`]}
+          id={taxRule.id || taxRule.key}
           onChange={onChange}
           type="text"
           className={
@@ -43,7 +44,8 @@ function TaxRuleForm({ taxRule, errors, onChange, removeTaxRule }) {
         </Label>
         <Input
           name={`amount_to_${taxRule.id || taxRule.key}`}
-          value={taxRule.amount_to}
+          value={taxRule[`amount_to_${taxRule.id || taxRule.key}`]}
+          id={taxRule.id || taxRule.key}
           onChange={onChange}
           type="text"
           className={
@@ -71,7 +73,8 @@ function TaxRuleForm({ taxRule, errors, onChange, removeTaxRule }) {
         </Label>
         <Input
           name={`rate_${taxRule.id || taxRule.key}`}
-          value={taxRule.rate}
+          value={taxRule[`rate_${taxRule.id || taxRule.key}`]}
+          id={taxRule.id || taxRule.key}
           onChange={onChange}
           type="text"
           className={
@@ -98,7 +101,7 @@ function TaxRuleForm({ taxRule, errors, onChange, removeTaxRule }) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 export default TaxRuleForm;

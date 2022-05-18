@@ -1,3 +1,4 @@
+import { connect } from 'react-redux'
 import { useState } from 'react'
 import axios from 'axios'
 import Jsona from 'jsona'
@@ -8,7 +9,6 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { fetchSalaries } from '../../redux/actions/dashboardActions'
-import { connect } from 'react-redux'
 
 function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
   const [salary, setSalary] = useState({})
@@ -86,7 +86,6 @@ function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
         </div>
 
         <DataTable
-          data={salaries}
           columns={columns}
           fetchFunction={fetchSalaries}
         />

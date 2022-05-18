@@ -25,6 +25,10 @@ export const fetchRecords = (fetchFunction) => (dispatch) => {
   dispatch(fetchFunction())
 }
 
+export const setLoadingState = (state) => (dispatch) => {
+  dispatch({ type: LEAVE_REQUESTS_LOADING, payload: state })
+}
+
 export const fetchSalaries = () => (dispatch, getState) => {
   dispatch(setLoadingState(true))
 
@@ -95,8 +99,4 @@ export const fetchSalaryRecords = () => (dispatch, getState) => {
         ),
       )
     })
-}
-
-export const setLoadingState = (state) => (dispatch) => {
-  dispatch({ type: LEAVE_REQUESTS_LOADING, payload: state })
 }

@@ -1,36 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { connect } from 'react-redux';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { connect } from 'react-redux'
 import {
   FormContainer,
   Input,
   Label,
   FormControl,
   Btn,
-} from '../components/formComponents';
-import { login, loadUser } from '../redux/actions/authActions';
+} from '../components/formComponents'
+import { login, loadUser } from '../redux/actions/authActions'
 
 function Login(props) {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const getRedirect = () =>
+    router.query && router.query.returnUrl ? router.query.returnUrl : '/'
 
   const token_verified = () => {
     if (props.isAuthenticated) {
-      props.loadUser();
-      router.push('/');
+      props.loadUser()
+      router.push(getRedirect())
     }
-  };
+  }
 
-  useEffect(() => token_verified(), [props.isAuthenticated]);
+  useEffect(() => token_verified(), [props.isAuthenticated])
   const handleSubmit = (e) => {
     const user = {
       email,
       password,
-    };
-    props.login(user);
-    e.preventDefault();
-  };
+    }
+    props.login(user)
+    e.preventDefault()
+  }
   return (
     <section className="my-8 pt-14">
       <FormContainer>
@@ -74,10 +77,10 @@ function Login(props) {
         </FormControl>
       </FormContainer>
     </section>
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
-});
-export default connect(mapStateToProps, { login, loadUser })(Login);
+})
+export default connect(mapStateToProps, { login, loadUser })(Login)

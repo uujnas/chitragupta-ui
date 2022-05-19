@@ -1,20 +1,20 @@
-import { connect } from 'react-redux';
-import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable';
-import Navbar from '../components/layout/Navbar';
-import Modal from '../components/modal';
-import { Btn, Input, Label } from '../components/formComponents';
-import LeaveBalanceBadge from '../components/leaveBalanceBadge';
-import Loader from '../components/ui/loader';
+import { connect } from 'react-redux'
+import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable'
+import Navbar from '../components/layout/Navbar'
+import Modal from '../components/modal'
+import { Btn, Input, Label } from '../components/formComponents'
+import LeaveBalanceBadge from '../components/leaveBalanceBadge'
+import Loader from '../components/ui/loader'
 import {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
   setLeaveModal,
-} from '../redux/actions/leaveActions';
-import { setFetchAllRecords } from '../redux/actions/dashboardActions';
+} from '../redux/actions/leaveActions'
+import { setFetchAllRecords } from '../redux/actions/dashboardActions'
 
 function Home(props) {
-  const isAdmin = () => props.user && props.user.role === 'admin';
+  const isAdmin = () => props.user && props.user.role === 'admin'
 
   return true ? (
     <>
@@ -30,8 +30,8 @@ function Home(props) {
             role="switch"
             aria-checked="false"
             onClick={() => {
-              props.setFetchAllRecords(!props.fetchAllRecords);
-              props.fetchLeaveRequests();
+              props.setFetchAllRecords(!props.fetchAllRecords)
+              props.fetchLeaveRequests()
             }}
           >
             <span className="sr-only">Use setting</span>
@@ -82,7 +82,7 @@ function Home(props) {
                 props.setSelectedLeave({
                   ...props.selectedLeave,
                   title: e.target.value,
-                });
+                })
               }}
               disabled={isAdmin()}
             />
@@ -114,8 +114,8 @@ function Home(props) {
                     ...props.selectedLeave,
                     status: 'rejected',
                     approver_id: props.user.id,
-                  });
-                  props.updateLeaveRequest();
+                  })
+                  props.updateLeaveRequest()
                 }}
               >
                 Reject
@@ -129,8 +129,8 @@ function Home(props) {
                     ...props.selectedLeave,
                     status: 'approved',
                     approver_id: props.user.id,
-                  });
-                  props.updateLeaveRequest();
+                  })
+                  props.updateLeaveRequest()
                 }}
               >
                 Approve
@@ -152,7 +152,7 @@ function Home(props) {
     </>
   ) : (
     <Loader />
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
@@ -163,11 +163,12 @@ const mapStateToProps = (state) => ({
   showModal: state.leave.leaveModal,
   selectedLeave: state.leave.selectedLeave,
   fetchAllRecords: state.records.fetchAllRecords,
-});
+  loading: state.records.loading,
+})
 export default connect(mapStateToProps, {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
   setLeaveModal,
   setFetchAllRecords,
-})(Home);
+})(Home)

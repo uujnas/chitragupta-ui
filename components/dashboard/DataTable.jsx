@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTable, useSortBy, usePagination } from 'react-table'
 import { connect } from 'react-redux'
 import { setPage } from '../../redux/actions/dashboardActions'
+import Loader from '../ui/loader'
 
 function DataTable({
   children,
@@ -13,6 +14,7 @@ function DataTable({
   pageIndex,
   fetchFunction,
   token,
+  loading,
 }) {
   const {
     getTableProps,
@@ -44,7 +46,7 @@ function DataTable({
     if (token) fetchFunction()
   }, [token])
 
-  return (
+  return !loading ? (
     <div className="relative">
       {children}
       <table
@@ -107,7 +109,9 @@ function DataTable({
                   <td
                     {...cell.getCellProps()}
                     className="p-2 py-4"
-                    key={`${new Date().getTime() * Math.random()} ${row.id} ${cell.value}`}
+                    key={`${new Date().getTime() * Math.random()} ${row.id} ${
+                      cell.value
+                    }`}
                   >
                     {cell.render('Cell')}
                   </td>
@@ -150,6 +154,8 @@ function DataTable({
         </button>
       </div>
     </div>
+  ) : (
+    <Loader />
   )
 }
 
@@ -158,6 +164,7 @@ const mapStateToProps = (state) => ({
   total: state.records.total,
   pageIndex: state.records.page,
   token: state.auth.token,
+  loading: state.records.loading,
 })
 
 export default connect(mapStateToProps, { setPage })(DataTable)

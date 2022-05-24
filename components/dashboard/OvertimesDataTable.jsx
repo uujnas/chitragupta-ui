@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
+import axios from 'axios'
+import Jsona from 'jsona'
+import AsyncSelect from 'react-select/async'
 import DataTable from './DataTable'
 import { columns } from '../../data/overtimeTableData'
 import { fetchOvertimes } from '../../redux/actions/dashboardActions'
 import Modal from '../modal'
-import { Btn, Input, Label, Select, Option } from '../formComponents'
-import axios from 'axios'
-import Jsona from 'jsona'
+import { Btn, Input, Label } from '../formComponents'
 
-function OvertimesDataTable({ fetchOvertimes, user }) {
-  const isAdmin = () => user && user.role === 'admin'
+function OvertimesDataTable({ fetchOvertimes, approver }) {
+  const isAdmin = () => approver && approver.role === 'admin'
   const dataFormatter = new Jsona()
 
   const [showModal, setShowModal] = useState(false)
-  const [overtime, setOvertime] = useState({ approver_id: user && user.id })
-  const [users, setUsers] = useState([])
+  const [overtime, setOvertime] = useState({
+    approver_id: approver && approver.id,
+  })
+  const [userOptions, setUserOptions] = useState([])
   const [selectedUserId, setSelectedUserId] = useState({})
 
   const createOvertime = async () => {
@@ -36,6 +39,33 @@ function OvertimesDataTable({ fetchOvertimes, user }) {
     }
   }
 
+  const searchRequest = async (query) => {
+    console.log('Searching')
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
+        {
+          headers: {
+            Authorization: localStorage.token,
+            'Content-type': 'application/json',
+          },
+          params: { search: query },
+        },
+      )
+
+      const users = dataFormatter.deserialize(response.data.data)
+      const updatedUserOptions = users.map((user) => ({
+        value: user.id,
+        label: `${user.first_name} ${user.last_name}`,
+      }))
+
+      setUserOptions(updatedUserOptions)
+      return updatedUserOptions
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -43,7 +73,13 @@ function OvertimesDataTable({ fetchOvertimes, user }) {
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
           { headers: { Authorization: localStorage.token } },
         )
-        setUsers(dataFormatter.deserialize(response.data.data))
+        const users = dataFormatter.deserialize(response.data.data)
+        setUserOptions(
+          users.map((user) => ({
+            value: user.id,
+            label: `${user.first_name} ${user.last_name}`,
+          })),
+        )
       } catch (error) {
         console.log(error)
       }
@@ -87,18 +123,14 @@ function OvertimesDataTable({ fetchOvertimes, user }) {
           />
 
           <Label>Select salary</Label>
-          <Select
-            onChange={(e) => setSelectedUserId(e.target.value)}
-            defaultValue={user && user.id}
-          >
-            <Option>...</Option>
-            {users.map((u) => (
-              <Option value={u.id} key={u.id}>
-                {' '}
-                {u.first_name} {u.last_name}{' '}
-              </Option>
-            ))}
-          </Select>
+          <AsyncSelect
+            onChange={(e) => {
+              setSelectedUserId(e.value)
+            }}
+            defaultOptions={userOptions}
+            // onInputChange={(query) => searchRequest(query)}
+            loadOptions={(query) => searchRequest(query)}
+          />
 
           <Btn
             className="bg-teal-500 hover:bg-teal-600"
@@ -114,7 +146,7 @@ function OvertimesDataTable({ fetchOvertimes, user }) {
 
 export default connect(
   (state) => ({
-    user: state.auth.user,
+    approver: state.auth.user,
   }),
   { fetchOvertimes },
 )(OvertimesDataTable)

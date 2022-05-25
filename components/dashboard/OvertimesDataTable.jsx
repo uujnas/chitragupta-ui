@@ -13,6 +13,7 @@ import { createOvertime } from '../../redux/actions/overtimeActions'
 import Modal from '../modal'
 import { Btn, Input, Label } from '../formComponents'
 import InputWithLabelAndError from '../InputWithLabelAndError'
+import { TableContainer } from '../modalComponents'
 
 function OvertimesDataTable({
   fetchOvertimes,
@@ -84,22 +85,24 @@ function OvertimesDataTable({
 
   return (
     <>
-      <DataTable
-        rowClick={() => console.log('')}
-        columns={columns}
-        fetchFunction={fetchOvertimes}
-      >
-        {isAdmin() && (
-          <Btn
-            className="bg-teal-500 hover:bg-teal-600"
-            onClick={() => {
-              setShowModal(true)
-            }}
-          >
-            New Overtime
-          </Btn>
-        )}
-      </DataTable>
+      <TableContainer>
+        <DataTable
+          rowClick={() => console.log('')}
+          columns={columns}
+          fetchFunction={fetchOvertimes}
+        >
+          {isAdmin() && (
+            <Btn
+              className="bg-teal-500 hover:bg-teal-600"
+              onClick={() => {
+                setShowModal(true)
+              }}
+            >
+              New Overtime
+            </Btn>
+          )}
+        </DataTable>
+      </TableContainer>
 
       {showModal && (
         <Modal
@@ -113,8 +116,7 @@ function OvertimesDataTable({
             onChange={(e) => {
               if (!e.target.value.match(numberRegEx))
                 setErrors({ seconds_tracked: 'Must be a whole number.' })
-              else
-                setErrors({seconds_tracked: null})
+              else setErrors({ seconds_tracked: null })
               setOvertime({ ...overtime, seconds_tracked: e.target.value })
             }}
           />

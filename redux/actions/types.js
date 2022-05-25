@@ -39,5 +39,7 @@ export const SET_FETCH_ALL_RECORDS = 'SET_FETCH_ALL_RECORDS'
 export const SET_PAGE = 'SET_PAGE'
 export const SET_BATCH = 'SET_BATCH'
 
+export const GET_USER = 'GET_USER'
+
 // types for server
 export const SET_IS_SERVER = 'SET_IS_SERVER'

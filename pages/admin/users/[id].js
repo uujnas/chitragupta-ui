@@ -12,11 +12,11 @@ import {
   Option,
 } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
-import { handleUnauthorized } from '../../../lib/utils'
+import { fetchUser } from '../../../redux/actions/usersActions'
 
-function User({ currentUser }) {
+function User({ currentUser, fetchUser, user }) {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
   const [updatingUser, setUpdatingUser] = useState(false)
   const [salaries, setSalaries] = useState([])
   const [salary, setSalary] = useState(null)
@@ -46,32 +46,6 @@ function User({ currentUser }) {
     let user_controller = new AbortController()
     let salary_controller = new AbortController()
 
-    const fetch_user = async (user_id) => {
-      try {
-        // fetch user from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: user_controller.signal,
-          },
-        )
-
-        const deserialized_user_data = dataFormatter.deserialize(response.data)
-
-        setUser(deserialized_user_data)
-        setSalary(
-          deserialized_user_data.active_salary &&
-            deserialized_user_data.active_salary.id,
-        )
-        setStatus(deserialized_user_data.status)
-        user_controller = null
-      } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
-      }
-    }
-
     const fetch_salaries = async () => {
       try {
         // fetch salaries from remote api
@@ -91,7 +65,7 @@ function User({ currentUser }) {
       }
     }
 
-    fetch_user(user_id)
+    currentUser && fetchUser(user_id)
     isAdmin() && fetch_salaries()
 
     return () => {
@@ -112,7 +86,7 @@ function User({ currentUser }) {
     return errorCount
   }
 
-  const updateUserSalary = async () => {
+  const updateUser = async () => {
     if (checkIfFormIsValid() === 0) {
       // make request to remote api to create or update user salary
       try {
@@ -352,7 +326,7 @@ function User({ currentUser }) {
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={updateUserSalary}>
+            <Btn className="bg-green-400" onClick={updateUser}>
               Submit
             </Btn>
           </div>
@@ -362,4 +336,6 @@ function User({ currentUser }) {
   )
 }
 
-export default connect((state) => ({ currentUser: state.auth.user }), {})(User)
+export default connect((state) => ({ currentUser: state.auth.user, user: state.users.user }), {
+  fetchUser,
+})(User)

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import Jsona from 'jsona'
@@ -13,9 +14,8 @@ import {
 import Modal from '../../../components/modal'
 import { handleUnauthorized } from '../../../lib/utils'
 
-function User() {
-  // const { isAdmin, setToken } = useGlobalContext();
-  const isAdmin = () => true
+function User({ currentUser }) {
+  const isAdmin = () => currentUser && currentUser.role === 'admin'
   const [user, setUser] = useState(null)
   const [updatingUser, setUpdatingUser] = useState(false)
   const [salaries, setSalaries] = useState([])
@@ -86,19 +86,19 @@ function User() {
         setSalaries(dataFormatter.deserialize(response.data.data))
         salary_controller = null
       } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
+        console.log(error)
+        // handleUnauthorized(error, setToken, router)
       }
     }
 
     fetch_user(user_id)
-    fetch_salaries()
+    isAdmin() && fetch_salaries()
 
     return () => {
       user_controller?.abort()
       salary_controller?.abort()
     }
-  }, [])
+  }, [currentUser])
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
@@ -136,8 +136,8 @@ function User() {
           },
         )
       } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
+        console.log(error)
+        // handleUnauthorized(error, setToken, router)
       }
     }
   }
@@ -362,4 +362,4 @@ function User() {
   )
 }
 
-export default User
+export default connect((state) => ({ currentUser: state.auth.user }), {})(User)

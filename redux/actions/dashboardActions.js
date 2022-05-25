@@ -108,19 +108,19 @@ export const fetchYearlySalaryRecords = () => (dispatch, getState) => {
     .get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/yearly_salary_records.json`,
       tokenConfig(getState),
-  )
+    )
     .then((res) => {
       dispatch({
         type: GET_RECORDS,
-        payload: res.data
+        payload: res.data,
       })
-        .catch((err) => {
-          dispatch(
-            returnErrors(
-              err.response && err.response.data,
-              err.response && err.response.status
-          )
-        )
-      })
-  })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
 }

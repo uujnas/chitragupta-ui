@@ -11,16 +11,14 @@ function YearlySalaryRecordDataTable({ fetchYearlySalaryRecords }) {
       columns={columns}
       fetchFunction={fetchYearlySalaryRecords}
     >
-      {isAdmin() && (
-        <Btn
-          className="bg-teal-500 hover:bg-teal-600"
-          onClick={() => {
-            console.log('Generating Yearly Salary Records')
-          }}
-        >
-          Generate Records
-        </Btn>
-      )}
+      <Btn
+        className="bg-teal-500 hover:bg-teal-600"
+        onClick={() => {
+          console.log('Generating Yearly Salary Records')
+        }}
+      >
+        Generate Records
+      </Btn>
     </DataTable>
   )
 }

@@ -5,39 +5,32 @@ import Jsona from 'jsona'
 import AsyncSelect from 'react-select/async'
 import DataTable from './DataTable'
 import { columns } from '../../data/overtimeTableData'
-import { fetchOvertimes } from '../../redux/actions/dashboardActions'
+import {
+  fetchOvertimes,
+  setShowModal,
+} from '../../redux/actions/dashboardActions'
+import { createOvertime } from '../../redux/actions/overtimeActions'
 import Modal from '../modal'
 import { Btn, Input, Label } from '../formComponents'
+import InputWithLabelAndError from '../InputWithLabelAndError'
 
-function OvertimesDataTable({ fetchOvertimes, approver }) {
+function OvertimesDataTable({
+  fetchOvertimes,
+  createOvertime,
+  setShowModal,
+  approver,
+  showModal,
+}) {
   const isAdmin = () => approver && approver.role === 'admin'
   const dataFormatter = new Jsona()
+  const numberRegEx = /^\d*$/
 
-  const [showModal, setShowModal] = useState(false)
+  // const [showModal, setShowModal] = useState(false)
   const [overtime, setOvertime] = useState({
     approver_id: approver && approver.id,
   })
   const [userOptions, setUserOptions] = useState([])
-  const [selectedUserId, setSelectedUserId] = useState({})
-
-  const createOvertime = async () => {
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/overtimes`,
-        {
-          overtime: {
-            user_id: selectedUserId,
-            seconds_tracked: overtime.seconds_tracked,
-          },
-        },
-        { headers: { Authorization: localStorage.token } },
-      )
-
-      setShowModal(false)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const [errors, setErrors] = useState({})
 
   const searchRequest = async (query) => {
     console.log('Searching')
@@ -63,6 +56,7 @@ function OvertimesDataTable({ fetchOvertimes, approver }) {
       return updatedUserOptions
     } catch (error) {
       console.log(error)
+      return []
     }
   }
 
@@ -113,28 +107,30 @@ function OvertimesDataTable({ fetchOvertimes, approver }) {
           setShowModal={setShowModal}
           title="New Overtime"
         >
-          <Label>Seconds Tracked</Label>
-          <Input
-            type="text"
-            value={overtime.seconds_tracked}
-            onChange={(e) =>
+          <InputWithLabelAndError
+            name="seconds_tracked"
+            errors={errors}
+            onChange={(e) => {
+              if (!e.target.value.match(numberRegEx))
+                setErrors({ seconds_tracked: 'Must be a whole number.' })
+              else
+                setErrors({seconds_tracked: null})
               setOvertime({ ...overtime, seconds_tracked: e.target.value })
-            }
+            }}
           />
 
           <Label>Select salary</Label>
           <AsyncSelect
             onChange={(e) => {
-              setSelectedUserId(e.value)
+              setOvertime({ ...overtime, user_id: e.value })
             }}
             defaultOptions={userOptions}
             // onInputChange={(query) => searchRequest(query)}
             loadOptions={(query) => searchRequest(query)}
           />
-
           <Btn
             className="bg-teal-500 hover:bg-teal-600"
-            onClick={createOvertime}
+            onClick={() => createOvertime(overtime)}
           >
             Submit
           </Btn>
@@ -147,6 +143,7 @@ function OvertimesDataTable({ fetchOvertimes, approver }) {
 export default connect(
   (state) => ({
     approver: state.auth.user,
+    showModal: state.records.showModal,
   }),
-  { fetchOvertimes },
+  { fetchOvertimes, setShowModal, createOvertime },
 )(OvertimesDataTable)

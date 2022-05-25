@@ -1,50 +1,50 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import Jsona from 'jsona';
-import Navbar from '../../../components/layout/Navbar';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+import Jsona from 'jsona'
+import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
   Label,
   Select,
   Input,
   Option,
-} from '../../../components/formComponents';
-import { useGlobalContext } from '../../../context';
-import Modal from '../../../components/modal';
-import { handleUnauthorized } from '../../../lib/utils';
+} from '../../../components/formComponents'
+import Modal from '../../../components/modal'
+import { handleUnauthorized } from '../../../lib/utils'
 
 function User() {
-  const { isAdmin, setToken } = useGlobalContext();
-  const [user, setUser] = useState(null);
-  const [updatingUser, setUpdatingUser] = useState(false);
-  const [salaries, setSalaries] = useState([]);
-  const [salary, setSalary] = useState(null);
+  // const { isAdmin, setToken } = useGlobalContext();
+  const isAdmin = () => true
+  const [user, setUser] = useState(null)
+  const [updatingUser, setUpdatingUser] = useState(false)
+  const [salaries, setSalaries] = useState([])
+  const [salary, setSalary] = useState(null)
   const [startDate, setStartDate] = useState(
     new Date().toISOString().slice(0, 10),
-  );
-  const [status, setStatus] = useState(null);
-  const [errors, setErrors] = useState({});
-  const router = useRouter();
-  const { id: user_id } = router.query;
+  )
+  const [status, setStatus] = useState(null)
+  const [errors, setErrors] = useState({})
+  const router = useRouter()
+  const { id: user_id } = router.query
 
-  const MAX_SICK_LEAVE_BALANCE = 5;
-  const MAX_PAID_LEAVE_BALANCE = 18;
-  const MAX_UNPAID_LEAVE_BALANCE = 25;
+  const MAX_SICK_LEAVE_BALANCE = 5
+  const MAX_PAID_LEAVE_BALANCE = 18
+  const MAX_UNPAID_LEAVE_BALANCE = 25
 
   const statuses = [
     { id: 0, status: 'invited' },
     { id: 1, status: 'active' },
     { id: 2, status: 'disabled' },
-  ];
+  ]
 
   const leave_percentage = (leave_balance, total) =>
-    user ? Math.round((leave_balance / total) * 100) : 0;
+    user ? Math.round((leave_balance / total) * 100) : 0
 
   useEffect(() => {
-    const dataFormatter = new Jsona();
-    let user_controller = new AbortController();
-    let salary_controller = new AbortController();
+    const dataFormatter = new Jsona()
+    let user_controller = new AbortController()
+    let salary_controller = new AbortController()
 
     const fetch_user = async (user_id) => {
       try {
@@ -55,21 +55,22 @@ function User() {
             headers: { Authorization: localStorage.token },
             signal: user_controller.signal,
           },
-        );
+        )
 
-        const deserialized_user_data = dataFormatter.deserialize(response.data);
+        const deserialized_user_data = dataFormatter.deserialize(response.data)
 
-        setUser(deserialized_user_data);
+        setUser(deserialized_user_data)
         setSalary(
           deserialized_user_data.active_salary &&
             deserialized_user_data.active_salary.id,
-        );
-        user_controller = null;
+        )
+        setStatus(deserialized_user_data.status)
+        user_controller = null
       } catch (error) {
         // console.log(error);
-        handleUnauthorized(error, setToken, router);
+        handleUnauthorized(error, setToken, router)
       }
-    };
+    }
 
     const fetch_salaries = async () => {
       try {
@@ -80,36 +81,36 @@ function User() {
             headers: { Authorization: localStorage.token },
             signal: salary_controller.signal,
           },
-        );
+        )
 
-        setSalaries(dataFormatter.deserialize(response.data));
-        salary_controller = null;
+        setSalaries(dataFormatter.deserialize(response.data.data))
+        salary_controller = null
       } catch (error) {
         // console.log(error);
-        handleUnauthorized(error, setToken, router);
+        handleUnauthorized(error, setToken, router)
       }
-    };
-
-    fetch_user(user_id);
-    fetch_salaries();
-
-    return () => {
-      user_controller?.abort();
-      salary_controller?.abort();
-    };
-  }, []);
-
-  const checkIfFormIsValid = () => {
-    let errorCount = 0;
-    if (!salary) {
-      errors.salary = "Can't be blank.";
-      // console.log(errors);
-      setErrors({ ...errors });
-      errorCount += 1;
     }
 
-    return errorCount;
-  };
+    fetch_user(user_id)
+    fetch_salaries()
+
+    return () => {
+      user_controller?.abort()
+      salary_controller?.abort()
+    }
+  }, [])
+
+  const checkIfFormIsValid = () => {
+    let errorCount = 0
+    if (!salary) {
+      errors.salary = "Can't be blank."
+      // console.log(errors);
+      setErrors({ ...errors })
+      errorCount += 1
+    }
+
+    return errorCount
+  }
 
   const updateUserSalary = async () => {
     if (checkIfFormIsValid() === 0) {
@@ -133,13 +134,13 @@ function User() {
               Authorization: localStorage.token,
             },
           },
-        );
+        )
       } catch (error) {
         // console.log(error);
-        handleUnauthorized(error, setToken, router);
+        handleUnauthorized(error, setToken, router)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -358,7 +359,7 @@ function User() {
         </Modal>
       )}
     </>
-  );
+  )
 }
 
-export default User;
+export default User

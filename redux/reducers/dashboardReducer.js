@@ -44,7 +44,7 @@ export default function (state = initialState, action) {
     case SET_PAGE:
       return { ...state, page: action.payload }
     case SET_BATCH:
-      return { ...state, page: action.payload }
+      return { ...state, batch: action.payload }
     default:
       return state
   }

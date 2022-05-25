@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import Jsona from 'jsona'
 import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
@@ -13,12 +12,11 @@ import {
 } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
 import { fetchUser } from '../../../redux/actions/usersActions'
+import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
 
-function User({ currentUser, fetchUser, user }) {
+function User({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
-  // const [user, setUser] = useState(null)
   const [updatingUser, setUpdatingUser] = useState(false)
-  const [salaries, setSalaries] = useState([])
   const [salary, setSalary] = useState(null)
   const [startDate, setStartDate] = useState(
     new Date().toISOString().slice(0, 10),
@@ -42,34 +40,12 @@ function User({ currentUser, fetchUser, user }) {
     user ? Math.round((leave_balance / total) * 100) : 0
 
   useEffect(() => {
-    const dataFormatter = new Jsona()
-    let user_controller = new AbortController()
     let salary_controller = new AbortController()
 
-    const fetch_salaries = async () => {
-      try {
-        // fetch salaries from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: salary_controller.signal,
-          },
-        )
-
-        setSalaries(dataFormatter.deserialize(response.data.data))
-        salary_controller = null
-      } catch (error) {
-        console.log(error)
-        // handleUnauthorized(error, setToken, router)
-      }
-    }
-
     currentUser && fetchUser(user_id)
-    isAdmin() && fetch_salaries()
+    isAdmin() && fetchAllSalaries()
 
     return () => {
-      user_controller?.abort()
       salary_controller?.abort()
     }
   }, [currentUser])
@@ -336,6 +312,10 @@ function User({ currentUser, fetchUser, user }) {
   )
 }
 
-export default connect((state) => ({ currentUser: state.auth.user, user: state.users.user }), {
-  fetchUser,
-})(User)
+export default connect(
+  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  {
+    fetchUser,
+    fetchAllSalaries,
+  },
+)(User)

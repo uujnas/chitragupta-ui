@@ -6,6 +6,7 @@ import {
   SET_FETCH_ALL_RECORDS,
   SET_PAGE,
   SET_BATCH,
+  SHOW_MODAL,
 } from '../actions/types'
 
 const dataFormatter = new Jsona()
@@ -17,6 +18,7 @@ const initialState = {
   fetchAllRecords: false,
   page: 1,
   batch: 10,
+  showModal: false,
 }
 
 export default function (state = initialState, action) {
@@ -44,7 +46,9 @@ export default function (state = initialState, action) {
     case SET_PAGE:
       return { ...state, page: action.payload }
     case SET_BATCH:
-      return { ...state, batch: action.payload }
+      return { ...state, page: action.payload }
+    case SHOW_MODAL:
+      return { ...state, showModal: action.payload }
     default:
       return state
   }

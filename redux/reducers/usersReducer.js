@@ -1,18 +1,18 @@
-// import { GET_USERS, USERS_LOADING, GET_RECORDS } from './types'
+import { GET_USER } from '../actions/types'
 
-// const initialState = {
-//   loading: false,
-//   selectedUser: {},
-//   userModal: false,
-//   users: []
-// }
+const initialState = {
+  loading: false,
+  user: {},
+}
 
-// export default (state = initalState, action) => {
-//   switch (action.type) {
-//     case USERS_LOADING:
-//       return {
-//         ...state, loading: true
-//       }
-
-//   }
-// }
+export default (state = initialState, action) => {
+  switch (action.type) {
+    case GET_USER:
+      return {
+        ...state,
+        user: action.payload,
+      }
+    default:
+      return state
+  }
+}

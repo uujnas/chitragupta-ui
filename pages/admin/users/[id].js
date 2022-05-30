@@ -1,117 +1,68 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import Jsona from 'jsona';
-import Navbar from '../../../components/layout/Navbar';
+import { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
   Label,
   Select,
   Input,
   Option,
-} from '../../../components/formComponents';
-import { useGlobalContext } from '../../../context';
-import Modal from '../../../components/modal';
-import { handleUnauthorized } from '../../../lib/utils';
+} from '../../../components/formComponents'
+import Modal from '../../../components/modal'
+import { fetchUser } from '../../../redux/actions/usersActions'
+import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
 
-function User() {
-  const { isAdmin, setToken } = useGlobalContext();
-  const [user, setUser] = useState(null);
-  const [updatingUser, setUpdatingUser] = useState(false);
-  const [salaries, setSalaries] = useState([]);
-  const [salary, setSalary] = useState(null);
+function User({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) {
+  const isAdmin = () => currentUser && currentUser.role === 'admin'
+  const [updatingUser, setUpdatingUser] = useState(false)
+  const [salary, setSalary] = useState(null)
   const [startDate, setStartDate] = useState(
     new Date().toISOString().slice(0, 10),
-  );
-  const [status, setStatus] = useState(null);
-  const [errors, setErrors] = useState({});
-  const router = useRouter();
-  const { id: user_id } = router.query;
+  )
+  const [status, setStatus] = useState(null)
+  const [errors, setErrors] = useState({})
+  const router = useRouter()
+  const { id: user_id } = router.query
 
-  const MAX_SICK_LEAVE_BALANCE = 5;
-  const MAX_PAID_LEAVE_BALANCE = 18;
-  const MAX_UNPAID_LEAVE_BALANCE = 25;
+  const MAX_SICK_LEAVE_BALANCE = 5
+  const MAX_PAID_LEAVE_BALANCE = 18
+  const MAX_UNPAID_LEAVE_BALANCE = 25
 
   const statuses = [
     { id: 0, status: 'invited' },
     { id: 1, status: 'active' },
     { id: 2, status: 'disabled' },
-  ];
+  ]
 
   const leave_percentage = (leave_balance, total) =>
-    user ? Math.round((leave_balance / total) * 100) : 0;
+    user ? Math.round((leave_balance / total) * 100) : 0
 
   useEffect(() => {
-    const dataFormatter = new Jsona();
-    let user_controller = new AbortController();
-    let salary_controller = new AbortController();
+    let salary_controller = new AbortController()
 
-    const fetch_user = async (user_id) => {
-      try {
-        // fetch user from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: user_controller.signal,
-          },
-        );
-
-        const deserialized_user_data = dataFormatter.deserialize(response.data);
-
-        setUser(deserialized_user_data);
-        setSalary(
-          deserialized_user_data.active_salary &&
-            deserialized_user_data.active_salary.id,
-        );
-        user_controller = null;
-      } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router);
-      }
-    };
-
-    const fetch_salaries = async () => {
-      try {
-        // fetch salaries from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: salary_controller.signal,
-          },
-        );
-
-        setSalaries(dataFormatter.deserialize(response.data));
-        salary_controller = null;
-      } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router);
-      }
-    };
-
-    fetch_user(user_id);
-    fetch_salaries();
+    currentUser && fetchUser(user_id)
+    isAdmin() && fetchAllSalaries()
 
     return () => {
-      user_controller?.abort();
-      salary_controller?.abort();
-    };
-  }, []);
+      salary_controller?.abort()
+    }
+  }, [currentUser])
 
   const checkIfFormIsValid = () => {
-    let errorCount = 0;
+    let errorCount = 0
     if (!salary) {
-      errors.salary = "Can't be blank.";
+      errors.salary = "Can't be blank."
       // console.log(errors);
-      setErrors({ ...errors });
-      errorCount += 1;
+      setErrors({ ...errors })
+      errorCount += 1
     }
 
-    return errorCount;
-  };
+    return errorCount
+  }
 
-  const updateUserSalary = async () => {
+  const updateUser = async () => {
     if (checkIfFormIsValid() === 0) {
       // make request to remote api to create or update user salary
       try {
@@ -133,13 +84,13 @@ function User() {
               Authorization: localStorage.token,
             },
           },
-        );
+        )
       } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router);
+        console.log(error)
+        // handleUnauthorized(error, setToken, router)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -351,14 +302,20 @@ function User() {
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={updateUserSalary}>
+            <Btn className="bg-green-400" onClick={updateUser}>
               Submit
             </Btn>
           </div>
         </Modal>
       )}
     </>
-  );
+  )
 }
 
-export default User;
+export default connect(
+  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  {
+    fetchUser,
+    fetchAllSalaries,
+  },
+)(User)

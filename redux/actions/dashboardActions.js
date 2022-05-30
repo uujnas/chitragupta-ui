@@ -59,6 +59,12 @@ export const fetchSalaries = () => (dispatch, getState) => {
     })
 }
 
+export const fetchAllSalaries = () => (dispatch) => {
+  dispatch(setBatch(null))
+  dispatch(setPage(null))
+  dispatch(fetchSalaries())
+}
+
 export const fetchSalarySettings = () => (dispatch, getState) => {
   dispatch(setLoadingState(true))
 

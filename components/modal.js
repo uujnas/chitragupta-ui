@@ -1,20 +1,19 @@
-import React from 'react';
 import {
   ModalBody,
   ModalBox,
   ModalContainer,
   ModalHeader,
-  ModalOverlay
+  ModalOverlay,
 } from './modalComponents';
 
-const Modal = ({ children, showModal, setShowModal, user }) => {
+function Modal({ children, showModal, setShowModal, title }) {
   return (
     <ModalContainer>
       <ModalOverlay aria-hidden="true">
         <ModalBox>
           <ModalHeader>
             <h4 className="text-lg font-semibold text-gray-900 lg:text-xl ">
-              {user}
+              {title}
             </h4>
             <button
               type="button"
@@ -33,18 +32,16 @@ const Modal = ({ children, showModal, setShowModal, user }) => {
                   fillRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                   clipRule="evenodd"
-                ></path>
+                />
               </svg>
             </button>
           </ModalHeader>
-          <div className="flex items-center px-6 py-2 mx-auto mt-4 text-sm bg-green-100 rounded w-fit">
-            <div className="text-green-600">Sick Leave Balance : 5</div>
-          </div>
+
           <ModalBody>{children}</ModalBody>
         </ModalBox>
       </ModalOverlay>
     </ModalContainer>
   );
-};
+}
 
 export default Modal;

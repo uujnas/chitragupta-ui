@@ -5,7 +5,7 @@ export const columns = [
     id: 'device_type',
     Cell: ({ row }) => {
       const { device_type } = row.original
-      return device_type.device_type
+      return device_type.type
     },
   },
   {

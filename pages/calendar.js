@@ -190,7 +190,7 @@ function Calendar({ user }) {
               },
             )
 
-            const leave_requests = dataFormatter.deserialize(response.data)
+            const leave_requests = dataFormatter.deserialize(response.data.data)
 
             return leave_requests.map((leave) => ({
               ...leave,

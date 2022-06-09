@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { addGreptcha, getCaptchaScore } from "../../lib/utils";
+import { addGreptcha } from "../../lib/utils";
+import { acceptInvitation } from "../../redux/actions/authActions";
+import { connect } from "react-redux";
 
-const InvitationAccept = () => {
+const InvitationAccept = ({acceptInvitation}) => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [error, setError] = useState("");
@@ -16,47 +18,7 @@ const InvitationAccept = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (password.length < 8) {
-      setError("Password length must be greater than 8.");
-      return;
-    } else if (password !== passwordConfirmation) {
-      setError("Password and confirmation does not match...");
-      return;
-    }
-
-    try {
-      const score = await getCaptchaScore();
-
-      if (score > 0.6) {
-        const response = await axios.put(
-          "http://localhost:4000/users/invitation.json",
-          {
-            user: {
-              invitation_token,
-              password,
-              password_confirmation: passwordConfirmation,
-            },
-          }
-        );
-
-        if (response.statusText == "OK") {
-          // set localstorage token
-          localStorage.setItem(
-            "token",
-            `Bearer ${response.headers.authorization}`
-          );
-          // set user id
-          localStorage.setItem("user_id", response.data.user.id);
-          // redirect to page where user will fill rest of the info
-          router.push("/users/profile_form");
-        } else {
-          // show error message
-          setError("Failed to set password");
-        }
-      }
-    } catch (error) {
-      setError(error.message);
-    }
+    acceptInvitation(invitation_token, password, passwordConfirmation)
   };
 
   return (
@@ -116,4 +78,6 @@ const InvitationAccept = () => {
   );
 };
 
-export default InvitationAccept;
+export default connect(() => ({}), {
+  acceptInvitation
+}) (InvitationAccept);

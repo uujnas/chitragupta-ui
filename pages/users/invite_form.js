@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { addGreptcha, getCaptchaScore } from "../../lib/utils";
+import { addGreptcha } from "../../lib/utils";
+import {connect} from "react-redux";
+import { invitationFormSubmit } from "../../redux/actions/authActions";
 
-const InviteForm = () => {
+const InviteForm = ({ invitationFormSubmit }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -12,36 +13,7 @@ const InviteForm = () => {
   const formSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const score = await getCaptchaScore();
-
-      if (score > 0.6) {
-        try {
-          const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/invite.json`,
-            {
-              email,
-            },
-            { headers: { Authorization: localStorage.token } }
-          );
-
-          if (response.statusText == "OK") {
-            setSuccess("Successfully invited user...");
-            setError("");
-          } else {
-            setError("Failed to invite user...");
-          }
-        } catch (error) {
-          setError(error.response.data.message || error.response.data.error);
-          setSuccess("");
-        }
-      } else {
-        setError("Are you a robot?");
-      }
-    } catch (error) {
-      setError(error.message);
-      console.log(error);
-    }
+    invitationFormSubmit(email)
   };
 
   return (
@@ -58,17 +30,17 @@ const InviteForm = () => {
             <span className="text-green-500">{success}</span>
           </div>
         )}
-        <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full px-3">
+        <div className="flex flex-wrap -mx-3 mb-6">
+          <div className="w-full px-3">
             <label
-              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="pan-number"
+              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              htmlFor="email"
             >
               Email
             </label>
             <input
-              class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="pan-number"
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              id="email"
               type="email"
               onChange={(e) => {
                 setSuccess("");
@@ -89,4 +61,6 @@ const InviteForm = () => {
   );
 };
 
-export default InviteForm;
+export default connect(() => ({}), {
+  invitationFormSubmit
+}) (InviteForm);

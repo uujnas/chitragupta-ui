@@ -26,7 +26,6 @@ const RouteGuard = (props) => {
   }
 
   useEffect(() => {
-    debugger
     const token = localStorage.getItem('token')
     if (token) {
       props.setToken(token)

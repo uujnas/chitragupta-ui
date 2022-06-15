@@ -7,6 +7,7 @@ const InviteForm = ({ invitationFormSubmit }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [captcha, setCaptcha] = useState(false);
 
   useEffect(() => addGreptcha(), []);
 
@@ -53,6 +54,7 @@ const InviteForm = ({ invitationFormSubmit }) => {
         <button
           className="inline-block px-4 py-2 text-white bg-blue-500 rounded"
           onClick={(e) => formSubmit(e)}
+          disabled={captcha}
         >
           Invite
         </button>

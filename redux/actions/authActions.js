@@ -177,8 +177,6 @@ export const acceptInvitation = (invitation_token , password, passwordConfirmati
       );
 
       if (response.statusText === "OK") {
-
-        debugger
         // set localstorage token
         localStorage.setItem(
             "token",

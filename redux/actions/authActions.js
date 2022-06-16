@@ -48,7 +48,7 @@ export const loadUser = () => (dispatch, getState) => {
 //* log in user
 export const login =
   ({ email, password }) =>
-  (dispatch) => {
+  async (dispatch) => {
     // headers
     const config = {
       headers: {
@@ -57,28 +57,33 @@ export const login =
     }
     // request body
     const body = JSON.stringify({ user: { email, password } })
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
-        body,
-        config,
-      )
-      .then((res) => {
-        dispatch(clearErrors())
-        dispatch(
-          returnAlerts('Logged in successfully', res.status, 'LOGIN_SUCCESS'),
-        )
-        dispatch({ type: LOGIN_SUCCESS, payload: res })
-        dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
-      })
-      .catch((err) => {
-        dispatch(
-          returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL'),
-        )
-        dispatch({
-          type: LOGIN_FAIL,
-        })
-      })
+    const score = await getCaptchaScore()
+    if (score > 0.6) {
+      axios
+          .post(
+              `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
+              body,
+              config,
+          )
+          .then((res) => {
+            dispatch(clearErrors())
+            dispatch(
+                returnAlerts('Logged in successfully', res.status, 'LOGIN_SUCCESS'),
+            )
+            dispatch({ type: LOGIN_SUCCESS, payload: res })
+            dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
+          })
+          .catch((err) => {
+            dispatch(
+                returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL'),
+            )
+            dispatch({
+              type: LOGIN_FAIL,
+            })
+          })
+    } else {
+      dispatch(returnErrors("Are you a robot?", 400, "CAPTCHA_FAILED"))
+    }
   }
 
 //* logout user

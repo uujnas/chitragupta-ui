@@ -10,12 +10,12 @@ import {
   Btn,
 } from '../components/formComponents'
 import { login, loadUser } from '../redux/actions/authActions'
+import { addGreptcha } from "../lib/utils";
 
 function Login(props) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
 
   const getRedirect = () =>
     router.query && router.query.returnUrl ? router.query.returnUrl : '/'
@@ -27,82 +27,18 @@ function Login(props) {
     }
   }
 
-  const handleScoreResponse = async (score) => {
-    if (score > 0.7) {
-      const user = {
-        email,
-        password,
-      }
-      props.login(user)
-    } else {
-      setError('Are you a robot?')
-    }
-  }
-
   useEffect(() => token_verified(), [props.isAuthenticated])
 
-  useEffect(() => {
-    const recaptcha_script = document.createElement('script')
-    recaptcha_script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}`
-    recaptcha_script.id = 'recaptcha'
-    document.head.append(recaptcha_script)
-
-    // clean up
-    return () => {
-      recaptcha_script.remove()
-    }
-  }, [])
-
-  // const handleSubmit = (e) => {
-  //   const user = {
-  //     email,
-  //     password,
-  //   }
-  //   props.login(user)
-  //   e.preventDefault()
-  // }
+  useEffect(() => { addGreptcha() }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // TODO: move the captcha logic to utils or libs
-    // the logic should be modular and needs implementation in other pages like password confirmations...
-    // first we will check captcha score
-    grecaptcha.ready(function async() {
-      grecaptcha
-        .execute(process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY, { action: 'submit' })
-        .then(function (token) {
-          console.log(token)
-          // We must make request to backend from here
-          // if we try to force our way google simply won't let us
-          return axios.get(
-            `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/user_scores`,
-            { params: { token: token } },
-          )
-        })
-        .then((response) => {
-          handleScoreResponse(response.data.score)
-        })
-        .catch((error) => {
-          debugger
-          setError(
-            error.response.data.message ||
-              error.response.data.error ||
-              error.message,
-          )
-        })
-    })
+    props.login({ email, password })
   }
   return (
     <section className="my-8 pt-14">
       <FormContainer>
-        <div>
-          {error.length >= 1 ? (
-            <div className="text-red-500 text">{error}</div>
-          ) : (
-            ''
-          )}
-        </div>
         <FormControl>
           <Label>E-mail</Label>
           <Input

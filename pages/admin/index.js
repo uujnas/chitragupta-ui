@@ -32,6 +32,11 @@ function Admin({ user, loading }) {
       description: 'View and manage overtimes',
       link: '/admin/overtimes',
     },
+    {
+      topic: 'Invite User',
+      description: 'Invite new users to the organization',
+      link: '/users/invite_form',
+    }
   ]
 
   return user && !loading && user.role === 'admin' ? (

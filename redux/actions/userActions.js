@@ -1,8 +1,9 @@
 import axios from "axios";
 import {SET_REDIRECT} from "./types";
 import {clearErrors, returnErrors} from "./alertActions";
+import {tokenConfig} from "./authActions";
 
-export const profileFormSubmit = (userId, user) => async (dispatch) => {
+export const profileFormSubmit = (userId, user) => async (dispatch, getState) => {
     try {
         // patch request to user resource remote url
         await axios.put(
@@ -10,7 +11,7 @@ export const profileFormSubmit = (userId, user) => async (dispatch) => {
             {
                 user,
             },
-            {headers: {Authorization: localStorage.token}}
+            tokenConfig(getState)
         );
 
         dispatch(clearErrors())

@@ -32,6 +32,11 @@ function Admin({ user, loading }) {
       description: 'View and manage overtimes',
       link: '/admin/overtimes',
     },
+    {
+      topic: 'Devices',
+      description: 'View and manage devices',
+      link: '/admin/devices',
+    },
   ]
 
   return user && !loading && user.role === 'admin' ? (

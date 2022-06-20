@@ -13,6 +13,7 @@ const RouteGuard = (props) => {
       '/admin/salaries',
       '/admin/salarySettings',
       '/admin/salaryRecords',
+      '/admin/devices',
     ]
     const path = url.split('?')[0]
     if (props.user) {

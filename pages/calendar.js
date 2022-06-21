@@ -19,6 +19,7 @@ const Calendar = ({
                     leave_request,
                     newModal,
                     updateModal,
+                    token,
                     setSelectedLeave,
                     addLeaveRequest,
                     updateLeaveRequest,
@@ -58,7 +59,7 @@ const Calendar = ({
     // make request to remote API to get leave request detail
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}`,
-      {headers: {Authorization: localStorage.token}},
+      {headers: {Authorization: token}},
     )
 
     setSelectedLeave(dataFormatter.deserialize(response.data))
@@ -85,7 +86,7 @@ const Calendar = ({
               `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
               {
                 params: {start, end, all_leaves: true},
-                headers: {Authorization: localStorage.token},
+                headers: {Authorization: token},
               },
             )
 
@@ -114,7 +115,7 @@ const Calendar = ({
           <div>
             <div className="flex justify-between">
               <LeaveBalanceBadge
-                label={'Sick Leave Balance'}
+                label='Sick Leave Balance'
                 balance={user.sick_leave_balance || 0}
               />
               <LeaveBalanceBadge
@@ -274,6 +275,7 @@ const mapStateToProps = (state) => ({
   leave_request: state.leave.selectedLeave,
   newModal: state.modal.newModal,
   updateModal: state.modal.updateModal,
+  token: state.auth.token
 })
 export default connect(mapStateToProps, {
   setSelectedLeave,

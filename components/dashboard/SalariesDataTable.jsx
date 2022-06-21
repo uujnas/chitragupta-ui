@@ -1,7 +1,5 @@
 import { connect } from 'react-redux'
 import { useState } from 'react'
-import axios from 'axios'
-import Jsona from 'jsona'
 import DataTable from './DataTable'
 import { columns } from '../../data/salariesTableData'
 import { TableContainer } from '../modalComponents'
@@ -9,13 +7,13 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { fetchSalaries } from '../../redux/actions/dashboardActions'
+import { createSalary } from '../../redux/actions/salaryActions'
 
-function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
+const SalariesDataTable = ({ fetchSalaries, createSalary }) => {
   const [salary, setSalary] = useState({})
   const [createNewSalary, setCreateNewSalary] = useState(false)
   const [errors, setErrors] = useState({})
 
-  const dataFormatter = new Jsona()
   const creatingNewSalary = () => setCreateNewSalary(true)
   const numberRegEx = /^\d+.?\d*$/
 
@@ -47,29 +45,10 @@ function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
     return errorCount
   }
 
-  const createSalary = async () => {
+  const newSalary = async () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          {
-            salary,
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-
-        if (response.statusText === 'OK') {
-          setSalaries([dataFormatter.deserialize(response.data), ...salaries])
-          setCreateNewSalary(false)
-          setSalary({})
-        }
-      } catch (error) {
-        // error block of code
-      }
+      createSalary(salary)
+      setCreateNewSalary(false)
     }
   }
 
@@ -113,7 +92,7 @@ function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
             ))}
           </div>
 
-          <Btn className="bg-teal-500 hover:bg-teal-600" onClick={createSalary}>
+          <Btn className="bg-teal-500 hover:bg-teal-600" onClick={() => newSalary()}>
             Submit
           </Btn>
         </Modal>
@@ -122,4 +101,4 @@ function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
   )
 }
 
-export default connect(() => ({}), { fetchSalaries })(SalariesDataTable)
+export default connect(() => ({}), { fetchSalaries, createSalary })(SalariesDataTable)

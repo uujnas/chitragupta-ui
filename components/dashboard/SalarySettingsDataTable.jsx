@@ -8,8 +8,15 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import SalarySettingForm from '../salarySettingForm'
 import { fetchSalarySettings } from '../../redux/actions/dashboardActions'
+import {createNewSalarySetting, remoteUpdateSalarySetting} from '../../redux/actions/salarySettingActions'
 
-const SalariesDataTable = ({ fetchSalarySettings }) => {
+function SalariesDataTable({
+  salarySettings,
+  setSalarySettings,
+  fetchSalarySettings,
+  createNewSalarySetting,
+  remoteUpdateSalarySetting
+}) {
   const [salarySetting, setSalarySetting] = useState({})
   const [createNew, setCreateNew] = useState(false)
   const [errors, setErrors] = useState({})
@@ -72,55 +79,17 @@ const SalariesDataTable = ({ fetchSalarySettings }) => {
     return errorCount
   }
 
-  const createSalarySetting = async () => {
+  const createSalarySetting = () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings.json`,
-          {
-            salary_setting: {
-              ...salarySetting,
-              tax_rules_attributes: taxRules,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-
-        if (response.statusText === 'OK') {
-          setCreateNew(false)
-          setSalarySetting({})
-          setTaxRules([])
-        }
-      } catch (error) {
-        // console.log(error);
-      }
+      createNewSalarySetting(salarySetting, taxRules)
+      setCreateNew(false)
     }
   }
 
-  const remoteUpdateSalarySetting = async () => {
+  const sendUpdateSalarySettingRequest = () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings/${salarySetting.id}.json`,
-          {
-            salary_setting: {
-              ...salarySetting,
-              tax_rules_attributes: taxRules,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-      } catch (error) {
-        // console.log(error);
-      }
+      remoteUpdateSalarySetting(salarySetting, taxRules)
+      setUpdatingSalarySetting(false)
     }
   }
 
@@ -216,7 +185,7 @@ const SalariesDataTable = ({ fetchSalarySettings }) => {
             salarySetting={salarySetting}
             errors={errors}
             taxRules={taxRules}
-            onSubmit={remoteUpdateSalarySetting}
+            onSubmit={sendUpdateSalarySettingRequest}
             setTaxRules={setTaxRules}
             updateTaxRules={updateTaxRules}
             removeTaxRule={removeTaxRule}
@@ -227,4 +196,4 @@ const SalariesDataTable = ({ fetchSalarySettings }) => {
   )
 }
 
-export default connect(() => ({}), { fetchSalarySettings })(SalariesDataTable)
+export default connect(() => ({}), { fetchSalarySettings, createNewSalarySetting, remoteUpdateSalarySetting })(SalariesDataTable)

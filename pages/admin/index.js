@@ -33,6 +33,11 @@ function Admin({ user, loading }) {
       link: '/admin/overtimes',
     },
     {
+      topic: 'Device Types',
+      description: 'View and manage device types',
+      link: '/admin/deviceTypes',
+    },
+    {
       topic: 'Devices',
       description: 'View and manage devices',
       link: '/admin/devices',

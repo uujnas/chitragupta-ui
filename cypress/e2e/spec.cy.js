@@ -11,7 +11,7 @@ describe('Navigation', () => {
     cy.contains('Forgot Password')
 
     // write email
-    cy.get('[type=email]').type('dit.subas1@gmail.com')
+    cy.get('[type=email]').type('dit.subas@gmail.com')
     cy.get('[type=password]').type('foobar')
 
     cy.wait(1000)

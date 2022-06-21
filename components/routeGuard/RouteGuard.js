@@ -47,7 +47,7 @@ const RouteGuard = (props) => {
       props.loadUser()
     }
     pathCheck(router.asPath)
-  }, [props.redirect])
+  }, [props.redirect, props.user])
   return props.children
 }
 

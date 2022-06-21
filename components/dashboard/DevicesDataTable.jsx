@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import Jsona from 'jsona'
-import { Btn } from '../formComponents'
+import { Btn, Label, Select, Option } from '../formComponents'
 import Modal from '../modal'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import DataTable from './DataTable'
@@ -23,7 +23,7 @@ function DevicesDataTable({ fetchDevices }) {
   }
 
   const checkIfFormIsValid = () => {
-    ;['device_type', 'identifier', 'status', 'image'].forEach((field) => {
+    ;['device_type_id', 'identifier', 'status', 'images'].forEach((field) => {
       if (device[field] === undefined) {
         setErrors({ ...errors, [field]: "Can't be blank." })
       }
@@ -39,65 +39,96 @@ function DevicesDataTable({ fetchDevices }) {
 
   return (
     <>
-    <TableContainer>
-    <div className="flex justify-end py-4">
-    <Btn
-    className="bg-teal-500 hover:bg-teal-600"
-    onClick={creatingNewDevice}
-    >
-    New Device
-    </Btn>
-    </div>
-    <DataTable
-    rowClick={() => console.log('row clicked')}
-    columns={columns}
-    fetchFunction={fetchDevices}
-    />
-    </TableContainer>
-    {createNewDevice && (
-      <Modal
-      showModal={createNewDevice}
-      setShowModal={setCreateNewDevice}
-      title="New Device"
-      >
-      <div className="flex flex-wrap">
-      {['device_type', 'identifier', 'status', 'image'].map((field) => {
-        if (field === 'image') {
-          return (
-            <InputWithLabelAndError
-            name={field}
-            onChange={updateDevice}
-            value={device[field]}
-            errors={errors}
-            type={'file'}
-            />
-            )
-          } else {
-            return (
-              <InputWithLabelAndError
-              name={field}
-              onChange={updateDevice}
-              value={device[field]}
-              errors={errors}
-              />
-              )
-            }
-          })}
+      <TableContainer>
+        <div className="flex justify-end py-4">
+          <Btn
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={creatingNewDevice}
+          >
+            New Device
+          </Btn>
+        </div>
+        <DataTable
+          rowClick={() => console.log('row clicked')}
+          columns={columns}
+          fetchFunction={fetchDevices}
+        />
+      </TableContainer>
+      {createNewDevice && (
+        <Modal
+          showModal={createNewDevice}
+          setShowModal={setCreateNewDevice}
+          title="New Device"
+        >
+          <div className="flex flex-wrap">
+            {['device_type', 'identifier', 'images'].map((field) => {
+              if (field === 'images') {
+                return (
+                  <InputWithLabelAndError
+                    name={field}
+                    onChange={updateDevice}
+                    value={device[field]}
+                    errors={errors}
+                    type={'file'}
+                  />
+                )
+              } else {
+                return (
+                  <InputWithLabelAndError
+                    name={field}
+                    onChange={updateDevice}
+                    value={device[field]}
+                    errors={errors}
+                  />
+                )
+              }
+            })}
+
+            <div className="w-status">
+              <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                Status
+              </Label>
+              <Select
+                className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                name="status"
+                onClick={updateDevice}
+                errrors={errors}
+              >
+                <Option>Please Select one</Option>
+                <Option
+                  value="available"
+                  selected={device.status == 'available'}
+                >
+                  available
+                </Option>
+                <Option
+                  value="unavailable"
+                  selected={device.status == 'unavailable'}
+                >
+                  unavailable
+                </Option>
+                <Option
+                  value="dysfunctional"
+                  selected={device.status == 'dysfunctional'}
+                >
+                  dysfunctional
+                </Option>
+              </Select>
+            </div>
           </div>
 
           <Btn
-          className="bg-teal-500 hover:bg-teal-600"
-          onClick={() => newDevice()}
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={() => newDevice()}
           >
-          Submit
+            Submit
           </Btn>
-          </Modal>
-          )}
-          </>
-          )
-        }
+        </Modal>
+      )}
+    </>
+  )
+}
 
-        export default connect(() => ({}), { fetchDevices, createDevice })(
-          DevicesDataTable,
-          )
-          
+export default connect(() => ({}), { fetchDevices, createDevice })(
+  DevicesDataTable,
+)

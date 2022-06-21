@@ -22,19 +22,19 @@ function DevicesDataTable({ fetchDevices, createDevice }) {
     setDevice({ ...device, [e.target.name]: e.target.value })
   }
 
-  const checkIfFormIsValid = () => {
-    ;['device_type_id', 'identifier', 'status', 'images'].forEach((field) => {
-      if (device[field] === undefined) {
-        setErrors({ ...errors, [field]: "Can't be blank." })
-      }
-    })
-  }
+  // const checkIfFormIsValid = () => {
+  //   ;['device_type', 'identifier', 'status', 'image'].forEach((field) => {
+  //     if (device[field] === undefined) {
+  //       setErrors({ ...errors, [field]: "Can't be blank." })
+  //     }
+  //   })
+  // }
 
   const newDevice = async () => {
-    if (checkIfFormIsValid() === 0) {
-      createDevice(device)
-      setCreateNewDevice(false)
-    }
+    // if (checkIfFormIsValid() === 0) {
+    createDevice(device)
+    setCreateNewDevice(false)
+    // }
   }
 
   return (

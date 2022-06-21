@@ -9,7 +9,6 @@ import { useGlobalContext } from '../../../context'
 
 function Devices() {
   const router = useRouter()
-  // const { setToken } = useGlobalContext()
   const [devices, setDevices] = useState([])
 
   return (

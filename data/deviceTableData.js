@@ -8,15 +8,7 @@ export const columns = [
       return device_type.device_type
     },
   },
-  {
-    Header: 'Username',
-    accessor: 'Username',
-    id: 'username',
-    Cell: ({ row }) => {
-      const { user } = row.original
-      return user ? `${user.first_name} ${user.last_name}` : ''
-    },
-  },
+
   {
     Header: 'Identifier',
     accessor: 'identifier',

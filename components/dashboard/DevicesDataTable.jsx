@@ -11,7 +11,7 @@ import { TableContainer } from '../modalComponents'
 import { fetchDevices } from '../../redux/actions/dashboardActions'
 import { createDevice } from '../../redux/actions/deviceActions'
 
-function DevicesDataTable({ fetchDevices }) {
+function DevicesDataTable({ fetchDevices, createDevice }) {
   const [device, setDevice] = useState({})
   const [createNewDevice, setCreateNewDevice] = useState(false)
   const [errors, setErrors] = useState({})

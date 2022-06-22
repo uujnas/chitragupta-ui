@@ -161,6 +161,54 @@ export const fetchDevices = () => (dispatch, getState) => {
     })
 }
 
+export const fetchDeviceUsers = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_users.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchDeviceManagers = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_managers.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
 export const fetchOvertimes = () => (dispatch, getState) => {
   dispatch(setLoadingState(true))
 

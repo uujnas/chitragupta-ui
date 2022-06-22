@@ -14,7 +14,7 @@ function InputWithLabelAndError({ name, errors, value, onChange, type }) {
         name={name}
         value={value}
         onChange={onChange}
-        type={type || 'text'}
+        type={type}
         className={errors[name] ? 'border-red-500' : ''}
       />
       {errors[name] && (

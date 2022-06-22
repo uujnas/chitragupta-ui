@@ -7,7 +7,7 @@ export const createDeviceUser = (deviceUser) => async (dispatch, getState) => {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_users.json`,
       {
-        deviceUser,
+        device_user: deviceUser,
       },
       {
         headers: {

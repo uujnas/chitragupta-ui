@@ -7,7 +7,10 @@ export const createDevice = (device) => async (dispatch, getState) => {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/devices.json`,
       {
-        device,
+        device: {
+          ...device,
+          device_type_attributes: device_type,
+        },
       },
       {
         headers: {
@@ -31,3 +34,5 @@ export const createDevice = (device) => async (dispatch, getState) => {
     )
   }
 }
+
+

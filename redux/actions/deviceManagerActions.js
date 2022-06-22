@@ -8,7 +8,7 @@ export const createDeviceManager =
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_managers.json`,
         {
-          deviceManager,
+          device_manager: deviceManager,
         },
         {
           headers: {

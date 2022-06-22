@@ -42,6 +42,16 @@ function Admin({ user, loading }) {
       description: 'View and manage devices',
       link: '/admin/devices',
     },
+    {
+      topic: 'Device Users',
+      description: 'View and manage device users',
+      link: '/admin/deviceUsers',
+    },
+    {
+      topic: 'Device Managers',
+      description: 'View and manage device managers',
+      link: '/admin/deviceManagers',
+    },
   ]
 
   return user && !loading && user.role === 'admin' ? (

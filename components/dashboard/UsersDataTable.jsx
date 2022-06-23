@@ -1,31 +1,31 @@
-import { useState } from 'react';
-import { CSVLink } from 'react-csv';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import { columns } from '../../data/usersTableData';
-import { Btn } from '../formComponents';
-import { useGlobalContext } from '../../context';
-import DataTable from './DataTable';
-import Alert from '../alert';
+import { useState } from 'react'
+import { connect } from 'react-redux'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+import { columns } from '../../data/usersTableData'
+import { Btn } from '../formComponents'
+import DataTable from './DataTable'
+import Alert from '../alert'
+import { fetchUsers } from '../../redux/actions/usersActions'
 
-function UsersDataTable() {
-  const { users } = useGlobalContext();
-  const router = useRouter();
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+const UsersDataTable = ({ fetchUsers }) => {
+  // const { users } = useGlobalContext()
+  const router = useRouter()
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-  const rowClick = (row) => router.push(`/admin/users/${row.original.id}`);
+  const rowClick = (row) => router.push(`/admin/users/${row.original.id}`)
 
-  const exportData = users.map((d) => Object.values(d));
+  // const exportData = users.map((d) => Object.values(d))
 
   const handleBulkImport = async () => {
-    setError('');
-    setSuccess('');
+    setError('')
+    setSuccess('')
 
-    const formData = new FormData();
-    const csv = document.querySelector('#file-upload');
+    const formData = new FormData()
+    const csv = document.querySelector('#file-upload')
 
-    formData.append('userFile', csv.files[0]);
+    formData.append('userFile', csv.files[0])
 
     try {
       const response = await axios.post(
@@ -37,17 +37,17 @@ function UsersDataTable() {
             Authorization: localStorage.token,
           },
         },
-      );
+      )
 
       if (response.statusText === 'OK') {
-        setSuccess(response.data.message);
+        setSuccess(response.data.message)
       }
     } catch (rerror) {
       setError(
         (rerror.response && rerror.response.data.message) || rerror.message,
-      );
+      )
     }
-  };
+  }
 
   return (
     <>
@@ -65,35 +65,37 @@ function UsersDataTable() {
         setError={setError}
         setSuccess={setSuccess}
       />
-      {users && (
-        <DataTable data={users} rowClick={rowClick} columns={columns}>
-          <div className="flex justify-between my-4">
-            <Btn
-              className="bg-teal-500 hover:bg-teal-600"
-              onClick={() => document.getElementById('file-upload').click()}
-            >
-              Bulk Upload
-            </Btn>
-            <input
-              type="file"
-              id="file-upload"
-              className="hidden"
-              onChange={handleBulkImport}
-            />
+      <DataTable
+        rowClick={rowClick}
+        columns={columns}
+        fetchFunction={fetchUsers}
+      >
+        <div className="flex justify-between my-4">
+          <Btn
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={() => document.getElementById('file-upload').click()}
+          >
+            Bulk Upload
+          </Btn>
+          <input
+            type="file"
+            id="file-upload"
+            className="hidden"
+            onChange={handleBulkImport}
+          />
 
-            <Btn className="bg-teal-500 hover:bg-teal-600">
-              <CSVLink
-                data={exportData}
-                filename={`${new Date().toISOString().slice(0, 18)}_report.csv`}
-              >
-                Export Data
-              </CSVLink>
-            </Btn>
-          </div>
-        </DataTable>
-      )}
+          {/* <Btn className="bg-teal-500 hover:bg-teal-600">
+            <CSVLink
+              // data={exportData}
+              filename={`${new Date().toISOString().slice(0, 18)}_report.csv`}
+            >
+              Export Data
+            </CSVLink>
+          </Btn> */}
+        </div>
+      </DataTable>
     </>
-  );
+  )
 }
 
-export default UsersDataTable;
+export default connect(() => ({}), { fetchUsers })(UsersDataTable)

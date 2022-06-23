@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import Jsona from 'jsona'
 import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
@@ -11,14 +11,12 @@ import {
   Option,
 } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
-import { handleUnauthorized } from '../../../lib/utils'
+import { fetchUser } from '../../../redux/actions/usersActions'
+import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
 
-function User() {
-  // const { isAdmin, setToken } = useGlobalContext();
-  const isAdmin = () => true
-  const [user, setUser] = useState(null)
+const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
+  const isAdmin = () => currentUser && currentUser.role === 'admin'
   const [updatingUser, setUpdatingUser] = useState(false)
-  const [salaries, setSalaries] = useState([])
   const [salary, setSalary] = useState(null)
   const [startDate, setStartDate] = useState(
     new Date().toISOString().slice(0, 10),
@@ -42,63 +40,15 @@ function User() {
     user ? Math.round((leave_balance / total) * 100) : 0
 
   useEffect(() => {
-    const dataFormatter = new Jsona()
-    let user_controller = new AbortController()
-    let salary_controller = new AbortController()
+    const salary_controller = new AbortController()
 
-    const fetch_user = async (user_id) => {
-      try {
-        // fetch user from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: user_controller.signal,
-          },
-        )
-
-        const deserialized_user_data = dataFormatter.deserialize(response.data)
-
-        setUser(deserialized_user_data)
-        setSalary(
-          deserialized_user_data.active_salary &&
-            deserialized_user_data.active_salary.id,
-        )
-        setStatus(deserialized_user_data.status)
-        user_controller = null
-      } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
-      }
-    }
-
-    const fetch_salaries = async () => {
-      try {
-        // fetch salaries from remote api
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salaries.json`,
-          {
-            headers: { Authorization: localStorage.token },
-            signal: salary_controller.signal,
-          },
-        )
-
-        setSalaries(dataFormatter.deserialize(response.data.data))
-        salary_controller = null
-      } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
-      }
-    }
-
-    fetch_user(user_id)
-    fetch_salaries()
+    currentUser && fetchUser(user_id)
+    isAdmin() && fetchAllSalaries()
 
     return () => {
-      user_controller?.abort()
       salary_controller?.abort()
     }
-  }, [])
+  }, [currentUser])
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
@@ -112,7 +62,7 @@ function User() {
     return errorCount
   }
 
-  const updateUserSalary = async () => {
+  const updateUser = async () => {
     if (checkIfFormIsValid() === 0) {
       // make request to remote api to create or update user salary
       try {
@@ -136,8 +86,8 @@ function User() {
           },
         )
       } catch (error) {
-        // console.log(error);
-        handleUnauthorized(error, setToken, router)
+        console.log(error)
+        // handleUnauthorized(error, setToken, router)
       }
     }
   }
@@ -352,7 +302,7 @@ function User() {
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={updateUserSalary}>
+            <Btn className="bg-green-400" onClick={updateUser}>
               Submit
             </Btn>
           </div>
@@ -362,4 +312,10 @@ function User() {
   )
 }
 
-export default User
+export default connect(
+  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  {
+    fetchUser,
+    fetchAllSalaries,
+  },
+)(User)

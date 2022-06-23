@@ -1,34 +1,26 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable';
-import Navbar from '../components/layout/Navbar';
-import Modal from '../components/modal';
-import { Btn, Input, Label } from '../components/formComponents';
-import LeaveBalanceBadge from '../components/leaveBalanceBadge';
-import Loader from '../components/ui/loader';
+import { connect } from 'react-redux'
+import LeaveRequestDataTable from '../components/dashboard/LeaveRequestDataTable'
+import Navbar from '../components/layout/Navbar'
+import Modal from '../components/modal'
+import { Btn, Input, Label } from '../components/formComponents'
+import LeaveBalanceBadge from '../components/leaveBalanceBadge'
 import {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
   setLeaveModal,
-} from '../redux/actions/leaveActions';
-import { setFetchAllRecords } from '../redux/actions/dashboardActions';
+} from '../redux/actions/leaveActions'
+import { setFetchAllRecords } from '../redux/actions/dashboardActions'
 
-function Home(props) {
-  const isAdmin = () => props.user && props.user.role === 'admin';
+const Home = (props) => {
+  const isAdmin = () => props.user && props.user.role === 'admin'
 
-  useEffect(() => {
-    if (props.token) {
-      props.fetchLeaveRequests(props.fetchAllRecords);
-    }
-  }, [props.token]);
-
-  return !props.leave.loading && props.leave.items ? (
+  return (
     <>
       <Navbar page="Dashboard" subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
         <div className="flex justify-end py-4">
-          <label className="mr-2">All Leaves</label>
+          <span className="mr-2">All Leaves</span>
           <button
             type="button"
             className={`${
@@ -37,8 +29,8 @@ function Home(props) {
             role="switch"
             aria-checked="false"
             onClick={() => {
-              props.setFetchAllRecords(!props.fetchAllRecords);
-              props.fetchLeaveRequests();
+              props.setFetchAllRecords(!props.fetchAllRecords)
+              props.fetchLeaveRequests()
             }}
           >
             <span className="sr-only">Use setting</span>
@@ -54,7 +46,6 @@ function Home(props) {
         <LeaveRequestDataTable
           showModal={props.showModal}
           setShowModal={props.setLeaveModal}
-          leaveRequests={props.leave.items}
           setLeaveRequest={props.setSelectedLeave}
         />
         {props.showModal && (
@@ -90,7 +81,7 @@ function Home(props) {
                 props.setSelectedLeave({
                   ...props.selectedLeave,
                   title: e.target.value,
-                });
+                })
               }}
               disabled={isAdmin()}
             />
@@ -122,8 +113,8 @@ function Home(props) {
                     ...props.selectedLeave,
                     status: 'rejected',
                     approver_id: props.user.id,
-                  });
-                  props.updateLeaveRequest();
+                  })
+                  props.updateLeaveRequest()
                 }}
               >
                 Reject
@@ -137,8 +128,8 @@ function Home(props) {
                     ...props.selectedLeave,
                     status: 'approved',
                     approver_id: props.user.id,
-                  });
-                  props.updateLeaveRequest();
+                  })
+                  props.updateLeaveRequest()
                 }}
               >
                 Approve
@@ -158,9 +149,7 @@ function Home(props) {
         )}
       </div>
     </>
-  ) : (
-    <Loader />
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
@@ -171,11 +160,12 @@ const mapStateToProps = (state) => ({
   showModal: state.leave.leaveModal,
   selectedLeave: state.leave.selectedLeave,
   fetchAllRecords: state.records.fetchAllRecords,
-});
+  loading: state.records.loading,
+})
 export default connect(mapStateToProps, {
   fetchLeaveRequests,
   setSelectedLeave,
   updateLeaveRequest,
   setLeaveModal,
   setFetchAllRecords,
-})(Home);
+})(Home)

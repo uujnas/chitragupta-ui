@@ -1,13 +1,28 @@
-import DataTable from './DataTable';
-import { columns } from '../../data/leaveTableData';
+import { connect } from 'react-redux'
+import DataTable from './DataTable'
+import { columns } from '../../data/leaveTableData'
+import { fetchLeaveRequests } from '../../redux/actions/leaveActions'
 
-function LeaveRequestDataTable({ showModal, setShowModal, setLeaveRequest }) {
+const LeaveRequestDataTable =({
+  showModal,
+  setShowModal,
+  setLeaveRequest,
+  fetchLeaveRequests,
+}) => {
   const rowClick = (row) => {
-    setLeaveRequest(row.original);
-    setShowModal(!showModal);
-  };
+    setLeaveRequest(row.original)
+    setShowModal(!showModal)
+  }
 
-  return <DataTable rowClick={rowClick} columns={columns} />;
+  return (
+    <DataTable
+      rowClick={rowClick}
+      columns={columns}
+      fetchFunction={fetchLeaveRequests}
+    />
+  )
 }
 
-export default LeaveRequestDataTable;
+export default connect(() => ({}), { fetchLeaveRequests })(
+  LeaveRequestDataTable,
+)

@@ -1,17 +1,21 @@
-import { useTable, useSortBy, usePagination } from 'react-table';
-import { connect } from 'react-redux';
-import { fetchRecords, setPage } from '../../redux/actions/dashboardActions';
+import { useEffect } from 'react'
+import { useTable, useSortBy, usePagination } from 'react-table'
+import { connect } from 'react-redux'
+import { setPage } from '../../redux/actions/dashboardActions'
+import Loader from '../ui/loader'
 
-function DataTable({
+const DataTable = ({
   children,
   data,
   rowClick,
   columns,
   total,
-  fetchRecords,
   setPage,
   pageIndex,
-}) {
+  fetchFunction,
+  token,
+  loading,
+}) => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -36,9 +40,13 @@ function DataTable({
     },
     useSortBy,
     usePagination,
-  );
+  )
 
-  return (
+  useEffect(() => {
+    if (token) fetchFunction()
+  }, [token])
+
+  return !loading ? (
     <div className="relative">
       {children}
       <table
@@ -46,8 +54,8 @@ function DataTable({
         className="min-w-full divide-y divide-gray-200"
       >
         <thead className="border-x-0 border-gray-50">
-          {headerGroups.map((headerGroup, index) => (
-            <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()} key={Math.random()}>
               {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
@@ -57,30 +65,17 @@ function DataTable({
                   <div className="flex justify-between">
                     {column.render('Header')}
                     <span>
-                      {column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-sort-down"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
-                          </svg>
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-sort-up"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M3.5 12.5a.5.5 0 0 1-1 0V3.707L1.354 4.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 3.707V12.5zm3.5-9a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
-                          </svg>
-                        )
+                      {column.isSortedDesc ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-sort-down"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
+                        </svg>
                       ) : (
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +97,7 @@ function DataTable({
         </thead>
         <tbody {...getTableBodyProps()}>
           {page.map((row) => {
-            prepareRow(row);
+            prepareRow(row)
             return (
               <tr
                 {...row.getRowProps()}
@@ -110,17 +105,19 @@ function DataTable({
                 onClick={() => rowClick(row)}
                 key={row.id}
               >
-                {row.cells.map((cell, index) => (
+                {row.cells.map((cell) => (
                   <td
                     {...cell.getCellProps()}
                     className="p-2 py-4"
-                    key={`${index} ${row.id} ${cell.value}`}
+                    key={`${new Date().getTime() * Math.random()} ${row.id} ${
+                      cell.value
+                    }`}
                   >
                     {cell.render('Cell')}
                   </td>
                 ))}
               </tr>
-            );
+            )
           })}
         </tbody>
       </table>
@@ -128,9 +125,9 @@ function DataTable({
         <button
           type="button"
           onClick={() => {
-            previousPage();
-            setPage(pageIndex - 1);
-            fetchRecords();
+            previousPage()
+            setPage(pageIndex - 1)
+            fetchFunction()
           }}
           disabled={!canPreviousPage}
           className="px-3 py-2 mr-4 text-white bg-blue-500 rounded"
@@ -146,9 +143,9 @@ function DataTable({
         <button
           type="button"
           onClick={() => {
-            nextPage();
-            setPage(pageIndex + 1);
-            fetchRecords();
+            nextPage()
+            setPage(pageIndex + 1)
+            fetchFunction()
           }}
           disabled={!canNextPage}
           className="px-3 py-2 text-white bg-blue-500 rounded "
@@ -157,13 +154,17 @@ function DataTable({
         </button>
       </div>
     </div>
-  );
+  ) : (
+    <Loader />
+  )
 }
 
 const mapStateToProps = (state) => ({
   data: state.records.records,
   total: state.records.total,
   pageIndex: state.records.page,
-});
+  token: state.auth.token,
+  loading: state.records.loading,
+})
 
-export default connect(mapStateToProps, { fetchRecords, setPage })(DataTable);
+export default connect(mapStateToProps, { setPage })(DataTable)

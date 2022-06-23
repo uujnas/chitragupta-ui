@@ -1,11 +1,11 @@
-import { connect } from 'react-redux';
-import Link from 'next/link';
-import Card from '../../components/card';
-import Navbar from '../../components/layout/Navbar';
-import { Btn } from '../../components/formComponents';
-import Loader from '../../components/ui/loader';
+import { connect } from 'react-redux'
+import Link from 'next/link'
+import Card from '../../components/card'
+import Navbar from '../../components/layout/Navbar'
+import { Btn } from '../../components/formComponents'
+import Loader from '../../components/ui/loader'
 
-function Admin({ user, loading }) {
+const Admin = ({ user, loading }) => {
   const adminPages = [
     {
       topic: 'User',
@@ -27,7 +27,17 @@ function Admin({ user, loading }) {
       description: 'View and manage salary records',
       link: '/admin/salaryRecords',
     },
-  ];
+    {
+      topic: 'Overtimes',
+      description: 'View and manage overtimes',
+      link: '/admin/overtimes',
+    },
+    {
+      topic: 'Invite User',
+      description: 'Invite new users to the organization',
+      link: '/users/invite_form',
+    }
+  ]
 
   return user && !loading && user.role === 'admin' ? (
     <>
@@ -48,11 +58,11 @@ function Admin({ user, loading }) {
     </>
   ) : (
     <Loader />
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
   loading: state.auth.loading,
-});
-export default connect(mapStateToProps)(Admin);
+})
+export default connect(mapStateToProps)(Admin)

@@ -1,220 +1,264 @@
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import FullCalendar from '@fullcalendar/react'; // must go before plugins
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction'; // needed for dayClick
-import { connect } from 'react-redux';
-import Navbar from '../components/layout/Navbar';
-import Modal from '../components/modal';
-import {
-  Input,
-  Label,
-  Select,
-  Option,
-  Btn,
-} from '../components/formComponents';
-import Loader from '../components/ui/loader';
-import LeaveBalanceBadge from '../components/leaveBalanceBadge';
-import {
-  fetchLeaveRequests,
-  getLeaveById,
-  setLeaveModal,
-  setSelectedLeave,
-  updateLeaveRequest,
-  addLeaveRequest,
-} from '../redux/actions/leaveActions';
+import {useState} from 'react'
+import {connect} from 'react-redux'
+import Head from 'next/head'
+import FullCalendar from '@fullcalendar/react' // must go before plugins
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
+import axios from 'axios'
+import Jsona from 'jsona'
+import Modal from '../components/modal'
+import {Input, Label, Select, Option, Btn} from '../components/formComponents'
+import LeaveBalanceBadge from '../components/leaveBalanceBadge'
+import {isAdmin, colorMap, fullCalendarEndDate} from '../lib/utils'
+import Navbar from '../components/layout/Navbar'
+import {addLeaveRequest, setSelectedLeave, updateLeaveRequest} from "../redux/actions/leaveActions";
+import {setNewModal, setUpdateModal} from "../redux/actions/modalActions";
 
-function Calendar(props) {
-  const [editModal, setEditModal] = useState(false);
+const Calendar = ({
+                    user,
+                    leave_request,
+                    newModal,
+                    updateModal,
+                    token,
+                    setSelectedLeave,
+                    addLeaveRequest,
+                    updateLeaveRequest,
+                    setNewModal,
+                    setUpdateModal
+                  }) => {
+  const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (props.user !== null) {
-      props.fetchLeaveRequests(true);
-    }
-  }, [props.user]);
-
-  const isAdmin = () => props.user.role === 'admin';
-
-  const colorMap = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'blue';
-      case 'rejected':
-        return 'red';
-      case 'approved':
-        return 'green';
-      default:
-        return 'blue';
-    }
-  };
+  const dataFormatter = new Jsona()
 
   const createLeaveRequest = (info) => {
+    setError('')
+
     // end date should be the last day of the leave, better not include the present day
-    const endDate = new Date(info.endStr);
-    endDate.setDate(endDate.getDate() - 1);
-    endDate.toLocaleString();
-    props.setSelectedLeave({
-      leave_type: 'sick_leave',
-      start_date: info.startStr,
-      end_date: endDate,
-      status: 'pending',
-    });
-    setEditModal(false);
-    props.setLeaveModal(true);
-  };
+    const endDate = new Date(info.endStr)
+    endDate.setDate(endDate.getDate() - 1)
+    endDate.toLocaleString()
 
-  const updateLeaveRequestModal = async ({ event }) => {
-    const { id } = event;
-    props.getLeaveById(id);
-    setEditModal(true);
-    props.setLeaveModal(true);
-  };
+    setSelectedLeave(
+      {
+        ...leave_request,
+        leave_type: 'sick_leave',
+        start_date: info.startStr,
+        end_date: endDate,
+        status: 'pending',
+      }
+    )
+    setNewModal(true)
+  }
 
-  return props.user || props.loading ? (
+  const updateLeave = async ({event}) => {
+    setError('')
+
+    //  first get id of leave request with
+    const {id} = event
+
+    // make request to remote API to get leave request detail
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}`,
+      {headers: {Authorization: token}},
+    )
+
+    setSelectedLeave(dataFormatter.deserialize(response.data))
+
+    setUpdateModal(true)
+  }
+
+  return (
     <>
       <Head>
         <title>Chitragupta App</title>
-        <meta name="description" content="chitragupta" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="chitragupta"/>
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
-      <Navbar />
+      <Navbar/>
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
-          events={async () => {
-            const leave_requests = props.leave.items;
+          events={async (info) => {
+            const start = info.start.toISOString().substring(0, 10)
+            const end = info.end.toISOString().substring(0, 10)
+
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
+              {
+                params: {start, end, all_leaves: true},
+                headers: {Authorization: token},
+              },
+            )
+
+            const leave_requests = dataFormatter.deserialize(response.data.data)
+
             return leave_requests.map((leave) => ({
               ...leave,
               start: leave.start_date,
-              end: leave.end_date,
+              end: fullCalendarEndDate(leave.end_date),
               color: colorMap(leave.status),
-            }));
+            }))
           }}
           selectable
           editable
           select={createLeaveRequest}
-          eventClick={updateLeaveRequestModal}
+          eventClick={updateLeave}
         />
       </div>
-      {editModal && props.showModal && props.selectedLeave.user && (
+      {newModal && (
         <Modal
-          setShowModal={props.setLeaveModal}
-          showModal={props.showModal}
-          title={`${props.selectedLeave.user.first_name} ${props.selectedLeave.user.last_name}`}
+          setShowModal={setNewModal}
+          showModal={newModal}
+          title='New Leave Request'
+          leaveRequest={leave_request}
         >
-          <div className="flex justify-between">
-            <LeaveBalanceBadge
-              label="Sick Leave Balance"
-              balance={props.selectedLeave.user.sick_leave_balance}
-            />
-            <LeaveBalanceBadge
-              label="Paid Leave Balance"
-              balance={props.selectedLeave.user.paid_leave_balance}
-            />
-            <LeaveBalanceBadge
-              label="Unpaid Leave Balance"
-              balance={props.selectedLeave.user.unpaid_leave_balance}
-            />
-          </div>
           <div>
-            {props.alerts.message && (
-              <span className="text-red-500">
-                {JSON.stringify(props.alerts.message)}
-              </span>
-            )}
+            <div className="flex justify-between">
+              <LeaveBalanceBadge
+                label='Sick Leave Balance'
+                balance={user.sick_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label='Paid Leave Balance'
+                balance={user.paid_leave_balance || 0}
+              />
+              <LeaveBalanceBadge
+                label='Unpaid Leave Balance'
+                balance={user.unpaid_leave_balance || 0}
+              />
+            </div>
+
+            {error !== '' && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
-              onChange={(e) => {
-                props.setSelectedLeave({
-                  ...props.selectedLeave,
-                  leave_type: e.target.value,
-                });
-              }}
-              disabled={isAdmin()}
+              onChange={(e) => setSelectedLeave({...leave_request, leave_type: e.target.value})}
             >
               <Option
                 value="sick_leave"
-                selected={props.selectedLeave.leave_type === 'sick_leave'}
+                selected={leave_request.leave_type === 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
                 value="personal"
-                selected={props.selectedLeave.leave_type === 'personal'}
+                selected={leave_request.leave_type === 'personal'}
               >
                 Personal
               </Option>
               <Option
                 value="others"
-                selected={props.selectedLeave.leave_type === 'others'}
+                selected={leave_request.leave_type === 'others'}
               >
                 Others
               </Option>
             </Select>
+
             <Label>Reason</Label>
             <Input
-              onChange={(e) => {
-                props.setSelectedLeave({
-                  ...props.selectedLeave,
-                  title: e.target.value,
-                });
-              }}
-              value={props.selectedLeave.title}
-              disabled={isAdmin()}
+              onChange={(e) => setSelectedLeave({...leave_request, title: e.target.value})}
+              value={leave_request.title}
             />
 
-            {isAdmin() && (
+            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addLeaveRequest}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
+
+      {updateModal && (
+        <Modal
+          setShowModal={setUpdateModal}
+          showModal={updateModal}
+          title={`${leave_request.user.first_name} ${leave_request.user.last_name}`}
+        >
+          <div className="flex justify-between">
+            <LeaveBalanceBadge
+              label='Sick Leave Balance'
+              balance={leave_request.user.sick_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label='Paid Leave Balance'
+              balance={leave_request.user.paid_leave_balance}
+            />
+            <LeaveBalanceBadge
+              label='Unpaid Leave Balance'
+              balance={leave_request.user.unpaid_leave_balance}
+            />
+          </div>
+          <div>
+            {error !== '' && <span className="mb-2 text-red-500">{error}</span>}
+            <Label>Leave Type</Label>
+            <Select
+              onChange={(e) => setSelectedLeave({...leave_request, leave_type: e.target.value})}
+              disabled={isAdmin(user)}
+            >
+              <Option
+                value="sick_leave"
+                selected={leave_request.leave_type === 'sick_leave'}
+              >
+                Sick Leave
+              </Option>
+              <Option
+                value="personal"
+                selected={leave_request.leave_type === 'personal'}
+              >
+                Personal
+              </Option>
+              <Option
+                value="others"
+                selected={leave_request.leave_type === 'others'}
+              >
+                Others
+              </Option>
+            </Select>
+
+            <Label>Reason</Label>
+            <Input
+              onChange={(e) =>
+                setSelectedLeave({...leave_request, title: e.target.value})
+              }
+              value={leave_request.title}
+              disabled={isAdmin(user)}
+            />
+
+            {isAdmin(user) && (
               <>
                 <Label>Reply</Label>
                 <Input
-                  value={
-                    props.selectedLeave.reply &&
-                    props.selectedLeave.reply.reason
-                  }
                   onChange={(e) =>
-                    props.setSelectedLeave({
-                      ...props.selectedLeave,
-                      reply: { reason: e.target.value },
-                      reply_attributes: { reason: e.target.value },
+                    setSelectedLeave({
+                      ...leave_request,
+                      reply_attributes: {reason: e.target.value},
                     })
                   }
+                  value={leave_request.reply && leave_request.reply.reason}
                 />
-                {isAdmin() && props.selectedLeave.status !== 'rejected' && (
-                  <Btn
-                    className="bg-red-500 hover:bg-red-600"
-                    onClick={() => {
-                      props.setSelectedLeave({
-                        ...props.selectedLeave,
-                        status: 'rejected',
-                        approver_id: props.user.id,
-                      });
-                      props.updateLeaveRequest();
-                    }}
-                  >
-                    Reject
-                  </Btn>
-                )}
-                {isAdmin() && props.selectedLeave.status !== 'approved' && (
-                  <Btn
-                    className="ml-2 bg-green-500 hover:bg-green-600"
-                    onClick={() => {
-                      props.setSelectedLeave({
-                        ...props.selectedLeave,
-                        status: 'approved',
-                        approver_id: props.user.id,
-                      });
-                      props.updateLeaveRequest();
-                    }}
-                  >
-                    Approve
-                  </Btn>
-                )}
+                <Btn
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={() => {
+                    setSelectedLeave({...leave_request, status: 'rejected'})
+                    updateLeaveRequest()
+                  }}
+                >
+                  Reject
+                </Btn>
+                <Btn
+                  className="ml-2 bg-green-500 hover:bg-green-600"
+                  onClick={() => {
+                    setSelectedLeave({...leave_request, status: 'approved'})
+                    updateLeaveRequest()
+                  }}
+                >
+                  Approve
+                </Btn>
               </>
             )}
-            {!isAdmin() && (
+
+            {!isAdmin(user) && (
               <Btn
                 className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => props.updateLeaveRequest()}
+                onClick={() => updateLeaveRequest()}
               >
                 Update
               </Btn>
@@ -222,100 +266,21 @@ function Calendar(props) {
           </div>
         </Modal>
       )}
-
-      {!editModal && props.showModal && props.user && (
-        <Modal
-          setShowModal={props.setLeaveModal}
-          showModal={props.showModal}
-          title={`${props.user.first_name} ${props.user.last_name}`}
-        >
-          <div className="flex justify-between">
-            <LeaveBalanceBadge
-              label="Sick Leave Balance"
-              balance={props.user.sick_leave_balance}
-            />
-            <LeaveBalanceBadge
-              label="Paid Leave Balance"
-              balance={props.user.paid_leave_balance}
-            />
-            <LeaveBalanceBadge
-              label="Unpaid Leave Balance"
-              balance={props.user.unpaid_leave_balance}
-            />
-          </div>
-          <div>
-            {props.alerts.message && (
-              <span className="text-red-500">
-                {JSON.stringify(props.alerts.message)}
-              </span>
-            )}
-            <Label>Leave Type</Label>
-            <Select
-              onChange={(e) => {
-                props.setSelectedLeave({
-                  ...props.selectedLeave,
-                  leave_type: e.target.value,
-                });
-              }}
-            >
-              <Option
-                value="sick_leave"
-                selected={props.selectedLeave.leave_type === 'sick_leave'}
-              >
-                Sick Leave
-              </Option>
-              <Option
-                value="personal"
-                selected={props.selectedLeave.leave_type === 'personal'}
-              >
-                Personal
-              </Option>
-              <Option
-                value="others"
-                selected={props.selectedLeave.leave_type === 'others'}
-              >
-                Others
-              </Option>
-            </Select>
-            <Label>Reason</Label>
-            <Input
-              onChange={(e) => {
-                props.setSelectedLeave({
-                  ...props.selectedLeave,
-                  title: e.target.value,
-                });
-              }}
-              value={props.selectedLeave.title}
-            />
-
-            <Btn
-              className="bg-blue-500 hover:bg-blue-600"
-              onClick={props.addLeaveRequest}
-            >
-              Submit
-            </Btn>
-          </div>
-        </Modal>
-      )}
     </>
-  ) : (
-    <Loader />
-  );
+  )
 }
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  leave: state.leave,
-  loading: state.leave.loading,
-  alerts: state.alerts,
-  showModal: state.leave.leaveModal,
-  selectedLeave: state.leave.selectedLeave,
-});
+  leave_request: state.leave.selectedLeave,
+  newModal: state.modal.newModal,
+  updateModal: state.modal.updateModal,
+  token: state.auth.token
+})
 export default connect(mapStateToProps, {
-  fetchLeaveRequests,
-  getLeaveById,
-  setLeaveModal,
   setSelectedLeave,
-  updateLeaveRequest,
   addLeaveRequest,
-})(Calendar);
+  updateLeaveRequest,
+  setNewModal,
+  setUpdateModal
+})(Calendar)

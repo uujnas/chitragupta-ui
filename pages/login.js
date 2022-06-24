@@ -9,7 +9,7 @@ import {
   Btn,
 } from '../components/formComponents'
 import { login, loadUser } from '../redux/actions/authActions'
-import { addGreptcha } from "../lib/utils";
+import { addGreptcha } from '../lib/utils'
 
 const Login = (props) => {
   const router = useRouter()
@@ -28,7 +28,9 @@ const Login = (props) => {
 
   useEffect(() => token_verified(), [props.isAuthenticated])
 
-  useEffect(() => { addGreptcha() }, [])
+  useEffect(() => {
+    addGreptcha()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -70,7 +72,10 @@ const Login = (props) => {
               </svg>
             </Btn>
             <div>
-              <a href="#" className="inline-block underline">
+              <a
+                href="/users/forgot_password"
+                className="inline-block underline"
+              >
                 Forgot Password
               </a>
             </div>

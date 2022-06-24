@@ -1,7 +1,11 @@
 import { useRouter } from 'next/router'
 import { connect } from 'react-redux'
 import { useEffect } from 'react'
-import { loadUser, setToken, resetRedirect } from '../../redux/actions/authActions'
+import {
+  loadUser,
+  setToken,
+  resetRedirect,
+} from '../../redux/actions/authActions'
 
 const RouteGuard = (props) => {
   const router = useRouter()
@@ -30,13 +34,18 @@ const RouteGuard = (props) => {
     if (token) {
       props.setToken(token)
     }
-    if(props.redirect) {
+    if (props.redirect) {
       const { redirect } = props
 
       router.push(redirect)
       props.resetRedirect()
     }
-    const publicPaths = ['/login', '/users/invitation_accept']
+    const publicPaths = [
+      '/login',
+      '/users/invitation_accept',
+      '/users/forgot_password',
+      '/users/password_reset',
+    ]
     if (!token && !publicPaths.includes(router.pathname)) {
       router.push({
         pathname: '/login',
@@ -56,4 +65,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   redirect: state.auth.redirect,
 })
-export default connect(mapStateToProps, { loadUser, setToken, resetRedirect })(RouteGuard)
+export default connect(mapStateToProps, { loadUser, setToken, resetRedirect })(
+  RouteGuard,
+)

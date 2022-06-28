@@ -1,11 +1,21 @@
 export const columns = [
   {
     Header: 'Device',
-    accessor: 'device',
+    accessor: 'Device',
+    id: 'device',
+    Cell: ({ row }) => {
+      const { device } = row.original
+      return `${device.identifier}`
+    },
   },
   {
-    Header: 'User',
-    accessor: 'user',
+    Header: 'Username',
+    accessor: 'Username',
+    id: 'username',
+    Cell: ({ row }) => {
+      const { user } = row.original
+      return `${user.first_name} ${user.last_name}`
+    },
   },
   {
     Header: 'Status',
@@ -13,10 +23,10 @@ export const columns = [
   },
   {
     Header: 'assigned date',
-    accessor: 'assigned_date',
+    accessor: 'assigned_at',
   },
   {
     Header: 'unassigned date',
-    accessor: 'unassigned_date',
+    accessor: 'unassigned_at',
   },
 ]

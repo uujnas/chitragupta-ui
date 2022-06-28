@@ -15,6 +15,7 @@ export const createDevice = (device) => async (dispatch, getState) => {
       {
         headers: {
           Authorization: getState().auth.token,
+          'Content-Type': 'multipart/form-data',
         },
       },
     )
@@ -34,5 +35,3 @@ export const createDevice = (device) => async (dispatch, getState) => {
     )
   }
 }
-
-

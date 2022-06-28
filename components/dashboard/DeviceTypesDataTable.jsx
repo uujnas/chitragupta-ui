@@ -17,8 +17,8 @@ function DeviceTypesDataTable({ fetchDeviceTypes, createDeviceType }) {
   const creatingNewDeviceType = () => setCreateNewDeviceType(true)
 
   const checkIfFormIsValid = () => {
-    let errorCount = 0
-    ;['device_type'].forEach((field) => {
+    let errorCount = 0;
+    ['device_type'].forEach((field) => {
       if (deviceType[field] === undefined) {
         errorCount += 1
         errors[field] = "Can't be blank."

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import Jsona from 'jsona'
@@ -11,11 +11,42 @@ import { TableContainer } from '../modalComponents'
 import { fetchDeviceManagers } from '../../redux/actions/dashboardActions'
 import { createDeviceManager } from '../../redux/actions/deviceManagerActions'
 
-function DeviceManagersDataTable({}) {
+function DeviceManagersDataTable({ createDeviceManager, fetchDeviceManagers }) {
   const [deviceManager, setDeviceManager] = useState({})
-  const [createNewDeviceManager, setcreateNewDeviceManager] = useState(false)
+  const [createNewDeviceManager, setCreateNewDeviceManager] = useState(false)
   const [errors, setErrors] = useState({})
-  const creatingNewDeviceManager = () => setcreateNewDeviceManager(true)
+  const creatingNewDeviceManager = () => setCreateNewDeviceManager(true)
+  const [devices, setDevices] = useState([])
+  const [users, setUsers] = useState([])
+  const dataFormatter = new Jsona()
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/devices.json`,
+        { headers: { Authorization: localStorage.token } },
+      )
+
+      const devices = dataFormatter.deserialize(response.data.data)
+      setDevices([...devices])
+    }
+    fetchDevices()
+  }, [])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
+        { headers: { Authorization: localStorage.token } },
+      )
+
+      const users = dataFormatter.deserialize(response.data.data)
+      setUsers([...users])
+    }
+    fetchUsers()
+  }, [])
+
+  useEffect(() => console.log(deviceManager), [deviceManager])
 
   const updateDeviceManager = (e) => {
     delete errors[e.target.name]
@@ -24,7 +55,7 @@ function DeviceManagersDataTable({}) {
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
-    ;['device', 'manager', 'assigned_at', 'unassigned_at'].forEach((field) => {
+    ;['device_id', 'user_id', 'assigned_at'].forEach((field) => {
       if (deviceManager[field] === undefined) {
         errorCount += 1
         errors[field] = "Can't be blank."
@@ -49,7 +80,7 @@ function DeviceManagersDataTable({}) {
   const newDeviceManager = async () => {
     if (checkIfFormIsValid() === 0) {
       createDeviceManager(deviceManager)
-      setcreateNewDeviceManager(false)
+      setCreateNewDeviceManager(false)
     }
   }
   return (
@@ -73,29 +104,60 @@ function DeviceManagersDataTable({}) {
       {createNewDeviceManager && (
         <Modal
           showModal={createNewDeviceManager}
-          setShowModal={setcreateNewDeviceManager}
+          setShowModal={setCreateNewDeviceManager}
           title="New Device Manager"
         >
-          <div className="flex flex-wrap">
-            {['device', 'manager'].map((field) => (
-              <InputWithLabelAndError
-                name={field}
+          {createNewDeviceManager && (
+            <div className="flex flex-wrap">
+              <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                Device
+              </Label>
+              <Select
+                className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                name="device_id"
                 onChange={updateDeviceManager}
-                value={deviceManager[field]}
-                errors={errors}
-              />
-            ))}
-            {['assigned_at', 'unassigned_at'].map((field) => (
-              <InputWithLabelAndError
-                name={field}
-                onChange={updateDeviceManager}
-                value={deviceManager[field]}
-                errors={errors}
-                type={'date'}
-              />
-            ))}
-          </div>
+                errrors={errors}
+              >
+                <Option value="" disabled selected>
+                  Please Select one
+                </Option>
+                {devices.map((device) => (
+                  <Option value={device.id} key={device.id}>
+                    {device.identifier}
+                  </Option>
+                ))}
+              </Select>
 
+              <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                User
+              </Label>
+              <Select
+                className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                name="user_id"
+                onChange={updateDeviceManager}
+                errrors={errors}
+              >
+                <Option value="" disabled selected>
+                  Please Select one
+                </Option>
+                {users.map((user) => (
+                  <Option value={user.id} key={user.id}>
+                    {user.first_name} {user.last_name}
+                  </Option>
+                ))}
+              </Select>
+
+              {['assigned_at', 'unassigned_at'].map((field) => (
+                <InputWithLabelAndError
+                  name={field}
+                  onChange={updateDeviceManager}
+                  value={deviceManager[field]}
+                  errors={errors}
+                  type={'date'}
+                />
+              ))}
+            </div>
+          )}
           <Btn
             className="bg-teal-500 hover:bg-teal-600"
             onClick={() => newDeviceManager()}
@@ -112,4 +174,3 @@ export default connect(() => ({}), {
   fetchDeviceManagers,
   createDeviceManager,
 })(DeviceManagersDataTable)
-// export default DeviceManagersDataTable

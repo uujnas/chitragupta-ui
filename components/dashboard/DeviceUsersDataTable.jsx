@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import DataTable from './DataTable'
 import { TableContainer } from '../modalComponents'
@@ -9,24 +9,57 @@ import InputWithLabelAndError from '../InputWithLabelAndError'
 import Modal from '../modal'
 import { fetchDeviceUsers } from '../../redux/actions/dashboardActions'
 import { createDeviceUser } from '../../redux/actions/deviceUserActions'
+// import { fetchUsers } from '../../redux/actions/usersActions'
+// import { fetchDevices } from '../../redux/actions/dashboardActions'
+import Jsona from 'jsona'
+import axios from 'axios'
 
-function DeviceUsersDataTable() {
+function DeviceUsersDataTable({ createDeviceUser, fetchDeviceUsers }) {
   const [deviceUser, setDeviceUser] = useState({})
   const [createNewDeviceUser, setCreateNewDeviceUser] = useState(false)
   const [errors, setErrors] = useState({})
   const creatingNewDeviceUser = () => setCreateNewDeviceUser(true)
+  const [devices, setDevices] = useState([])
+  const [users, setUsers] = useState([])
+  const dataFormatter = new Jsona()
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/devices.json`,
+        { headers: { Authorization: localStorage.token } },
+      )
+
+      const devices = dataFormatter.deserialize(response.data.data)
+      setDevices([...devices])
+    }
+    fetchDevices()
+  }, [])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
+        { headers: { Authorization: localStorage.token } },
+      )
+
+      const users = dataFormatter.deserialize(response.data.data)
+      setUsers([...users])
+    }
+    fetchUsers()
+  }, [])
+
+  useEffect(() => console.log(deviceUser), [deviceUser])
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
-    ;['device', 'user', 'status', 'assigned_at', 'unassigned_at'].forEach(
-      (field) => {
-        if (deviceUser[field] === undefined) {
-          errorCount += 1
-          errors[field] = "Can't be blank."
-          setErrors({ ...errors })
-        }
-      },
-    )
+    ;['device_id', 'user_id', 'status', 'assigned_at'].forEach((field) => {
+      if (deviceUser[field] === undefined) {
+        errorCount += 1
+        errors[field] = "Can't be blank."
+        setErrors({ ...errors })
+      }
+    })
     if (
       deviceUser.assigned_at &&
       new Date(deviceUser.assigned_at) > new Date(deviceUser.unassigned_at)
@@ -79,14 +112,44 @@ function DeviceUsersDataTable() {
         >
           {createNewDeviceUser && (
             <div className="flex flex-wrap">
-              {['device', 'user'].map((field) => (
-                <InputWithLabelAndError
-                  name={field}
-                  onChange={updateDeviceUser}
-                  value={deviceUser[field]}
-                  errors={errors}
-                />
-              ))}
+              <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                Device
+              </Label>
+              <Select
+                className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                name="device_id"
+                onChange={updateDeviceUser}
+                errrors={errors}
+              >
+                <Option value="" disabled selected>
+                  Please Select one
+                </Option>
+                {devices.map((device) => (
+                  <Option value={device.id} key={device.id}>
+                    {device.identifier}
+                  </Option>
+                ))}
+              </Select>
+
+              <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                User
+              </Label>
+              <Select
+                className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                name="user_id"
+                onChange={updateDeviceUser}
+                errrors={errors}
+              >
+                <Option value="" disabled selected>
+                  Please Select one
+                </Option>
+                {users.map((user) => (
+                  <Option value={user.id} key={user.id}>
+                    {user.first_name} {user.last_name}
+                  </Option>
+                ))}
+              </Select>
+
               {['assigned_at', 'unassigned_at'].map((field) => (
                 <InputWithLabelAndError
                   name={field}
@@ -104,18 +167,20 @@ function DeviceUsersDataTable() {
                 <Select
                   className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
                   name="status"
-                  onClick={updateDeviceUser}
+                  onChange={updateDeviceUser}
                   errrors={errors}
                 >
-                  <Option>Please Select one</Option>
+                  <Option value="" disabled selected>
+                    Please Select one
+                  </Option>
                   <Option
-                    value="available"
+                    value="active"
                     selected={deviceUser.status == 'active'}
                   >
                     Active
                   </Option>
                   <Option
-                    value="unavailable"
+                    value="inactive"
                     selected={deviceUser.status == 'inactive'}
                   >
                     Inactive
@@ -136,6 +201,7 @@ function DeviceUsersDataTable() {
   )
 }
 
-export default connect(() => ({}), { fetchDeviceUsers, createDeviceUser })(
-  DeviceUsersDataTable,
-)
+export default connect(() => ({}), {
+  fetchDeviceUsers,
+  createDeviceUser,
+})(DeviceUsersDataTable)

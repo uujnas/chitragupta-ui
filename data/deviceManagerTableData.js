@@ -1,8 +1,8 @@
 export const columns = [
   {
     Header: 'Device',
-    accessor: 'device_id',
-    id: 'device_id',
+    accessor: 'Device',
+    id: 'device',
     Cell: ({ row }) => {
       const { device } = row.original
       return `${device.identifier}`

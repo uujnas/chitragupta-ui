@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import Jsona from 'jsona'
@@ -16,6 +16,21 @@ function DevicesDataTable({ fetchDevices, createDevice }) {
   const [createNewDevice, setCreateNewDevice] = useState(false)
   const [errors, setErrors] = useState({})
   const creatingNewDevice = () => setCreateNewDevice(true)
+  const [deviceTypes, setDeviceTypes] = useState([])
+  const dataFormatter = new Jsona()
+
+  useEffect(() => {
+    const fetchDeviceTypes = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_types.json`,
+        { headers: { Authorization: localStorage.token } },
+      )
+
+      const deviceTypes = dataFormatter.deserialize(response.data.data)
+      setDeviceTypes([...deviceTypes])
+    }
+    fetchDeviceTypes()
+  }, [])
 
   const updateDevice = (e) => {
     delete errors[e.target.name]
@@ -24,7 +39,7 @@ function DevicesDataTable({ fetchDevices, createDevice }) {
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
-    ;['device_type', 'identifier', 'status', 'images'].forEach((field) => {
+    ;['device_type', 'identifier', 'status'].forEach((field) => {
       if (device[field] === undefined) {
         errorCount += 1
         errors[field] = "Can't be blank."
@@ -64,63 +79,83 @@ function DevicesDataTable({ fetchDevices, createDevice }) {
           setShowModal={setCreateNewDevice}
           title="New Device"
         >
-          <div className="flex flex-wrap">
-            {['device_type', 'identifier', 'images'].map((field) => {
-              if (field === 'images') {
-                return (
-                  <InputWithLabelAndError
-                    name={field}
-                    onChange={updateDevice}
-                    value={device[field]}
-                    errors={errors}
-                    type={'file'}
-                  />
-                )
-              } else {
-                return (
-                  <InputWithLabelAndError
-                    name={field}
-                    onChange={updateDevice}
-                    value={device[field]}
-                    errors={errors}
-                  />
-                )
-              }
-            })}
-
-            <div className="w-status">
+          {createNewDevice && (
+            <div className="flex flex-wrap">
               <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
-                Status
+                Device Type
               </Label>
+
               <Select
                 className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
-                name="status"
-                onClick={updateDevice}
+                name="device_type_id"
+                onChange={updateDevice}
                 errrors={errors}
               >
-                <Option>Please Select one</Option>
-                <Option
-                  value="available"
-                  selected={device.status == 'available'}
-                >
-                  available
+                <Option value="" disabled selected>
+                  Please Select one
                 </Option>
-                <Option
-                  value="unavailable"
-                  selected={device.status == 'unavailable'}
-                >
-                  unavailable
-                </Option>
-                <Option
-                  value="dysfunctional"
-                  selected={device.status == 'dysfunctional'}
-                >
-                  dysfunctional
-                </Option>
+                {deviceTypes.map((device_type) => (
+                  <Option value={device_type.id} key={device_type.id}>
+                    {device_type.device_type}
+                  </Option>
+                ))}
               </Select>
-            </div>
-          </div>
 
+              {['identifier', 'images'].map((field) => {
+                if (field === 'images') {
+                  return (
+                    <div className="block px-5 py-3 pr-4 mb-4 md:w-1/2">
+                      <label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                        images
+                      </label>
+                      <input id="image" name={field} type={'file'} />
+                    </div>
+                  )
+                } else {
+                  return (
+                    <InputWithLabelAndError
+                      name={field}
+                      onChange={updateDevice}
+                      value={device[field]}
+                      errors={errors}
+                    />
+                  )
+                }
+              })}
+
+              <div className="w-status">
+                <Label className="block pb-3 text-sm font-semibold text-gray-500 uppercase">
+                  Status
+                </Label>
+                <Select
+                  className="w-full px-3 py-3 text-sm border rounded-lg mt-0"
+                  name="status"
+                  onChange={updateDevice}
+                  errrors={errors}
+                >
+                  <Option>Please Select one</Option>
+                  <Option
+                    value="available"
+                    selected={device.status == 'available'}
+                  >
+                    available
+                  </Option>
+                  <Option
+                    value="unavailable"
+                    selected={device.status == 'unavailable'}
+                  >
+                    unavailable
+                  </Option>
+                  <Option
+                    value="dysfunctional"
+                    selected={device.status == 'dysfunctional'}
+                  >
+                    dysfunctional
+                  </Option>
+                </Select>
+              </div>
+            </div>
+          )}
           <Btn
             className="bg-teal-500 hover:bg-teal-600"
             onClick={() => newDevice()}

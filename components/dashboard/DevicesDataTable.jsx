@@ -39,7 +39,7 @@ function DevicesDataTable({ fetchDevices, createDevice }) {
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
-    ;['device_type', 'identifier', 'status'].forEach((field) => {
+    ;['device_type_id', 'identifier', 'status'].forEach((field) => {
       if (device[field] === undefined) {
         errorCount += 1
         errors[field] = "Can't be blank."

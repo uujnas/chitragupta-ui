@@ -7,7 +7,6 @@ import { TableContainer } from '../../components/modalComponents'
 const GroupLunchDayDetail = () => {
   const router = useRouter()
   const { id } = router.query
-
   const [lunchDay, setGroupLunchDay] = useState({})
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const GroupLunchDayDetail = () => {
         <strong>Date: {lunchDay.date}</strong>
         {lunchDay?.group_lunch?.map((group_lunch) => (
           <ul key={group_lunch.id}>
-            <li> Group Lunch {group_lunch.id}</li>
+            <li onClick={ () => router.push(`../group_lunch/${group_lunch.id}`)}> Group Lunch {group_lunch.id}</li>
           </ul>
         ))}
       </TableContainer>

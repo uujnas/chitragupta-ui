@@ -8,7 +8,7 @@ const GroupLunchDayDetail = () => {
   const router = useRouter()
   const { id } = router.query
 
-  const [lunchDay, setLunchDay] = useState({})
+  const [lunchDay, setGroupLunchDay] = useState({})
 
   useEffect(() => {
     const fetchGroupLunchDay = () => {
@@ -22,7 +22,12 @@ const GroupLunchDayDetail = () => {
             },
           },
         )
-        .then((response) => setLunchDay(response.data.data))
+        .then((response) =>
+          setGroupLunchDay({
+            date: response.data.data.attributes.date,
+            group_lunch: response.data.data.relationships.group_lunches.data,
+          }),
+        )
         .catch((err) => console.log(err))
     }
     fetchGroupLunchDay()
@@ -32,7 +37,8 @@ const GroupLunchDayDetail = () => {
     <>
       <Navbar />
       <TableContainer>
-        {lunchDay?.relationships?.group_lunches?.data?.map((group_lunch) => (
+        <strong>Date: {lunchDay.date}</strong>
+        {lunchDay?.group_lunch?.map((group_lunch) => (
           <ul key={group_lunch.id}>
             <li> Group Lunch {group_lunch.id}</li>
           </ul>

@@ -57,7 +57,6 @@ const GroupLunchShow = () => {
           <div>
             <img
               className="h-auto w-auto max-h-48 max-w-50"
-              z
               src={`${lunch.lunch_img_urls}`}
               onError={(e) => {
                 e.target.style.display = 'none'

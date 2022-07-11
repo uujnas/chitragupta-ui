@@ -25,7 +25,7 @@ const GroupLunchDayDetail = () => {
           setGroupLunchDay({
             date: response.data.data.attributes.date,
             group_lunch: response.data.included,
-          })
+          }),
         )
 
         .catch((err) => console.log(err))
@@ -59,7 +59,8 @@ const GroupLunchDayDetail = () => {
 
                 <tbody className="bg-white">
                   {lunchDay?.group_lunch?.map((lunch_data) => (
-                    <tr key={ lunch_data.id}
+                    <tr
+                      key={lunch_data.id}
                       className="hover:cursor-pointer"
                       onClick={() =>
                         router.push(`../group_lunch/${lunch_data.id}`)
@@ -75,16 +76,19 @@ const GroupLunchDayDetail = () => {
                             }}
                             alt="group lunch"
                           />
-                          <div className="ml-4">{lunch_data.id}</div>
+                          <div className="ml-4">id_{lunch_data.id}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-no-wrap">
+                      <td
+                        className="px-6 py-4 whitespace-no-wrap">                      
                         {`${lunch_data.attributes.status}`}
                       </td>
                       <td className="px-6 py-4  whitespace-no-wrap">
                         {lunch_data?.attributes?.group_member
                           ?.map((member) => (
-                            <span key={member.id}>{member.user_id}</span>
+                            <span key={member.id}>
+                              {member.first_name} {member.last_name}
+                            </span>
                           ))
                           .reduce(
                             (group_member, elem) =>
